@@ -14,11 +14,13 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.MASS;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.mass.Tools.ShapeFactory;
 
+
+import static com.mygdx.mass.BoxObject.Wall.createWall;
 import static com.mygdx.mass.Constants.*;
 
 
@@ -26,7 +28,7 @@ public class BETAscreen implements Screen {
 
 
     public String windowName = "Simulation";
-    private final Body agent;
+    private final Body bod;
     private final OrthographicCamera camera;
     private final Viewport viewPort;
     private final World mWorld; //all physics world
@@ -48,9 +50,10 @@ public class BETAscreen implements Screen {
         camera.zoom = DEFAULT_ZOOM;
         viewPort = new FitViewport(640/PPM,480/PPM,camera);
         viewPort.apply();
-        agent = ShapeFactory.createRectangle(new Vector2(0,0), new Vector2(64,64), BodyDef.BodyType.DynamicBody, mWorld, 0.4f);
-        //viewPort = new FitViewport(RESOLUTION.x / PPM, RESOLUTION.y / PPM, camera);
-        //camera.position.set(viewPort.getScreenWidth()/2,viewPort.getScreenHeight()/2,0); //maybe
+        //agent = ShapeFactory.createRectangle(new Vector2(0,0), new Vector2(64,64), BodyDef.BodyType.DynamicBody, mWorld, 0.4f);
+        bod = createWall(new Vector2(0,0), new Vector2(30,60),mWorld);
+
+
 
     }
 
@@ -72,7 +75,7 @@ public class BETAscreen implements Screen {
     }
 
     public void update(float delta) {
-        camera.position.set(agent.getPosition(),0);
+        camera.position.set(bod.getPosition(),0);
         //handleInput(delta);
         camera.update();
         mWorld.step(delta, 6, 2);
