@@ -1,4 +1,4 @@
-package com.mygdx.mass.BoxEntity;
+package com.mygdx.mass.BoxObject;
 
 public class OuterWall extends BoxObject {
     // allows intruder to break into wall

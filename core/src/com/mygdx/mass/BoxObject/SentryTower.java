@@ -1,4 +1,4 @@
-package com.mygdx.mass.BoxEntity;
+package com.mygdx.mass.BoxObject;
 
 public class SentryTower extends BoxObject {
     // they are visible from 18m away
