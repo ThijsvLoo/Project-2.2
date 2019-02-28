@@ -1,4 +1,4 @@
-package com.mygdx.mass.Entity;
+package com.mygdx.mass.BoxEntity;
 
 public class TargetArea extends BoxObject {
     // unknown to guards

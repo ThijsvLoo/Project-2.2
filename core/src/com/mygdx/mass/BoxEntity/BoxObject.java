@@ -1,4 +1,4 @@
-package com.mygdx.mass.Entity;
+package com.mygdx.mass.BoxEntity;
 import java.awt.Point;
 
 public abstract class BoxObject {
