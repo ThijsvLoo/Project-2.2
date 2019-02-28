@@ -3,8 +3,7 @@ import java.awt.Point;
 
 public abstract class Agents {
 
-    Point topLeft;
-    Point bottomRight;
+    Point position;
     String type;
     int state;
     int count;
