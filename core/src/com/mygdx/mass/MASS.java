@@ -15,7 +15,7 @@ public class MASS extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		setScreen(new MapBuilderScreen(this));
+		setScreen(new BETAscreen());
 	}
 
 	@Override
