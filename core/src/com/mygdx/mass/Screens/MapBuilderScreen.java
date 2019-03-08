@@ -179,8 +179,8 @@ public class MapBuilderScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            float x = camera.position.x - Gdx.graphics.getWidth()/2f + screenX;
-            float y = camera.position.y - Gdx.graphics.getHeight()/2f + Gdx.graphics.getHeight() - screenY;
+            float x = camera.position.x - Gdx.graphics.getWidth()/PPM/2 + screenX/PPM;
+            float y = camera.position.y - Gdx.graphics.getHeight()/PPM/2 + (Gdx.graphics.getHeight() - screenY)/PPM;
             startDrag = new Vector2(x, y);
             endDrag = startDrag;
             return true;
@@ -188,8 +188,8 @@ public class MapBuilderScreen implements Screen {
 
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-            float x = camera.position.x - Gdx.graphics.getWidth()/2f + screenX;
-            float y = camera.position.y - Gdx.graphics.getHeight()/2f + Gdx.graphics.getHeight() - screenY;
+            float x = camera.position.x - Gdx.graphics.getWidth()/PPM/2 + screenX/PPM;
+            float y = camera.position.y - Gdx.graphics.getHeight()/PPM/2 + (Gdx.graphics.getHeight() - screenY)/PPM;
             createRectangle(startDrag, new Vector2(x, y));
             startDrag = null;
             endDrag = null;
