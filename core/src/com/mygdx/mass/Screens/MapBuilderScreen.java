@@ -22,7 +22,7 @@ public class MapBuilderScreen implements Screen {
     //Camera and Viewport
     private OrthographicCamera camera;
     private ScreenViewport viewport;
-    private float PPM = 1; //Pixels per meter
+    private float PPM = 3; //Pixels per meter
 
     //Box2D
     private World world;
@@ -102,11 +102,11 @@ public class MapBuilderScreen implements Screen {
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             camera.position.y -= 100 * delta;
         }else if (Gdx.input.isKeyPressed(Input.Keys.I) && PPM < 30) {
-            PPM += 0.01;
+            PPM += 0.02;
             viewport.setUnitsPerPixel(1/PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         } else if (Gdx.input.isKeyPressed(Input.Keys.O) && PPM > 1) {
-            PPM -= 0.01;
+            PPM -= 0.02;
             viewport.setUnitsPerPixel(1/PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         }
