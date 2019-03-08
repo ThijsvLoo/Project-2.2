@@ -11,17 +11,17 @@ import com.mygdx.mass.Screens.MapBuilderScreen;
 
 public class MASS extends Game {
 
+	public static final String TITLE = "Multi-Agent Surveillance System";
+
+	//Virtual Screen size
+	public static final int VIRTUAL_WIDTH = 50;
+	public static final int VIRTUAL_HEIGHT = 50;
+
 	public SpriteBatch batch;
 
-	//Virtual Screen size and Box2D Scale(Pixels Per Meter)
-	public static final int V_WIDTH = 50;
-	public static final int V_HEIGHT = 50;
-	public static final float PPM = 10;
-	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-//		setScreen(new BETAscreen());
         setScreen(new MapBuilderScreen(this));
 	}
 
