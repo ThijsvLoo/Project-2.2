@@ -1,5 +1,12 @@
 package com.mygdx.mass.BoxObject;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.World;
+
 public class HidingArea extends BoxObject {
-    // decrease visual range by 50%
+
+    public HidingArea (World world, Rectangle rectangle) {
+        super(world, rectangle);
+    }
+
 }

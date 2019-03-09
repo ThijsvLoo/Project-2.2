@@ -1,15 +1,14 @@
 package com.mygdx.mass.Agents;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.mass.Map;
 
-import java.awt.Point;
+public abstract class Agent{
 
-public abstract class Agent {
-
+    World world;
     Body body;
+
     Vector2 position;
     Map map;
 

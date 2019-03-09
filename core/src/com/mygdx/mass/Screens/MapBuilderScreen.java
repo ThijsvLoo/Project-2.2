@@ -2,14 +2,12 @@ package com.mygdx.mass.Screens;
 
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -18,6 +16,9 @@ import com.mygdx.mass.Map;
 import com.mygdx.mass.Scenes.HUD;
 
 public class MapBuilderScreen implements Screen {
+
+    public enum State {NONE, BUILDING, SENTRYTOWER, HIDINGAREA, TARGETAREA};
+    private State currentState;
 
     private MASS mass;
 
@@ -29,6 +30,8 @@ public class MapBuilderScreen implements Screen {
     //Box2D
     private World world;
     private Box2DDebugRenderer debugRenderer;
+
+    private Map map;
 
     private RayHandler rayHandler;
     private PointLight pointLight;
@@ -42,6 +45,8 @@ public class MapBuilderScreen implements Screen {
     public MapBuilderScreen(MASS mass) {
         this.mass = mass;
 
+        currentState = State.NONE;
+
         camera = new OrthographicCamera();
         camera.position.set(Map.WIDTH/2,Map.HEIGHT/2,0.0f);
 
@@ -53,6 +58,8 @@ public class MapBuilderScreen implements Screen {
         //allows for debug lines of our box2d world.
         debugRenderer = new Box2DDebugRenderer();
 
+        map = new Map(world);
+
         rayHandler = new RayHandler(world);
         rayHandler.setShadows(false);
         rayHandler.setAmbientLight(0.01f, 0.01f, 0.01f, 0.8f);
@@ -61,10 +68,13 @@ public class MapBuilderScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
 
-        hud = new HUD(mass.batch);
+        hud = new HUD(this, mass.batch);
 
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(hud.stage);
         inputHandler = new InputHandler();
-        Gdx.input.setInputProcessor(inputHandler);
+        inputMultiplexer.addProcessor(inputHandler);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     @Override
@@ -103,6 +113,16 @@ public class MapBuilderScreen implements Screen {
         polygonShape.dispose();
     }
 
+    public void update(float delta) {
+        handleInput(delta); //handle user input through polling
+
+        camera.update();
+
+        pointLight.setPosition(camera.position.x, camera.position.y);
+
+        hud.update(delta);
+    }
+
     public void handleInput(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camera.position.x -= 100 * delta;
@@ -113,24 +133,14 @@ public class MapBuilderScreen implements Screen {
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             camera.position.y -= 100 * delta;
         }else if (Gdx.input.isKeyPressed(Input.Keys.I) && PPM < 30) {
-            PPM += 0.02;
+            PPM *= 1.01;
             viewport.setUnitsPerPixel(1/PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         } else if (Gdx.input.isKeyPressed(Input.Keys.O) && PPM > 1) {
-            PPM -= 0.02;
+            PPM /= 1.01;
             viewport.setUnitsPerPixel(1/PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         }
-    }
-
-    public void update(float delta) {
-        handleInput(delta); //handle user input through polling
-
-        camera.update();
-
-        pointLight.setPosition(camera.position.x, camera.position.y);
-
-        hud.update(delta);
     }
 
     @Override
@@ -190,7 +200,13 @@ public class MapBuilderScreen implements Screen {
         world.dispose();
         debugRenderer.dispose();
         rayHandler.dispose();
+        pointLight.dispose();
+        shapeRenderer.dispose();
         hud.dispose();
+    }
+
+    public void setCurrentState(State state) {
+        currentState = state;
     }
 
     private class InputHandler implements InputProcessor {
@@ -215,41 +231,56 @@ public class MapBuilderScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            float x = camera.position.x - Gdx.graphics.getWidth()/PPM/2 + screenX/PPM;
-            float y = camera.position.y - Gdx.graphics.getHeight()/PPM/2 + (Gdx.graphics.getHeight() - screenY)/PPM;
-            startDrag = new Vector2(x, y);
-            endDrag = startDrag;
-            return true;
+            if (currentState != State.NONE) {
+                float x = camera.position.x - Gdx.graphics.getWidth() / PPM / 2 + screenX / PPM;
+                float y = camera.position.y - Gdx.graphics.getHeight() / PPM / 2 + (Gdx.graphics.getHeight() - screenY) / PPM;
+                startDrag = new Vector2(x, y);
+                endDrag = startDrag;
+                return true;
+            }
+            return false;
         }
 
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-            float x = camera.position.x - Gdx.graphics.getWidth()/PPM/2 + screenX/PPM;
-            float y = camera.position.y - Gdx.graphics.getHeight()/PPM/2 + (Gdx.graphics.getHeight() - screenY)/PPM;
-            endDrag = new Vector2(x, y);
-            createRectangle(startDrag, endDrag);
-            startDrag = null;
-            endDrag = null;
-            return true;
-        }
-
-        private void createRectangle(Vector2 start, Vector2 end) {
-            BodyDef bodyDef = new BodyDef();
-            bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(new Vector2((start.x + end.x)/2,(start.y + end.y)/2));
-
-            PolygonShape polygonShape = new PolygonShape();
-            polygonShape.setAsBox(Math.abs(start.x - end.x)/2, Math.abs(start.y - end.y)/2);
-
-            world.createBody(bodyDef).createFixture(polygonShape,1.0f);
+            if (currentState != State.NONE) {
+                float x = camera.position.x - Gdx.graphics.getWidth() / PPM / 2 + screenX / PPM;
+                float y = camera.position.y - Gdx.graphics.getHeight() / PPM / 2 + (Gdx.graphics.getHeight() - screenY) / PPM;
+                endDrag = new Vector2(x, y);
+                Rectangle rectangle = new Rectangle(Math.min(inputHandler.startDrag.x, inputHandler.endDrag.x),
+                                                    Math.min(inputHandler.startDrag.y, inputHandler.endDrag.y),
+                                                    Math.abs(inputHandler.startDrag.x - inputHandler.endDrag.x),
+                                                    Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
+                switch (currentState) {
+                    case BUILDING:
+                        map.addBuilding(rectangle);
+                        break;
+                    case SENTRYTOWER:
+                        map.addSentryTower(rectangle);
+                        break;
+                    case HIDINGAREA:
+                        map.addHidingArea(rectangle);
+                        break;
+                    case TARGETAREA:
+                        map.addTargetArea(rectangle);
+                        break;
+                }
+                startDrag = null;
+                endDrag = null;
+                return true;
+            }
+            return false;
         }
 
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
-            float x = camera.position.x - Gdx.graphics.getWidth()/PPM/2 + screenX/PPM;
-            float y = camera.position.y - Gdx.graphics.getHeight()/PPM/2 + (Gdx.graphics.getHeight() - screenY)/PPM;
-            endDrag = new Vector2(x, y);
-            return true;
+            if (currentState != State.NONE) {
+                float x = camera.position.x - Gdx.graphics.getWidth() / PPM / 2 + screenX / PPM;
+                float y = camera.position.y - Gdx.graphics.getHeight() / PPM / 2 + (Gdx.graphics.getHeight() - screenY) / PPM;
+                endDrag = new Vector2(x, y);
+                return true;
+            }
+            return false;
         }
 
         @Override

@@ -1,6 +1,12 @@
 package com.mygdx.mass.BoxObject;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.World;
+
 public class OuterWall extends BoxObject {
-    // allows intruder to break into wall
-    // creates sound upon entry (5m distance)
+
+    public OuterWall (World world, Rectangle rectangle) {
+        super(world, rectangle);
+    }
+
 }
