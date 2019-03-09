@@ -32,10 +32,13 @@ public class HUD implements Disposable {
     TextureRegion textureRegion;
     TextureRegionDrawable textureRegionDrawable;
 
+    private ImageButton wall;
     private ImageButton building;
     private ImageButton sentryTower;
     private ImageButton hidingArea;
     private ImageButton targetArea;
+    private ImageButton surveillance;
+    private ImageButton intruder;
 
     private ImageButton load;
     private ImageButton save;
@@ -58,6 +61,13 @@ public class HUD implements Disposable {
         textureRegion = new TextureRegion(texture);
         textureRegionDrawable = new TextureRegionDrawable(textureRegion);
 
+        wall = new ImageButton(textureRegionDrawable);
+        wall.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WALL);
+                System.out.println("Current action: Create wall");
+            }
+        });
         building = new ImageButton(textureRegionDrawable);
         building.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
@@ -86,6 +96,20 @@ public class HUD implements Disposable {
                 System.out.println("Current action: Create targtet area");
             }
         });
+        surveillance = new ImageButton(textureRegionDrawable);
+        surveillance.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.SURVEILLANCE);
+                System.out.println("Current action: Create surveillance");
+            }
+        });
+        intruder = new ImageButton(textureRegionDrawable);
+        intruder.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.INTRUDER);
+                System.out.println("Current action: Create intruder");
+            }
+        });
 
         load = new ImageButton(textureRegionDrawable);
         load.addListener(new ClickListener() {
@@ -112,10 +136,13 @@ public class HUD implements Disposable {
             }
         });
 
+        table.add(wall);
         table.add(building);
         table.add(sentryTower);
         table.add(hidingArea);
         table.add(targetArea);
+        table.add(surveillance);
+        table.add(intruder);
 
         table.row();
 

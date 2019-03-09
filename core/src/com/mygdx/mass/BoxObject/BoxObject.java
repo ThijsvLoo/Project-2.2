@@ -26,8 +26,15 @@ public abstract class BoxObject {
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.setAsBox(rectangle.getWidth()/2, rectangle.getHeight()/2);
 
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = polygonShape;
+        fixtureDef.density = 1.0f;
+
         body = world.createBody(bodyDef);
-        fixture = body.createFixture(polygonShape,1.0f);
+        fixture = body.createFixture(fixtureDef);
+        fixture.setUserData(this);
+
+        polygonShape.dispose();
     }
 
 }

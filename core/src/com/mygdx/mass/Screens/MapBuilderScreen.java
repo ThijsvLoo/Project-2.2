@@ -11,13 +11,17 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.Agents.Agent;
+import com.mygdx.mass.Agents.Surveillance;
 import com.mygdx.mass.MASS;
 import com.mygdx.mass.Map;
 import com.mygdx.mass.Scenes.HUD;
 
+import java.util.ArrayList;
+
 public class MapBuilderScreen implements Screen {
 
-    public enum State {NONE, BUILDING, SENTRYTOWER, HIDINGAREA, TARGETAREA};
+    public enum State {NONE, WALL, BUILDING, SENTRYTOWER, HIDINGAREA, TARGETAREA, SURVEILLANCE, INTRUDER};
     private State currentState;
 
     private MASS mass;
@@ -83,34 +87,24 @@ public class MapBuilderScreen implements Screen {
     }
 
     private void createOuterWall() {
+        Rectangle rectangle = new Rectangle();
         float thickness = 4;
 
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-
-        PolygonShape polygonShape = new PolygonShape();
-
         //North wall
-        bodyDef.position.set(new Vector2(Map.WIDTH/2,Map.HEIGHT));
-        polygonShape.setAsBox((Map.WIDTH + thickness)/2,thickness/2);
-        world.createBody(bodyDef).createFixture(polygonShape,1.0f);
+        rectangle.set(0 - thickness, Map.HEIGHT, Map.WIDTH + 2*thickness, thickness);
+        map.addWall(rectangle);
 
         //East wall
-        bodyDef.position.set(new Vector2(Map.WIDTH,Map.HEIGHT/2));
-        polygonShape.setAsBox(thickness/2,(Map.HEIGHT + thickness)/2);
-        world.createBody(bodyDef).createFixture(polygonShape,1.0f);
+        rectangle.set(Map.WIDTH, 0 - thickness, thickness, Map.HEIGHT + 2*thickness);
+        map.addWall(rectangle);
 
         //South wall
-        bodyDef.position.set(new Vector2(Map.WIDTH/2,0));
-        polygonShape.setAsBox((Map.WIDTH + thickness)/2,thickness/2);
-        world.createBody(bodyDef).createFixture(polygonShape,1.0f);
+        rectangle.set(0 - thickness, 0 - thickness, Map.WIDTH + 2*thickness, thickness);
+        map.addWall(rectangle);
 
         //West wall
-        bodyDef.position.set(new Vector2(0,Map.HEIGHT/2));
-        polygonShape.setAsBox(thickness/2,(Map.HEIGHT + thickness)/2);
-        world.createBody(bodyDef).createFixture(polygonShape,1.0f);
-
-        polygonShape.dispose();
+        rectangle.set(0 - thickness, 0 - thickness, thickness, Map.HEIGHT + 2*thickness);
+        map.addWall(rectangle);
     }
 
     public void update(float delta) {
@@ -231,11 +225,27 @@ public class MapBuilderScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            if (currentState != State.NONE) {
+            if (currentState == State.WALL || currentState == State.BUILDING || currentState == State.SENTRYTOWER
+                    || currentState == State.HIDINGAREA || currentState == State.TARGETAREA) {
                 float x = camera.position.x - Gdx.graphics.getWidth() / PPM / 2 + screenX / PPM;
                 float y = camera.position.y - Gdx.graphics.getHeight() / PPM / 2 + (Gdx.graphics.getHeight() - screenY) / PPM;
                 startDrag = new Vector2(x, y);
                 endDrag = startDrag;
+                return true;
+            } else if (currentState == State.SURVEILLANCE || currentState == State.INTRUDER) {
+                float x = camera.position.x - Gdx.graphics.getWidth() / PPM / 2 + screenX / PPM;
+                float y = camera.position.y - Gdx.graphics.getHeight() / PPM / 2 + (Gdx.graphics.getHeight() - screenY) / PPM;
+                Vector2 position = new Vector2(x, y);
+                if (insideMap(position)) {
+                    switch (currentState) {
+                        case SURVEILLANCE:
+                            map.addSurveillance(position);
+                            break;
+                        case INTRUDER:
+                            map.addIntruder(position);
+                            break;
+                    }
+                }
                 return true;
             }
             return false;
@@ -243,27 +253,30 @@ public class MapBuilderScreen implements Screen {
 
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-            if (currentState != State.NONE) {
+            if (currentState == State.WALL || currentState == State.BUILDING || currentState == State.SENTRYTOWER
+                    || currentState == State.HIDINGAREA || currentState == State.TARGETAREA) {
                 float x = camera.position.x - Gdx.graphics.getWidth() / PPM / 2 + screenX / PPM;
                 float y = camera.position.y - Gdx.graphics.getHeight() / PPM / 2 + (Gdx.graphics.getHeight() - screenY) / PPM;
                 endDrag = new Vector2(x, y);
-                Rectangle rectangle = new Rectangle(Math.min(inputHandler.startDrag.x, inputHandler.endDrag.x),
-                                                    Math.min(inputHandler.startDrag.y, inputHandler.endDrag.y),
-                                                    Math.abs(inputHandler.startDrag.x - inputHandler.endDrag.x),
-                                                    Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
-                switch (currentState) {
-                    case BUILDING:
-                        map.addBuilding(rectangle);
-                        break;
-                    case SENTRYTOWER:
-                        map.addSentryTower(rectangle);
-                        break;
-                    case HIDINGAREA:
-                        map.addHidingArea(rectangle);
-                        break;
-                    case TARGETAREA:
-                        map.addTargetArea(rectangle);
-                        break;
+                if (insideMap(startDrag) && insideMap(endDrag)) {
+                    Rectangle rectangle = new Rectangle(Math.min(inputHandler.startDrag.x, inputHandler.endDrag.x),
+                                                        Math.min(inputHandler.startDrag.y, inputHandler.endDrag.y),
+                                                        Math.abs(inputHandler.startDrag.x - inputHandler.endDrag.x),
+                                                        Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
+                    switch (currentState) {
+                        case BUILDING:
+                            map.addBuilding(rectangle);
+                            break;
+                        case SENTRYTOWER:
+                            map.addSentryTower(rectangle);
+                            break;
+                        case HIDINGAREA:
+                            map.addHidingArea(rectangle);
+                            break;
+                        case TARGETAREA:
+                            map.addTargetArea(rectangle);
+                            break;
+                    }
                 }
                 startDrag = null;
                 endDrag = null;
@@ -272,9 +285,14 @@ public class MapBuilderScreen implements Screen {
             return false;
         }
 
+        private boolean insideMap(Vector2 point) {
+            return point.x >= 0 && point.x <= Map.WIDTH && point.y >= 0 && point.y <= Map.HEIGHT;
+        }
+
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
-            if (currentState != State.NONE) {
+            if (currentState == State.WALL || currentState == State.BUILDING || currentState == State.SENTRYTOWER
+                    || currentState == State.HIDINGAREA || currentState == State.TARGETAREA) {
                 float x = camera.position.x - Gdx.graphics.getWidth() / PPM / 2 + screenX / PPM;
                 float y = camera.position.y - Gdx.graphics.getHeight() / PPM / 2 + (Gdx.graphics.getHeight() - screenY) / PPM;
                 endDrag = new Vector2(x, y);

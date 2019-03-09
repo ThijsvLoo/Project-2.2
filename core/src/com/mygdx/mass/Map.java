@@ -1,6 +1,7 @@
 package com.mygdx.mass;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Intruder;
@@ -31,6 +32,11 @@ public class Map {
         intruders = new ArrayList<Intruder>();
     }
 
+    public void addWall(Rectangle rectangle) {
+        Wall wall = new Wall(world, rectangle);
+        mapObjects.add(wall);
+    }
+
     public void addBuilding(Rectangle rectangle) {
         Building building = new Building(world, rectangle);
         mapObjects.add(building);
@@ -51,15 +57,17 @@ public class Map {
         mapObjects.add(targetArea);
     }
 
-    public Surveillance addSurveillance(float x, float y) {
-        Surveillance surveillance = new Surveillance();
+    public Surveillance addSurveillance(Vector2 position) {
+        Surveillance surveillance = new Surveillance(world, position);
         surveillances.add(surveillance);
+        agents.add(surveillance);
         return surveillance;
     }
 
-    public Intruder addIntruder(float x, float y) {
-        Intruder intruder = new Intruder();
+    public Intruder addIntruder(Vector2 position) {
+        Intruder intruder = new Intruder(world, position);
         intruders.add(intruder);
+        agents.add(intruder);
         return intruder;
     }
 
