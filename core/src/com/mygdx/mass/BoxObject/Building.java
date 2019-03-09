@@ -1,12 +1,13 @@
 package com.mygdx.mass.BoxObject;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.mass.MASS;
 
 public class Building extends BoxObject {
 
-    public Building (World world, Rectangle rectangle) {
-        super(world, rectangle);
+    public Building (MASS mass, Rectangle rectangle) {
+        super(mass, rectangle);
+        type = Type.BUILDING;
     }
 
 }

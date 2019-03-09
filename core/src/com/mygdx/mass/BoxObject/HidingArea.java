@@ -1,12 +1,13 @@
 package com.mygdx.mass.BoxObject;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.mass.MASS;
 
 public class HidingArea extends BoxObject {
 
-    public HidingArea (World world, Rectangle rectangle) {
-        super(world, rectangle);
+    public HidingArea (MASS mass, Rectangle rectangle) {
+        super(mass, rectangle);
+        type = Type.HIDING_AREA;
     }
 
 }

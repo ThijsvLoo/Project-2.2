@@ -1,12 +1,15 @@
 package com.mygdx.mass.Agents;
-import box2dLight.RayHandler;
-import com.badlogic.gdx.graphics.Color;
+import box2dLight.PointLight;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.mass.Map;
-import javafx.scene.PointLight;
+import com.mygdx.mass.MASS;
 
 public abstract class Agent{
+
+    public enum Type {SURVEILLANCE, INTRUDER};
+    protected Type type;
+
+    protected MASS mass;
 
     protected World world;
 
@@ -15,13 +18,16 @@ public abstract class Agent{
 
     protected Vector2 position;
 
+    protected PointLight pointLight;
+
 //    String type;
 //    int state;
 //    int count;
 //    int velocity;
 
-    public Agent(World world, Vector2 position) {
-        this.world = world;
+    public Agent(MASS mass, Vector2 position) {
+        this.mass = mass;
+        world = mass.world;
         this.position = position;
         define();
     }
@@ -40,6 +46,10 @@ public abstract class Agent{
         body = world.createBody(bodyDef);
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public Vector2 getPosition() {

@@ -2,8 +2,14 @@ package com.mygdx.mass.BoxObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.mygdx.mass.MASS;
 
 public abstract class BoxObject {
+
+    public enum Type {WALL, BUILDING, SENTRY_TOWER, HIDING_AREA, TARGET_AREA};
+    protected Type type;
+
+    protected MASS mass;
 
     protected World world;
     protected Rectangle rectangle;
@@ -11,8 +17,9 @@ public abstract class BoxObject {
     protected Body body;
     protected Fixture fixture;
 
-    public BoxObject (World world, Rectangle rectangle) {
-        this.world = world;
+    public BoxObject (MASS mass, Rectangle rectangle) {
+        this.mass = mass;
+        world = mass.world;
         this.rectangle = rectangle;
 
         define();
@@ -35,6 +42,14 @@ public abstract class BoxObject {
         fixture.setUserData(this);
 
         polygonShape.dispose();
+    }
+
+    public Rectangle getRectangle() {
+        return rectangle;
+    }
+
+    public Type getType() {
+        return type;
     }
 
 }

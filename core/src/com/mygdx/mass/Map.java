@@ -2,7 +2,6 @@ package com.mygdx.mass;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.Agents.Surveillance;
@@ -15,7 +14,7 @@ public class Map {
     public static final float WIDTH = 200;
     public static final float HEIGHT = 200;
 
-    private World world;
+    private MASS mass;
 
     private ArrayList<BoxObject> mapObjects;
 
@@ -23,8 +22,8 @@ public class Map {
     private ArrayList<Surveillance> surveillances;
     private ArrayList<Intruder> intruders;
 
-    public Map(World world) {
-        this.world = world;
+    public Map(MASS mass) {
+        this.mass = mass;
 
         mapObjects = new ArrayList<BoxObject>();
         agents = new ArrayList<Agent>();
@@ -33,39 +32,39 @@ public class Map {
     }
 
     public void addWall(Rectangle rectangle) {
-        Wall wall = new Wall(world, rectangle);
+        Wall wall = new Wall(mass, rectangle);
         mapObjects.add(wall);
     }
 
     public void addBuilding(Rectangle rectangle) {
-        Building building = new Building(world, rectangle);
+        Building building = new Building(mass, rectangle);
         mapObjects.add(building);
     }
 
     public void addSentryTower(Rectangle rectangle) {
-        SentryTower sentryTower = new SentryTower(world, rectangle);
+        SentryTower sentryTower = new SentryTower(mass, rectangle);
         mapObjects.add(sentryTower);
     }
 
     public void addHidingArea(Rectangle rectangle) {
-        HidingArea hidingArea = new HidingArea(world, rectangle);
+        HidingArea hidingArea = new HidingArea(mass, rectangle);
         mapObjects.add(hidingArea);
     }
 
     public void addTargetArea(Rectangle rectangle) {
-        TargetArea targetArea = new TargetArea(world, rectangle);
+        TargetArea targetArea = new TargetArea(mass, rectangle);
         mapObjects.add(targetArea);
     }
 
     public Surveillance addSurveillance(Vector2 position) {
-        Surveillance surveillance = new Surveillance(world, position);
+        Surveillance surveillance = new Surveillance(mass, position);
         surveillances.add(surveillance);
         agents.add(surveillance);
         return surveillance;
     }
 
     public Intruder addIntruder(Vector2 position) {
-        Intruder intruder = new Intruder(world, position);
+        Intruder intruder = new Intruder(mass, position);
         intruders.add(intruder);
         agents.add(intruder);
         return intruder;

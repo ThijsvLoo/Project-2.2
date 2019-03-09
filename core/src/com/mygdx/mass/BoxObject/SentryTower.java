@@ -1,12 +1,13 @@
 package com.mygdx.mass.BoxObject;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.mass.MASS;
 
 public class SentryTower extends BoxObject {
 
-    public SentryTower (World world, Rectangle rectangle) {
-        super(world, rectangle);
+    public SentryTower (MASS mass, Rectangle rectangle) {
+        super(mass, rectangle);
+        type = Type.SENTRY_TOWER;
     }
 
 }

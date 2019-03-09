@@ -1,12 +1,16 @@
 package com.mygdx.mass.Agents;
 
+import box2dLight.PointLight;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.mass.MASS;
 
 public class Intruder extends Agent {
 
-    public Intruder(World world, Vector2 position) {
-        super(world, position);
+    public Intruder(MASS mass, Vector2 position) {
+        super(mass, position);
+        type = Type.INTRUDER;
+        pointLight = new PointLight(mass.rayHandler, 50, new Color(1,0,0,1), 20, position.x, position.y);
     }
 
 }

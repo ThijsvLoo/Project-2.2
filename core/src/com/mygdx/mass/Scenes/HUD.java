@@ -5,8 +5,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -14,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 
 public class HUD implements Disposable {
@@ -78,21 +75,21 @@ public class HUD implements Disposable {
         sentryTower = new ImageButton(textureRegionDrawable);
         sentryTower.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.SENTRYTOWER);
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.SENTRY_TOWER);
                 System.out.println("Current action: Create sentry tower");
             }
         });
         hidingArea = new ImageButton(textureRegionDrawable);
         hidingArea.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.HIDINGAREA);
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.HIDING_AREA);
                 System.out.println("Current action: Create hiding area");
             }
         });
         targetArea = new ImageButton(textureRegionDrawable);
         targetArea.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.TARGETAREA);
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.TARGET_AREA);
                 System.out.println("Current action: Create targtet area");
             }
         });

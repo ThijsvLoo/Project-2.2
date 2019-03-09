@@ -1,15 +1,16 @@
 package com.mygdx.mass.Agents;
 
+import box2dLight.PointLight;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.mass.Agents.Agent;
-import com.mygdx.mass.Map;
+import com.mygdx.mass.MASS;
 
 public class Surveillance extends Agent {
 
-    public Surveillance(World world, Vector2 position) {
-        super(world, position);
+    public Surveillance(MASS mass, Vector2 position) {
+        super(mass, position);
+        type = Type.SURVEILLANCE;
+        pointLight = new PointLight(mass.rayHandler, 50, new Color(0,0,1,1), 20, position.x, position.y);
     }
 
 }
