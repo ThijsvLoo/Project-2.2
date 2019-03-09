@@ -1,4 +1,5 @@
 package com.mygdx.mass.Agents;
 
-public class Intruder extends Agents {
+public class Intruder extends Agent {
+
 }

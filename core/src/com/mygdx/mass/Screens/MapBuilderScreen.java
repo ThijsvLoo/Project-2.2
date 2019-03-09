@@ -1,5 +1,7 @@
 package com.mygdx.mass.Screens;
 
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -28,6 +30,9 @@ public class MapBuilderScreen implements Screen {
     private World world;
     private Box2DDebugRenderer debugRenderer;
 
+    private RayHandler rayHandler;
+    private PointLight pointLight;
+
     private ShapeRenderer shapeRenderer;
 
     private HUD hud;
@@ -47,6 +52,12 @@ public class MapBuilderScreen implements Screen {
         world = new World(new Vector2(0, 0), true);
         //allows for debug lines of our box2d world.
         debugRenderer = new Box2DDebugRenderer();
+
+        rayHandler = new RayHandler(world);
+        rayHandler.setShadows(false);
+        rayHandler.setAmbientLight(0.01f, 0.01f, 0.01f, 0.8f);
+        rayHandler.setBlurNum(0);
+        pointLight = new PointLight(rayHandler, 50, new Color(1,1,1,1), 200, camera.position.x, camera.position.y);
 
         shapeRenderer = new ShapeRenderer();
 
@@ -117,6 +128,8 @@ public class MapBuilderScreen implements Screen {
 
         camera.update();
 
+        pointLight.setPosition(camera.position.x, camera.position.y);
+
         hud.update(delta);
     }
 
@@ -133,6 +146,9 @@ public class MapBuilderScreen implements Screen {
 
         debugRenderer.render(world, camera.combined);
         world.step(1 / 60f, 6, 2);
+
+        rayHandler.setCombinedMatrix(camera);
+        rayHandler.updateAndRender();
 
         if (inputHandler.startDrag != null && inputHandler.endDrag != null) {
             shapeRenderer.setProjectionMatrix(camera.combined);
@@ -173,6 +189,7 @@ public class MapBuilderScreen implements Screen {
     public void dispose() {
         world.dispose();
         debugRenderer.dispose();
+        rayHandler.dispose();
         hud.dispose();
     }
 
