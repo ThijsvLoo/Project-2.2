@@ -100,8 +100,11 @@ public class MapBuilderScreen implements Screen {
     public void update(float delta) {
         handleInput(delta); //handle user input through polling
 
-        camera.update();
+        for (Agent agent : map.getAgents()) {
+            agent.update(delta);
+        }
 
+        camera.update();
         pointLight.setPosition(camera.position.x, camera.position.y);
 
         hud.update(delta);
@@ -184,7 +187,7 @@ public class MapBuilderScreen implements Screen {
                     shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
                     break;
             }
-            shapeRenderer.circle(agent.getPosition().x, agent.getPosition().y, 0.5f);
+            shapeRenderer.circle(agent.getBody().getPosition().x, agent.getBody().getPosition().y, 1.0f);
         }
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);

@@ -27,6 +27,7 @@ public class MASS extends Game {
 	//Box2D
 	public World world;
 	public Box2DDebugRenderer debugRenderer;
+	public WorldContactListener worldContactListener;
 
 	public Map map;
 
@@ -49,10 +50,14 @@ public class MASS extends Game {
 		world = new World(new Vector2(0, 0), true);
 		//allows for debug lines of our box2d world.
 		debugRenderer = new Box2DDebugRenderer();
+		worldContactListener = new WorldContactListener();
+		world.setContactListener(worldContactListener);
 
 		map = new Map(this);
 
 		rayHandler = new RayHandler(world);
+		RayHandler.setGammaCorrection(true);
+		RayHandler.useDiffuseLight(true);
 		rayHandler.setShadows(false);
 		rayHandler.setAmbientLight(0.01f, 0.01f, 0.01f, 0.8f);
 		rayHandler.setBlurNum(0);
