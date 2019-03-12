@@ -17,7 +17,6 @@ Tasks that aren't constraint with other tasks, in no particular order
 - MapBuilder function: delete object
 - MapBuilder function: Clear all
 - MapBuilder function: Undo, Redo
-- MapSimulator function: camera follow agent on click
 - Research possible algorithms for next phase (exploring, decision, path finding)
 - Draft introduction and literature review
 
