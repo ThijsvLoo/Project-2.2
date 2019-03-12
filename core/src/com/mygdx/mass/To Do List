@@ -23,6 +23,8 @@ Tasks that aren't constraint with other tasks, in no particular order
 
 Tasks that are not required but nice to have
 - Light cone as indicator for agent vision (Hong)
+- Camera follow agent on click
+- Agent path indicator
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
