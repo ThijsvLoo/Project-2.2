@@ -2,7 +2,6 @@ package com.mygdx.mass.Algorithms;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.Agents.Agent;
-import com.mygdx.mass.Agents.Surveillance;
 import com.mygdx.mass.Map;
 
 public class Random extends Algorithm {

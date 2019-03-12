@@ -1,5 +1,6 @@
 package com.mygdx.mass.Agents;
 
+import box2dLight.ConeLight;
 import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -12,6 +13,7 @@ public class Intruder extends Agent {
         super(mass, position);
         type = Type.INTRUDER;
         pointLight = new PointLight(mass.rayHandler, 50, new Color(1,0,0,1), 20, position.x, position.y);
+//        coneLight = new ConeLight(mass.rayHandler, 50, new Color(1,0,0,1), 50, body.getPosition().x, body.getPosition().y, 180.0f, 90.0f);
         velocity = 40;
         algorithm = new Random(this);
     }
@@ -20,6 +22,7 @@ public class Intruder extends Agent {
     public void update(float delta) {
         algorithm.act();
         pointLight.setPosition(body.getPosition());
+//        coneLight.setPosition(body.getPosition());
     }
 
 }

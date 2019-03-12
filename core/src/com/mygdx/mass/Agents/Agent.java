@@ -1,4 +1,5 @@
 package com.mygdx.mass.Agents;
+import box2dLight.ConeLight;
 import box2dLight.PointLight;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -25,6 +26,7 @@ public abstract class Agent{
     protected float velocity;
 
     protected PointLight pointLight;
+    protected ConeLight coneLight;
 
     public static int count = 0;
 
