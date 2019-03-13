@@ -2,7 +2,7 @@ PHASE 1
 
 Tasks that need to be finish ASAP (try to aim for 1 week), as other tasks depend on it
 - Box2D contact listener for handling collision (Hong)
-- MapBuilder: Save/Load Function (Lily)
+- MapBuilder: Save/Load Function (Lilly)
 - MapSimulator: Basic structure, see MapBuilder for insight
 - MapSimulator HUD, HUD buttons, buttons listener
 - MapSimulator function: decrease speed, play/pause, increase speed
@@ -39,9 +39,15 @@ Tasks that need to be finish ASAP (try within 1 week), good coding, as other tas
 - MapSimulator algorithm menu
 
 Tasks that doesn't really have a time constraint
+- Search algorithm:
 - Decision algorithm: MCTS
+- Decision algorithm: Collaborate Diffusion
 - Path finding algorithm: Dijkstra
 - Path finding algorithm: A*
 - Exploring algorithm: Breadth first search
 - Exploring algorithm: Depth first search
 - Exploring algorithm: Nearest neighbour algorithm?
+
+Research materials:
+- https://www.youtube.com/watch?v=1jATP-_CWr4
+- https://www.youtube.com/watch?time_continue=80&v=B-OoL2bOXl0

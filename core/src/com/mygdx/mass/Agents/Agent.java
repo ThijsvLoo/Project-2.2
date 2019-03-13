@@ -6,6 +6,8 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Algorithms.Algorithm;
 import com.mygdx.mass.MASS;
 
+import java.util.ArrayList;
+
 public abstract class Agent{
 
     public enum Type {SURVEILLANCE, INTRUDER};
@@ -24,6 +26,7 @@ public abstract class Agent{
     protected Vector2 destination;
     protected Vector2 direction;
     protected float velocity;
+    protected ArrayList<Vector2> path;
 
     protected PointLight pointLight;
     protected ConeLight coneLight;
