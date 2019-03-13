@@ -74,10 +74,10 @@ public class MASS extends Game {
 	@Override
 	public void dispose () {
 		super.dispose();
-		batch.dispose();
-		world.dispose();
+		batch.dispose();;
 		debugRenderer.dispose();
 		rayHandler.dispose();
+		world.dispose();
 		shapeRenderer.dispose();
 	}
 }

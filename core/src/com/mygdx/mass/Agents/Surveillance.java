@@ -1,6 +1,5 @@
 package com.mygdx.mass.Agents;
 
-import box2dLight.ChainLight;
 import box2dLight.ConeLight;
 import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;

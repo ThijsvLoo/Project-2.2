@@ -21,9 +21,9 @@ Tasks that aren't constraint with other tasks, in no particular order
 - Draft introduction and literature review
 
 Tasks that are not required but nice to have
-- Light cone as indicator for agent vision (Hong)
+- Light cone as indicator for agent vision (Hong) (DONE)
 - Camera follow agent on click
-- Agent path indicator
+- Agent path indicator (Hong)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,8 +31,8 @@ PHASE 2
 - We probably make use of graph modelling and graph algorithms
 
 Tasks that need to be finish ASAP (try within 1 week), good coding, as other tasks will depend on this foundation
-- Simulation environment: working doors/hiding spot/tower
-- Graph class: build a representation of the map as graph
+- Simulation environment: working doors/hiding spot/tower (Hong)
+- Graph class: build a representation of the map as graph (Hong)
 - 2 surveillance types, 1 truder type and their basic behavior
 - Research algorithms (explore, path finding, planning)
 - Agent communication tools (direct/indirect)
