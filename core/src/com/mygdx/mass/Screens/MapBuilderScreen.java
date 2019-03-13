@@ -113,17 +113,17 @@ public class MapBuilderScreen implements Screen {
     public void handleInput(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camera.position.x -= 100 * delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             camera.position.x += 100 * delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             camera.position.y += 100 * delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             camera.position.y -= 100 * delta;
-        }else if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < 30) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < 30) {
             mass.PPM *= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        } else if (Gdx.input.isKeyPressed(Input.Keys.O) && mass.PPM > 1) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.O) && mass.PPM > 1) {
             mass.PPM /= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
@@ -348,5 +348,4 @@ public class MapBuilderScreen implements Screen {
             return false;
         }
     }
-
 }
