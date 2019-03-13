@@ -9,20 +9,27 @@ import com.mygdx.mass.MASS;
 
 public class Intruder extends Agent {
 
+    public static final float BASE_SPEED = 1.4f;
+    public static final float SPRINT_SPEED = 3.0f;
+
+    protected float restTime;
+    protected boolean sprinting;
+
     public Intruder(MASS mass, Vector2 position) {
         super(mass, position);
         type = Type.INTRUDER;
-        pointLight = new PointLight(mass.rayHandler, 50, new Color(1,0,0,1), 20, position.x, position.y);
-//        coneLight = new ConeLight(mass.rayHandler, 50, new Color(1,0,0,1), 50, body.getPosition().x, body.getPosition().y, 180.0f, 90.0f);
-        velocity = 40;
+        moveSpeed = BASE_SPEED;
+        visualRange = 7.5f;
+        viewAngle = 45.0f;
+        pointLight = new PointLight(mass.rayHandler, 360, new Color(1,0,0,1), 10, body.getPosition().x, body.getPosition().y);
+        coneLight = new ConeLight(mass.rayHandler, 45, new Color(1,0,0,1), visualRange*10, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
+        coneLight.attachToBody(body);
         algorithm = new Random(this);
     }
 
     @Override
     public void update(float delta) {
-        algorithm.act();
-        pointLight.setPosition(body.getPosition());
-//        coneLight.setPosition(body.getPosition());
+        super.update(delta);
     }
 
 }

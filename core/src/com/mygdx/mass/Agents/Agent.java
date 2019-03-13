@@ -10,40 +10,48 @@ import java.util.ArrayList;
 
 public abstract class Agent{
 
+    public static final float MAX_TURN_SPEED = 180.0f;
+
     public enum Type {SURVEILLANCE, INTRUDER};
     protected Type type;
 
     public MASS mass;
-
-    protected Algorithm algorithm;
 
     protected World world;
 
     protected Body body;
     protected Fixture fixture;
 
-    protected Vector2 position;
-    protected Vector2 destination;
-    protected Vector2 direction;
-    protected float velocity;
-    protected ArrayList<Vector2> path;
+    protected float moveSpeed;
+    protected float turnSpeed;
 
+    protected float visualRange;
+    protected float viewAngle;
     protected PointLight pointLight;
     protected ConeLight coneLight;
+
+    protected Vector2 destination;
+    protected ArrayList<Vector2> path;
+    protected Vector2 direction;
+    protected Vector2 velocity;
+
+    protected Algorithm algorithm;
 
     public static int count = 0;
 
     public Agent(MASS mass, Vector2 position) {
         this.mass = mass;
         world = mass.world;
-        this.position = position;
+        define(position);
+        destination = new Vector2();
+        path = new ArrayList<Vector2>();
         direction = new Vector2();
-        define();
+        velocity = new Vector2();
         count++;
     }
 
     //define the box2d body
-    private void define() {
+    private void define(Vector2 position) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(position);
@@ -59,19 +67,33 @@ public abstract class Agent{
         fixture.setUserData(this);
     }
 
-    public abstract void update(float delta);
+    public void update(float delta) {
+        algorithm.act();
+        float angle = (float) Math.atan2(direction.y, direction.x);
+        body.setTransform(body.getWorldCenter(), angle);
+        pointLight.setPosition(body.getPosition());
+        coneLight.setPosition(body.getPosition());
+        coneLight.setDirection((float) (body.getAngle()*180/Math.PI));
+        coneLight.setDistance(visualRange*10);
+    };
 
     //Move towards a destination with constant velocity
     public void move() {
         updateDirection();
-        Vector2 unitVector = normalise(direction);
-        body.setLinearVelocity(unitVector.x*velocity, unitVector.y*velocity);
+        updateVelocity();
+        body.setLinearVelocity(velocity.x, velocity.y);
     }
 
-    //So that direction always point towards destination
     public void updateDirection() {
         direction.x = destination.x - body.getPosition().x;
         direction.y = destination.y - body.getPosition().y;
+    }
+
+    //So that direction always point towards destination
+    public void updateVelocity() {
+        Vector2 normalizedDirection = normalise(direction);
+        velocity.x = normalizedDirection.x*moveSpeed;
+        velocity.y = normalizedDirection.y*moveSpeed;
     }
 
     //get the unit vector with length 1
@@ -87,14 +109,23 @@ public abstract class Agent{
 
     public Type getType() { return type; }
     public Body getBody() { return body; }
-    public Vector2 getPosition() { return position; }
+    public float getMoveSpeed() { return moveSpeed; }
+    public float getTurnSpeed() { return turnSpeed; }
+    public float getVisualRange() { return visualRange; }
+    public float getViewAngle() { return viewAngle; }
     public Vector2 getDestination() { return destination; }
+    public ArrayList<Vector2> getPath() { return path; }
     public Vector2 getDirection() { return direction; }
-    public float getVelocity() { return velocity; }
+    public Vector2 getVelocity() { return velocity; }
 
+    public void setMoveSpeed(float moveSpeed) { this.moveSpeed = moveSpeed; }
+    public void setTurnSpeed(float turnSpeed) { this.turnSpeed = turnSpeed; }
+    public void setVisualRange(float visualRange) { this.visualRange = visualRange; }
+    public void setViewAngle(float viewAngle) { this.viewAngle = viewAngle; }
     public void setDestination(Vector2 destination) { this.destination = destination; }
+    public void setPath(ArrayList<Vector2> path) { this.path = path; }
     public void setDirection(Vector2 direction) { this.direction = direction; }
-    public void setVelocity(float velocity) { this.velocity = velocity; }
+    public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
 
     public String toString() {
         return "Type = "+this.type+" count of Agents = "+ count;

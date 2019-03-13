@@ -23,5 +23,6 @@ public class MapFileReader {
             e.printStackTrace();
             return null;
         }
+        return null;
     }
 }

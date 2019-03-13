@@ -39,9 +39,9 @@ Tasks that need to be finish ASAP (try within 1 week), good coding, as other tas
 - MapSimulator algorithm menu
 
 Tasks that doesn't really have a time constraint
-- Search algorithm:
+- Search algorithm: Collaborate Diffusion
 - Decision algorithm: MCTS
-- Decision algorithm: Collaborate Diffusion
+- Cover algorithm (cover the area as efficient as possible with the available agent)
 - Path finding algorithm: Dijkstra
 - Path finding algorithm: A*
 - Exploring algorithm: Breadth first search

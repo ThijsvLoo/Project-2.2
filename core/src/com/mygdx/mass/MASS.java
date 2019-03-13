@@ -1,6 +1,5 @@
 package com.mygdx.mass;
 
-import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Color;
@@ -32,7 +31,6 @@ public class MASS extends Game {
 	public Map map;
 
 	public RayHandler rayHandler;
-	public PointLight pointLight;
 
 	public ShapeRenderer shapeRenderer;
 
@@ -61,7 +59,6 @@ public class MASS extends Game {
 		rayHandler.setShadows(false);
 		rayHandler.setAmbientLight(0.01f, 0.01f, 0.01f, 0.8f);
 		rayHandler.setBlurNum(0);
-		pointLight = new PointLight(rayHandler, 360, new Color(1,1,1,1), 100, camera.position.x, camera.position.y);
 
 		shapeRenderer = new ShapeRenderer();
 

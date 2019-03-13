@@ -15,7 +15,7 @@ public class Random extends Algorithm {
 
     @Override
     public void act() {
-        if (Math.random() < 0.02) {
+        if (Math.random() < 0.01) {
             agent.setDestination(new Vector2((float) Math.random()*Map.WIDTH, (float) Math.random()*Map.HEIGHT));
         }
         agent.move();

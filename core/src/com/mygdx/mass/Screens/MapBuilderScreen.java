@@ -38,7 +38,6 @@ public class MapBuilderScreen implements Screen {
     private Map map;
 
     private RayHandler rayHandler;
-    private PointLight pointLight;
 
     private ShapeRenderer shapeRenderer;
 
@@ -55,7 +54,6 @@ public class MapBuilderScreen implements Screen {
         debugRenderer = mass.debugRenderer;
         map = mass.map;
         rayHandler = mass.rayHandler;
-        pointLight = mass.pointLight;
         shapeRenderer = mass.shapeRenderer;
 
         camera.position.set(Map.WIDTH/2,Map.HEIGHT/2,0.0f);
@@ -105,7 +103,6 @@ public class MapBuilderScreen implements Screen {
         }
 
         camera.update();
-        pointLight.setPosition(camera.position.x, camera.position.y);
 
         hud.update(delta);
     }
@@ -141,11 +138,11 @@ public class MapBuilderScreen implements Screen {
         batch.begin();
         batch.end();
 
-        debugRenderer.render(world, camera.combined);
-        world.step(1 / 60f, 6, 2);
-
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
+
+        debugRenderer.render(world, camera.combined);
+        world.step(1 / 60f, 6, 2);
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -229,7 +226,6 @@ public class MapBuilderScreen implements Screen {
 
     @Override
     public void dispose() {
-        pointLight.dispose(); //dunno why error when dispose in mass
         hud.dispose();
     }
 
