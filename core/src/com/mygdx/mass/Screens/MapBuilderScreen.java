@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -18,12 +19,15 @@ import com.mygdx.mass.MASS;
 import com.mygdx.mass.Map;
 import com.mygdx.mass.Scenes.HUD;
 
+;import java.lang.String;
+import java.util.Iterator;
+
 public class MapBuilderScreen implements Screen {
 
-    public enum State {NONE, WALL, BUILDING, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, SURVEILLANCE, INTRUDER};
+    public enum State {NONE, WALL, BUILDING, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, SURVEILLANCE, INTRUDER, DELETION};
     private State currentState;
 
-    private MASS mass;
+    public MASS mass;
 
     //Camera and Viewport
     private OrthographicCamera camera;
@@ -44,6 +48,8 @@ public class MapBuilderScreen implements Screen {
     private HUD hud;
 
     private InputHandler inputHandler;
+
+
 
     public MapBuilderScreen(MASS mass) {
         this.mass = mass;
@@ -278,7 +284,23 @@ public class MapBuilderScreen implements Screen {
                 }
                 return true;
             }
+            if (currentState== State.DELETION) {
+                float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
+                float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
+                Vector2 position = new Vector2(x, y);
+                int index =-1;
+                for(int i=0; i<map.getMapObjects().size(); i++){
+                    if(map.getMapObjects().get(i).getRectangle().x<position.x &&map.getMapObjects().get(i).getRectangle().y<position.y && map.getMapObjects().get(i).getRectangle().width+map.getMapObjects().get(i).getRectangle().x> position.x &&
+                            map.getMapObjects().get(i).getRectangle().height + map.getMapObjects().get(i).getRectangle().y > position.y){
+                      index =i;
+                    }
+                }
+                mass.world.destroyBody( map.getMapObjects().get(index).getBody());
+                map.getMapObjects().remove(index);
+
+            }
             return false;
+
         }
 
         @Override

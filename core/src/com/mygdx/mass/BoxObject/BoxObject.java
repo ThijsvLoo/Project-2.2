@@ -43,6 +43,9 @@ public abstract class BoxObject {
 
         polygonShape.dispose();
     }
+    public Body getBody(){
+        return body;
+    }
 
     public Rectangle getRectangle() {
         return rectangle;
