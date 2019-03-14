@@ -19,6 +19,7 @@ public class Intruder extends Agent {
         super(mass, position);
         type = Type.INTRUDER;
         moveSpeed = BASE_SPEED;
+        turnSpeed = 180f;
         visualRange = 7.5f;
         viewAngle = 45.0f;
         pointLight = new PointLight(mass.rayHandler, 360, new Color(1,0,0,1), 10, body.getPosition().x, body.getPosition().y);

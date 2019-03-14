@@ -136,7 +136,8 @@ public class MapBuilderScreen implements Screen {
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0,0,0,1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        //anti aliasing
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
 
         update(delta);
 
@@ -193,6 +194,14 @@ public class MapBuilderScreen implements Screen {
             shapeRenderer.circle(agent.getBody().getPosition().x, agent.getBody().getPosition().y, 1.0f);
         }
         shapeRenderer.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (Agent agent : map.getAgents()) {
+            shapeRenderer.setColor(Color.PURPLE);
+            shapeRenderer.line(agent.getBody().getPosition(), agent.getDestination());
+        }
+        shapeRenderer.end();
+
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
         if (inputHandler.startDrag != null && inputHandler.endDrag != null) {
@@ -239,6 +248,7 @@ public class MapBuilderScreen implements Screen {
         currentState = state;
     }
 
+    //This is the part where mouse and keyboard events are being handle
     private class InputHandler implements InputProcessor {
 
         private Vector2 startDrag;

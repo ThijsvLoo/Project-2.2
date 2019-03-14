@@ -1,6 +1,7 @@
 package com.mygdx.mass.Agents;
 import box2dLight.ConeLight;
 import box2dLight.PointLight;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Algorithms.Algorithm;
@@ -24,6 +25,7 @@ public abstract class Agent implements java.io.Serializable{
 
     protected float moveSpeed;
     protected float turnSpeed;
+    protected int turnSide; //or Counter Clock
 
     protected float visualRange;
     protected float viewAngle;
@@ -69,8 +71,6 @@ public abstract class Agent implements java.io.Serializable{
 
     public void update(float delta) {
         algorithm.act();
-        float angle = (float) Math.atan2(direction.y, direction.x);
-        body.setTransform(body.getWorldCenter(), angle);
         pointLight.setPosition(body.getPosition());
         coneLight.setPosition(body.getPosition());
         coneLight.setDirection((float) (body.getAngle()*180/Math.PI));
@@ -80,6 +80,7 @@ public abstract class Agent implements java.io.Serializable{
     //Move towards a destination with constant velocity
     public void move() {
         updateDirection();
+        updateAngle();
         updateVelocity();
         body.setLinearVelocity(velocity.x, velocity.y);
     }
@@ -89,23 +90,29 @@ public abstract class Agent implements java.io.Serializable{
         direction.y = destination.y - body.getPosition().y;
     }
 
+    public void updateAngle() {
+        turnSide = ((Math.atan2(direction.y, direction.x) + 2*Math.PI - body.getAngle()) % (2*Math.PI) < Math.PI) ? 1 : -1;
+        float angle = (float)((body.getAngle() + turnSide*turnSpeed*Math.PI/180*Gdx.graphics.getDeltaTime())%(2*Math.PI));
+        body.setTransform(body.getWorldCenter(), angle);
+        System.out.println(body.getAngle());
+    }
+
     //So that direction always point towards destination
     public void updateVelocity() {
-        Vector2 normalizedDirection = normalise(direction);
-        velocity.x = normalizedDirection.x*moveSpeed;
-        velocity.y = normalizedDirection.y*moveSpeed;
+        velocity.x = (float) Math.cos(body.getAngle())*moveSpeed;
+        velocity.y = (float) Math.sin(body.getAngle())*moveSpeed;
     }
 
     //get the unit vector with length 1
-    private Vector2 normalise(Vector2 vector2) {
-        float magnitude = magnitude(vector2);
-        return new Vector2(vector2.x*(1/magnitude), vector2.y*(1/magnitude));
-    }
+//    private Vector2 normalise(Vector2 vector2) {
+//        float magnitude = magnitude(vector2);
+//        return new Vector2(vector2.x*(1/magnitude), vector2.y*(1/magnitude));
+//    }
 
     //magnitude is the length of a vector
-    private float magnitude(Vector2 vector2) {
-        return (float) Math.sqrt(Math.pow(vector2.x, 2) + Math.pow(vector2.y, 2));
-    }
+//    private float magnitude(Vector2 vector2) {
+//        return (float) Math.sqrt(Math.pow(vector2.x, 2) + Math.pow(vector2.y, 2));
+//    }
 
     public Type getType() { return type; }
     public Body getBody() { return body; }

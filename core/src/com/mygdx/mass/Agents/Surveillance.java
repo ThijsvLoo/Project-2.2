@@ -15,6 +15,7 @@ public class Surveillance extends Agent {
         super(mass, position);
         type = Type.SURVEILLANCE;
         moveSpeed = BASE_SPEED;
+        turnSpeed = 180f;
         visualRange = 6.0f;
         viewAngle = 45.0f;
         pointLight = new PointLight(mass.rayHandler, 360, new Color(0,0,1,1), 10, body.getPosition().x, body.getPosition().y);
