@@ -2,7 +2,7 @@ PHASE 1
 
 Tasks that need to be finish ASAP (try to aim for 1 week), as other tasks depend on it
 - Box2D contact listener for handling collision (Hong)
-- MapBuilder: Save/Load Function (Lilly)
+- MapBuilder: Save/Load Function (Thijs)
 - MapSimulator: Basic structure, see MapBuilder for insight
 - MapSimulator HUD, HUD buttons, buttons listener
 - MapSimulator function: decrease speed, play/pause, increase speed
@@ -14,7 +14,7 @@ Tasks that aren't constraint with other tasks, in no particular order
 - Manage and implement assets using AssetManager
 - MapBuilder function: Multi object selection
 - MapBuilder function: Relocate object(s)
-- MapBuilder function: delete object
+- MapBuilder function: delete object (DONE) Lilly
 - MapBuilder function: Clear all
 - MapBuilder function: Undo, Redo
 - Research possible algorithms for next phase (exploring, decision, path finding)

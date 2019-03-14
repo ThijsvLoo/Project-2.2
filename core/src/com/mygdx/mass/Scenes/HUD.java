@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -12,9 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.mass.MASS;
+import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Screens.MapBuilderScreen;
-import com.mygdx.mass.Tools.MapFileReader;
+
+import java.util.ArrayList;
 
 public class HUD implements Disposable {
 
@@ -38,6 +40,7 @@ public class HUD implements Disposable {
     private ImageButton targetArea;
     private ImageButton surveillance;
     private ImageButton intruder;
+    private ImageButton delete;
 
     private ImageButton load;
     private ImageButton save;
@@ -128,12 +131,25 @@ public class HUD implements Disposable {
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Clear map");
+               ArrayList<BoxObject> mapObjectList=  mapBuilderScreen.mass.map.getMapObjects();
+
+                for(int i=0; i<mapObjectList.size(); i++){
+                    mapBuilderScreen.mass.world.destroyBody( mapBuilderScreen.mass.map.getMapObjects().get(i).getBody());
+                }
+                mapObjectList.clear();
             }
         });
         exit = new ImageButton(textureRegionDrawable);
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit");
+            }
+        });
+        delete = new ImageButton(textureRegionDrawable);
+        delete.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DELETION);
+                System.out.println("Current action: Delete");
             }
         });
 
@@ -144,6 +160,7 @@ public class HUD implements Disposable {
         table.add(targetArea);
         table.add(surveillance);
         table.add(intruder);
+        table.add(delete);
 
         table.row();
 
@@ -151,6 +168,7 @@ public class HUD implements Disposable {
         table.add(save).padBottom(10);
         table.add(clear).padBottom(10);
         table.add(exit).padBottom(10);
+        table.add(delete).padBottom(10);
 
         stage.addActor(table);
     }
