@@ -6,10 +6,12 @@ import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.Agents.Surveillance;
 import com.mygdx.mass.BoxObject.*;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Map {
+public class Map implements Serializable {
 
     public static final float WIDTH = 200;
     public static final float HEIGHT = 200;
@@ -17,18 +19,21 @@ public class Map {
     private MASS mass;
 
     private ArrayList<BoxObject> mapObjects;
-
-    private ArrayList<Agent> agents;
-    private ArrayList<Surveillance> surveillances;
+    private ArrayList<Surveillance> surveyors;
     private ArrayList<Intruder> intruders;
 
     public Map(MASS mass) {
         this.mass = mass;
 
         mapObjects = new ArrayList<BoxObject>();
-        agents = new ArrayList<Agent>();
-        surveillances = new ArrayList<Surveillance>();
+        surveyors = new ArrayList<Surveillance>();
         intruders = new ArrayList<Intruder>();
+    }
+
+    public MapData GetMapData(){
+        MapData mapData = new MapData();
+
+        return mapData;
     }
 
     public void addWall(Rectangle rectangle) {
@@ -58,15 +63,13 @@ public class Map {
 
     public Surveillance addSurveillance(Vector2 position) {
         Surveillance surveillance = new Surveillance(mass, position);
-        surveillances.add(surveillance);
-        agents.add(surveillance);
+        surveyors.add(surveillance);
         return surveillance;
     }
 
     public Intruder addIntruder(Vector2 position) {
         Intruder intruder = new Intruder(mass, position);
         intruders.add(intruder);
-        agents.add(intruder);
         return intruder;
     }
 
@@ -75,11 +78,14 @@ public class Map {
     }
 
     public ArrayList<Agent> getAgents() {
+        ArrayList<Agent> agents = new ArrayList<Agent>();
+        agents.addAll(intruders);
+        agents.addAll(surveyors);
         return agents;
     }
 
-    public ArrayList<Surveillance> getSurveillances() {
-        return surveillances;
+    public ArrayList<Surveillance> getSurveyors() {
+        return surveyors;
     }
 
     public ArrayList<Intruder> getIntruders() {

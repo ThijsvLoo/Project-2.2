@@ -28,7 +28,7 @@ public class MASS extends Game {
 	public Box2DDebugRenderer debugRenderer;
 	public WorldContactListener worldContactListener;
 
-	public Map map;
+	public static Map map;
 
 	public RayHandler rayHandler;
 
@@ -79,5 +79,13 @@ public class MASS extends Game {
 		rayHandler.dispose();
 		world.dispose();
 		shapeRenderer.dispose();
+	}
+
+	public Map getMap() {
+		return map;
+	}
+
+	public void setMap(Map map) {
+		this.map = map;
 	}
 }

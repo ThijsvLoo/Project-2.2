@@ -23,7 +23,7 @@ public class MapBuilderScreen implements Screen {
     public enum State {NONE, WALL, BUILDING, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, SURVEILLANCE, INTRUDER};
     private State currentState;
 
-    private MASS mass;
+    public MASS mass;
 
     //Camera and Viewport
     private OrthographicCamera camera;

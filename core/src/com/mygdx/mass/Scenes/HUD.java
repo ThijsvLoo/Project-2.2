@@ -12,7 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.MASS;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.Tools.MapFileReader;
 
 public class HUD implements Disposable {
 
@@ -117,6 +119,8 @@ public class HUD implements Disposable {
         save = new ImageButton(textureRegionDrawable);
         save.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
+                MapFileReader mapFileReader = new MapFileReader();
+                mapFileReader.saveToFile(mapBuilderScreen.mass.getMap());
                 System.out.println("Current action: Save map");
             }
         });

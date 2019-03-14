@@ -8,7 +8,7 @@ import com.mygdx.mass.MASS;
 
 import java.util.ArrayList;
 
-public abstract class Agent{
+public abstract class Agent implements java.io.Serializable{
 
     public static final float MAX_TURN_SPEED = 180.0f;
 
