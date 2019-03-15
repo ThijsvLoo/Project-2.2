@@ -1,11 +1,8 @@
 package com.mygdx.mass.Tools;
 
-import com.mygdx.mass.Agents.Agent;
-import com.mygdx.mass.BoxObject.BoxObject;
-import com.mygdx.mass.Map;
+import com.mygdx.mass.World.Map;
 
 import java.io.*;
-import java.util.ArrayList;
 
 
 public class MapFileReader implements Serializable{

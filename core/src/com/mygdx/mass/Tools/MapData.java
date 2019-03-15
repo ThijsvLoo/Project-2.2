@@ -1,4 +1,4 @@
-package com.mygdx.mass;
+package com.mygdx.mass.Tools;
 
 public class MapData {
 

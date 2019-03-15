@@ -1,4 +1,4 @@
-package com.mygdx.mass;
+package com.mygdx.mass.World;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -6,7 +6,8 @@ import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.Agents.Surveillance;
 import com.mygdx.mass.BoxObject.*;
-import com.sun.org.apache.bcel.internal.generic.NEW;
+import com.mygdx.mass.MASS;
+import com.mygdx.mass.Tools.MapData;
 
 import java.io.Serializable;
 import java.util.ArrayList;

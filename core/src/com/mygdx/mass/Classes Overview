@@ -1,0 +1,35 @@
+Class Mass
+- The main or root class
+- Contains references to other objects
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+Class Map
+- Contains all the details about a map
+- Contains arraylists of all the world objects
+
+Class WorldContactListener
+- Handle all the collissions in the box2d world
+
+Class WorldObject
+- The abstract parent class of all objects in the world (building/agents)
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Class MapBuilderScreen
+- Handle everything that happen in the map builder screen (display, input events, etc)
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Class HUD
+- Handle everything that is HUD related (button display, button onclick events, etc)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Class Algorithm
+- The abstract parent class of all algorithm being used by agents
+
+Class Random
+- Algorithm which cause an agent to moves randomly within the map
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////

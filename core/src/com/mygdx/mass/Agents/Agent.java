@@ -81,8 +81,12 @@ public abstract class Agent implements java.io.Serializable{
     public void move() {
         updateDirection();
         updateAngle();
-        updateVelocity();
-        body.setLinearVelocity(velocity.x, velocity.y);
+        if (turnSide == 0) {
+            updateVelocity();
+            body.setLinearVelocity(velocity.x, velocity.y);
+        } else {
+            body.setLinearVelocity(0, 0);
+        }
     }
 
     public void updateDirection() {
@@ -91,10 +95,15 @@ public abstract class Agent implements java.io.Serializable{
     }
 
     public void updateAngle() {
-        turnSide = ((Math.atan2(direction.y, direction.x) + 2*Math.PI - body.getAngle()) % (2*Math.PI) < Math.PI) ? 1 : -1;
-        float angle = (float)((body.getAngle() + turnSide*turnSpeed*Math.PI/180*Gdx.graphics.getDeltaTime())%(2*Math.PI));
+        float angle;
+        if (Math.PI - Math.abs(Math.PI - Math.abs(Math.atan2(direction.y, direction.x) - body.getAngle())) < 5*Math.PI/180) {
+            turnSide = 0;
+            angle = (float) Math.atan2(direction.y, direction.x);
+        } else {
+            turnSide = ((Math.atan2(direction.y, direction.x) + 2 * Math.PI - body.getAngle()) % (2 * Math.PI) < Math.PI) ? 1 : -1;
+            angle = (float) ((body.getAngle() + turnSide * turnSpeed * Math.PI / 180 * Gdx.graphics.getDeltaTime()) % (2 * Math.PI));
+        }
         body.setTransform(body.getWorldCenter(), angle);
-        System.out.println(body.getAngle());
     }
 
     //So that direction always point towards destination

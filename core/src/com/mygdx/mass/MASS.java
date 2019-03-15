@@ -2,7 +2,6 @@ package com.mygdx.mass;
 
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -11,6 +10,8 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.World.Map;
+import com.mygdx.mass.World.WorldContactListener;
 
 public class MASS extends Game {
 

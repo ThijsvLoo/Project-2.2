@@ -16,17 +16,12 @@ public class Surveillance extends Agent {
         type = Type.SURVEILLANCE;
         moveSpeed = BASE_SPEED;
         turnSpeed = 180f;
-        visualRange = 6.0f;
+        visualRange = 30.0f;
         viewAngle = 45.0f;
         pointLight = new PointLight(mass.rayHandler, 360, new Color(0,0,1,1), 10, body.getPosition().x, body.getPosition().y);
         coneLight = new ConeLight(mass.rayHandler, 45, new Color(0,0,1,1), visualRange*10, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
         coneLight.attachToBody(body);
         algorithm = new Random(this);
-    }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
     }
 
 }

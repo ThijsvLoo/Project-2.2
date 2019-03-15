@@ -28,9 +28,4 @@ public class Intruder extends Agent {
         algorithm = new Random(this);
     }
 
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-    }
-
 }

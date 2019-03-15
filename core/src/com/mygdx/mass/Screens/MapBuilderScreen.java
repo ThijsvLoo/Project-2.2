@@ -1,6 +1,5 @@
 package com.mygdx.mass.Screens;
 
-import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
@@ -8,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -16,11 +14,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.MASS;
-import com.mygdx.mass.Map;
+import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
 
-;import java.lang.String;
-import java.util.Iterator;
+;
 
 public class MapBuilderScreen implements Screen {
 
@@ -293,8 +290,7 @@ public class MapBuilderScreen implements Screen {
                     }
                 }
                 return true;
-            }
-            if (currentState== State.DELETION) {
+            } else if (currentState== State.DELETION) {
                 float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
                 float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
                 Vector2 position = new Vector2(x, y);
@@ -307,10 +303,8 @@ public class MapBuilderScreen implements Screen {
                 }
                 mass.world.destroyBody( map.getMapObjects().get(index).getBody());
                 map.getMapObjects().remove(index);
-
             }
             return false;
-
         }
 
         @Override
