@@ -6,14 +6,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.Algorithms.Random;
 import com.mygdx.mass.MASS;
+import com.mygdx.mass.Test.Constants;
 
-public class Surveillance extends Agent {
+public class Surveyor extends Agent {
 
     public static final float BASE_SPEED = 1.4f;
 
-    public Surveillance(MASS mass, Vector2 position) {
+    public Surveyor(MASS mass, Vector2 position) {
         super(mass, position);
-        type = Type.SURVEILLANCE;
+        type = Constants.SURVEYOR;
         moveSpeed = BASE_SPEED;
         turnSpeed = 180f;
         visualRange = 30.0f;

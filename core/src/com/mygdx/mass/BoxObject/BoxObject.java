@@ -6,8 +6,7 @@ import com.mygdx.mass.MASS;
 
 public abstract class BoxObject implements java.io.Serializable{
 
-    public enum Type {WALL, BUILDING, SENTRY_TOWER, HIDING_AREA, TARGET_AREA};
-    protected Type type;
+    protected int type;
 
     protected MASS mass;
 
@@ -51,7 +50,7 @@ public abstract class BoxObject implements java.io.Serializable{
         return rectangle;
     }
 
-    public Type getType() {
+    public int getType() {
         return type;
     }
 

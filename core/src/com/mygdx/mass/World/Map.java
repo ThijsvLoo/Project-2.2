@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Intruder;
-import com.mygdx.mass.Agents.Surveillance;
+import com.mygdx.mass.Agents.Surveyor;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.MASS;
 import com.mygdx.mass.Tools.MapData;
@@ -14,27 +14,31 @@ import java.util.ArrayList;
 
 public class Map implements Serializable {
 
-    public static final float WIDTH = 200;
-    public static final float HEIGHT = 200;
+    public static float width = 200;
+    public static float height = 200;
 
     private MASS mass;
 
     private ArrayList<BoxObject> mapObjects;
-    private ArrayList<Surveillance> surveyors;
+    private ArrayList<Surveyor> surveyors;
     private ArrayList<Intruder> intruders;
 
     public Map(MASS mass) {
         this.mass = mass;
 
         mapObjects = new ArrayList<BoxObject>();
-        surveyors = new ArrayList<Surveillance>();
+        surveyors = new ArrayList<Surveyor>();
         intruders = new ArrayList<Intruder>();
     }
 
-    public MapData GetMapData(){
-        MapData mapData = new MapData();
+    public Map(MASS mass, int width, int heigth) {
+        this.mass = mass;
 
-        return mapData;
+        mapObjects = new ArrayList<BoxObject>();
+        surveyors = new ArrayList<Surveyor>();
+        intruders = new ArrayList<Intruder>();
+        this.width = width;
+        this.height = heigth;
     }
 
     public void addWall(Rectangle rectangle) {
@@ -62,10 +66,10 @@ public class Map implements Serializable {
         mapObjects.add(targetArea);
     }
 
-    public Surveillance addSurveillance(Vector2 position) {
-        Surveillance surveillance = new Surveillance(mass, position);
-        surveyors.add(surveillance);
-        return surveillance;
+    public Surveyor addSurveillance(Vector2 position) {
+        Surveyor surveyor = new Surveyor(mass, position);
+        surveyors.add(surveyor);
+        return surveyor;
     }
 
     public Intruder addIntruder(Vector2 position) {
@@ -85,7 +89,7 @@ public class Map implements Serializable {
         return agents;
     }
 
-    public ArrayList<Surveillance> getSurveyors() {
+    public ArrayList<Surveyor> getSurveyors() {
         return surveyors;
     }
 
@@ -93,4 +97,17 @@ public class Map implements Serializable {
         return intruders;
     }
 
+    public static float getWidth() {
+        return width;
+    }
+    public static float getHeight() {
+        return height;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+    public void setHeight(float height) {
+        this.height = height;
+    }
 }

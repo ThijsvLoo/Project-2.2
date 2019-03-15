@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.Tools.MapFileReader;
 
 import java.util.ArrayList;
 
@@ -121,8 +122,7 @@ public class HUD implements Disposable {
         save = new ImageButton(textureRegionDrawable);
         save.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-//                MapFileReader mapFileReader = new MapFileReader();
-//                mapFileReader.saveToFile(mapBuilderScreen.mass.getMap());
+                MapFileReader.saveToFile(mapBuilderScreen.mass.getMap());
                 System.out.println("Current action: Save map");
             }
         });

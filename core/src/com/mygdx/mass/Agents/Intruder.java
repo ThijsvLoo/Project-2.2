@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.Algorithms.Random;
 import com.mygdx.mass.MASS;
+import com.mygdx.mass.Test.Constants;
 
 public class Intruder extends Agent {
 
@@ -17,7 +18,7 @@ public class Intruder extends Agent {
 
     public Intruder(MASS mass, Vector2 position) {
         super(mass, position);
-        type = Type.INTRUDER;
+        type = Constants.INTRUDER;
         moveSpeed = BASE_SPEED;
         turnSpeed = 180f;
         visualRange = 7.5f;

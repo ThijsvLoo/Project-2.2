@@ -13,8 +13,7 @@ public abstract class Agent implements java.io.Serializable{
 
     public static final float MAX_TURN_SPEED = 180.0f;
 
-    public enum Type {SURVEILLANCE, INTRUDER};
-    protected Type type;
+    protected int type;
 
     public MASS mass;
 
@@ -123,7 +122,7 @@ public abstract class Agent implements java.io.Serializable{
 //        return (float) Math.sqrt(Math.pow(vector2.x, 2) + Math.pow(vector2.y, 2));
 //    }
 
-    public Type getType() { return type; }
+    public int getType() { return type; }
     public Body getBody() { return body; }
     public float getMoveSpeed() { return moveSpeed; }
     public float getTurnSpeed() { return turnSpeed; }

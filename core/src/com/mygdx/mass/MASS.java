@@ -15,7 +15,7 @@ import com.mygdx.mass.World.WorldContactListener;
 
 public class MASS extends Game {
 
-	public static final String TITLE = "Multi-Agent Surveillance System";
+	public static final String TITLE = "Multi-Agent Surveyor System";
 
 	//Camera and Viewport
 	public OrthographicCamera camera;

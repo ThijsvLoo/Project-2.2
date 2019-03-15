@@ -13,11 +13,11 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureB = contact.getFixtureB();
 
         if (fixtureA.getUserData() instanceof Agent) {
-            ((Agent) fixtureA.getUserData()).setDestination(new Vector2((float) Math.random() * Map.WIDTH, (float) Math.random() * Map.HEIGHT));
+            ((Agent) fixtureA.getUserData()).setDestination(new Vector2((float) Math.random() * Map.width, (float) Math.random() * Map.height));
         }
 
         if (fixtureB.getUserData() instanceof Agent) {
-            ((Agent) fixtureB.getUserData()).setDestination(new Vector2((float) Math.random() * Map.WIDTH, (float) Math.random() * Map.HEIGHT));
+            ((Agent) fixtureB.getUserData()).setDestination(new Vector2((float) Math.random() * Map.width, (float) Math.random() * Map.height));
         }
     }
 

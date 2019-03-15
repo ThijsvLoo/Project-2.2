@@ -16,6 +16,7 @@ import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.MASS;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
+import com.mygdx.mass.Test.Constants;
 
 ;
 
@@ -59,7 +60,7 @@ public class MapBuilderScreen implements Screen {
         rayHandler = mass.rayHandler;
         shapeRenderer = mass.shapeRenderer;
 
-        camera.position.set(Map.WIDTH/2,Map.HEIGHT/2,0.0f);
+        camera.position.set(Map.width /2,Map.height /2,0.0f);
         viewport.setUnitsPerPixel(1/mass.PPM);
 
         hud = new HUD(this, batch);
@@ -82,19 +83,19 @@ public class MapBuilderScreen implements Screen {
         float thickness = 4;
 
         //North wall
-        Rectangle northWall = new Rectangle(0 - thickness, Map.HEIGHT, Map.WIDTH + 2*thickness, thickness);
+        Rectangle northWall = new Rectangle(0 - thickness, Map.height, Map.width + 2*thickness, thickness);
         map.addWall(northWall);
 
         //East wall
-        Rectangle eastWall = new Rectangle(Map.WIDTH, 0 - thickness, thickness, Map.HEIGHT + 2*thickness);
+        Rectangle eastWall = new Rectangle(Map.width, 0 - thickness, thickness, Map.height + 2*thickness);
         map.addWall(eastWall);
 
         //South wall
-        Rectangle southWall = new Rectangle(0 - thickness, 0 - thickness, Map.WIDTH + 2*thickness, thickness);
+        Rectangle southWall = new Rectangle(0 - thickness, 0 - thickness, Map.width + 2*thickness, thickness);
         map.addWall(southWall);
 
         //West wall
-        Rectangle westWall = new Rectangle(0 - thickness, 0 - thickness, thickness, Map.HEIGHT + 2*thickness);
+        Rectangle westWall = new Rectangle(0 - thickness, 0 - thickness, thickness, Map.height + 2*thickness);
         map.addWall(westWall);
     }
 
@@ -161,19 +162,19 @@ public class MapBuilderScreen implements Screen {
                 alpha = 1.0f;
             }
             switch (boxObject.getType()) {
-                case WALL:
+                case Constants.WALL:
                     shapeRenderer.setColor(0.5f, 0.5f, 0.5f, alpha);
                     break;
-                case BUILDING:
+                case Constants.BUILDING:
                     shapeRenderer.setColor(0.8f, 0.8f, 0.8f, alpha);
                     break;
-                case SENTRY_TOWER:
+                case Constants.SENTRY_TOWER:
                     shapeRenderer.setColor(1.0f, 1.0f, 0.0f, alpha);
                     break;
-                case HIDING_AREA:
+                case Constants.HIDING_AREA:
                     shapeRenderer.setColor(0.0f, 1.0f, 0.0f, alpha);
                     break;
-                case TARGET_AREA:
+                case Constants.TARGET_AREA:
                     shapeRenderer.setColor(1.0f, 0.0f, 1.0f, alpha);
                     break;
             }
@@ -181,10 +182,10 @@ public class MapBuilderScreen implements Screen {
         }
         for (Agent agent: map.getAgents()) {
             switch (agent.getType()) {
-                case SURVEILLANCE:
+                case Constants.SURVEYOR:
                     shapeRenderer.setColor(0.0f, 0.0f, 1.0f, 1.0f);
                     break;
-                case INTRUDER:
+                case Constants.INTRUDER:
                     shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
                     break;
             }
@@ -345,7 +346,7 @@ public class MapBuilderScreen implements Screen {
         }
 
         private boolean insideMap(Vector2 point) {
-            return point.x >= 0 && point.x <= Map.WIDTH && point.y >= 0 && point.y <= Map.HEIGHT;
+            return point.x >= 0 && point.x <= Map.width && point.y >= 0 && point.y <= Map.height;
         }
 
         @Override

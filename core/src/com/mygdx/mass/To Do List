@@ -33,7 +33,7 @@ PHASE 2
 Tasks that need to be finish ASAP (try within 1 week), good coding, as other tasks will depend on this foundation
 - Simulation environment: working doors/hiding spot/tower (Hong)
 - Graph class: build a representation of the map as graph (Hong)
-- 2 surveillance types, 1 truder type and their basic behavior
+- 2 surveyor types, 1 truder type and their basic behavior
 - Research algorithms (explore, path finding, planning)
 - Agent communication tools (direct/indirect)
 - MapSimulator algorithm menu

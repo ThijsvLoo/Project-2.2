@@ -13,7 +13,7 @@ public class Random extends Algorithm {
 
     public Random(Agent agent) {
         this.agent = agent;
-        this.agent.setDestination(new Vector2((float) Math.random()*Map.WIDTH, (float) Math.random()*Map.HEIGHT));
+        this.agent.setDestination(new Vector2((float) Math.random()*Map.getWidth(), (float) Math.random()*Map.getHeight()));
         count = 0;
     }
 
@@ -21,7 +21,7 @@ public class Random extends Algorithm {
     public void act() {
         count += Gdx.graphics.getDeltaTime();
         if (count >= 2) {
-            agent.setDestination(new Vector2((float) Math.random()*Map.WIDTH, (float) Math.random()*Map.HEIGHT));
+            agent.setDestination(new Vector2((float) Math.random()*Map.getWidth(), (float) Math.random()*Map.getHeight()));
             count = 0;
         }
         agent.move();

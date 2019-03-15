@@ -10,7 +10,8 @@ public class MapFileReader implements Serializable{
         try {
             OutputStream outStream = new FileOutputStream("map1.ser");
             ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
-            fileObjectOut.writeObject(map);
+            MapData mapData = new MapData(map);
+            fileObjectOut.writeObject(mapData);
             fileObjectOut.close();
             outStream.close();
         } catch(IOException e){
