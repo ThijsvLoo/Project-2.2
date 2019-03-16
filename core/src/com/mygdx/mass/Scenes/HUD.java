@@ -35,16 +35,22 @@ public class HUD implements Disposable {
 
     private ImageButton wall;
     private ImageButton building;
+    private ImageButton door;
+    private ImageButton window;
     private ImageButton sentryTower;
     private ImageButton hidingArea;
     private ImageButton targetArea;
-    private ImageButton surveillance;
+    private ImageButton guard;
     private ImageButton intruder;
 
     private ImageButton load;
     private ImageButton save;
+    private ImageButton move;
     private ImageButton delete;
     private ImageButton clear;
+    private ImageButton undo;
+    private ImageButton redo;
+    private ImageButton simulate;
     private ImageButton exit;
 
     public HUD(final MapBuilderScreen mapBuilderScreen, SpriteBatch batch){
@@ -77,6 +83,20 @@ public class HUD implements Disposable {
                 System.out.println("Current action: Create building");
             }
         });
+        door = new ImageButton(textureRegionDrawable);
+        door.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DOOR);
+                System.out.println("Current action: Create door");
+            }
+        });
+        window = new ImageButton(textureRegionDrawable);
+        window.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WINDOW);
+                System.out.println("Current action: Create window");
+            }
+        });
         sentryTower = new ImageButton(textureRegionDrawable);
         sentryTower.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
@@ -98,11 +118,11 @@ public class HUD implements Disposable {
                 System.out.println("Current action: Create targtet area");
             }
         });
-        surveillance = new ImageButton(textureRegionDrawable);
-        surveillance.addListener(new ClickListener() {
+        guard = new ImageButton(textureRegionDrawable);
+        guard.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.SURVEILLANCE);
-                System.out.println("Current action: Create surveillance");
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.GUARD);
+                System.out.println("Current action: Create guard");
             }
         });
         intruder = new ImageButton(textureRegionDrawable);
@@ -126,6 +146,13 @@ public class HUD implements Disposable {
                 System.out.println("Current action: Save map");
             }
         });
+        move = new ImageButton(textureRegionDrawable);
+        move.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.MOVE);
+                System.out.println("Current action: Move");
+            }
+        });
         delete = new ImageButton(textureRegionDrawable);
         delete.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
@@ -137,12 +164,30 @@ public class HUD implements Disposable {
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Clear map");
-               ArrayList<BoxObject> mapObjectList=  mapBuilderScreen.mass.map.getMapObjects();
+               ArrayList<BoxObject> mapObjectList=  mapBuilderScreen.mass.map.getBoxObjects();
 
                 for(int i=0; i<mapObjectList.size(); i++){
-                    mapBuilderScreen.mass.world.destroyBody( mapBuilderScreen.mass.map.getMapObjects().get(i).getBody());
+                    mapBuilderScreen.mass.world.destroyBody( mapBuilderScreen.mass.map.getBoxObjects().get(i).getBody());
                 }
                 mapObjectList.clear();
+            }
+        });
+        undo = new ImageButton(textureRegionDrawable);
+        undo.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                System.out.println("Current action: Undo");
+            }
+        });
+        redo = new ImageButton(textureRegionDrawable);
+        redo.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                System.out.println("Current action: Redo");
+            }
+        });
+        simulate = new ImageButton(textureRegionDrawable);
+        simulate.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                System.out.println("Current action: Simulate");
             }
         });
         exit = new ImageButton(textureRegionDrawable);
@@ -154,18 +199,24 @@ public class HUD implements Disposable {
 
         table.add(wall);
         table.add(building);
+        table.add(door);
+        table.add(window);
         table.add(sentryTower);
         table.add(hidingArea);
         table.add(targetArea);
-        table.add(surveillance);
+        table.add(guard);
         table.add(intruder);
 
         table.row();
 
         table.add(load).padBottom(10);
         table.add(save).padBottom(10);
+        table.add(move).padBottom(10);
         table.add(delete).padBottom(10);
         table.add(clear).padBottom(10);
+        table.add(undo).padBottom(10);
+        table.add(redo).padBottom(10);
+        table.add(simulate).padBottom(10);
         table.add(exit).padBottom(10);
 
         stage.addActor(table);

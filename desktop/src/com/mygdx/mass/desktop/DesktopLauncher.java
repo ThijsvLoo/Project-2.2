@@ -8,9 +8,9 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = MASS.TITLE;
-		config.width = 800;
-		config.height = 800;
-		config.samples = 16; //anti aliasing
+		config.width = MASS.WINDOW_WIDTH;
+		config.height = MASS.WINDOW_HEIGHT;
+		config.samples = MASS.ANTI_ALIASING; //anti aliasing
 		new LwjglApplication(new MASS(), config);
 	}
 }

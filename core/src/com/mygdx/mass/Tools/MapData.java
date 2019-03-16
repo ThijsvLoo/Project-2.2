@@ -27,7 +27,7 @@ public class MapData implements Serializable {
 		agentPosition = new float[agentArray.size()][3];
 		for(int i = 0; i < agentArray.size(); i++){
 			Agent tmpAgent = agentArray.get(i);
-			agentType[i] = tmpAgent.getType();
+//			agentType[i] = tmpAgent.getType();
 			agentPosition[i][0] = tmpAgent.getBody().getPosition().x;
 			agentPosition[i][1] = tmpAgent.getBody().getPosition().y;
 			agentPosition[i][2] = tmpAgent.getBody().getAngle();
@@ -39,14 +39,14 @@ public class MapData implements Serializable {
 		objectRectangle = new Rectangle[objectArray.size()];
 		for(int i = 0; i < objectArray.size(); i++){
 			BoxObject tmpObject = objectArray.get(i);
-			objectType[i] = tmpObject.getType();
+//			objectType[i] = tmpObject.getType();
 			objectRectangle[i] = tmpObject.getRectangle();
 		}
 	}
 
 	public void setMapData(Map map){
 		setAgents(map.getAgents());
-		setObjects(map.getMapObjects());
+		setObjects(map.getBoxObjects());
 		this.width = map.getWidth();
 		this.heigth = map.getHeight();
 

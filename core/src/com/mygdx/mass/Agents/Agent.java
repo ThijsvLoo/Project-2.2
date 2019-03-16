@@ -6,14 +6,16 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Algorithms.Algorithm;
 import com.mygdx.mass.MASS;
+import com.mygdx.mass.World.WorldObject;
 
 import java.util.ArrayList;
 
-public abstract class Agent implements java.io.Serializable{
+public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public static final float MAX_TURN_SPEED = 180.0f;
 
-    protected int type;
+    public enum Type {GUARD, INTRUDER};
+    protected Type type;
 
     public MASS mass;
 
@@ -122,7 +124,7 @@ public abstract class Agent implements java.io.Serializable{
 //        return (float) Math.sqrt(Math.pow(vector2.x, 2) + Math.pow(vector2.y, 2));
 //    }
 
-    public int getType() { return type; }
+    public Type getType() { return type; }
     public Body getBody() { return body; }
     public float getMoveSpeed() { return moveSpeed; }
     public float getTurnSpeed() { return turnSpeed; }
