@@ -25,6 +25,7 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
         define();
     }
 
+    //Define the box2d object and put it in the box2d world
     public void define() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;

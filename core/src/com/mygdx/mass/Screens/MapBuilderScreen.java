@@ -145,9 +145,11 @@ public class MapBuilderScreen implements Screen {
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
+        //draw the box2d objects
         debugRenderer.render(world, camera.combined);
         world.step(1 / 60f, 6, 2);
 
+        //draw the building with shapes
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -201,6 +203,7 @@ public class MapBuilderScreen implements Screen {
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
+        //Draw the mouse selection area with click drag
         if (inputHandler.startDrag != null && inputHandler.endDrag != null) {
 //            shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);

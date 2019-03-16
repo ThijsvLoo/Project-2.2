@@ -15,7 +15,7 @@ import com.mygdx.mass.World.WorldContactListener;
 
 public class MASS extends Game {
 
-	//General constants, don't put specific constants here
+	//General settings constants, don't put specific constants here
 	public static final String TITLE = "Multi-Agent Surveillance System";
 	public static final int WINDOW_WIDTH = 800;
 	public static final int WINDOW_HEIGHT = 800;

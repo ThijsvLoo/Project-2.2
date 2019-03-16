@@ -4,7 +4,7 @@ public abstract class WorldObject {
 
     //Box2D Collision Bits, to identify which world object
     public static final short NOTHING_BIT = 0;
-    public static final short WALL_BIT = 1;
+    public static final short BOX_AREA_BIT = 1;
     public static final short BUILDING_BIT = 2;
     public static final short DOOR_BIT = 2;
     public static final short SENTRY_TOWER_BIT = 4;

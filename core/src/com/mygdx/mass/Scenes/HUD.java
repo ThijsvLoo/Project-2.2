@@ -29,10 +29,6 @@ public class HUD implements Disposable {
 
     Table table;
 
-    Texture texture;
-    TextureRegion textureRegion;
-    TextureRegionDrawable textureRegionDrawable;
-
     private ImageButton wall;
     private ImageButton building;
     private ImageButton door;
@@ -65,67 +61,65 @@ public class HUD implements Disposable {
         table.setFillParent(true);
         table.bottom();
 
-        texture = new Texture(Gdx.files.internal("button.jpg"));
-        textureRegion = new TextureRegion(texture);
-        textureRegionDrawable = new TextureRegionDrawable(textureRegion);
+        //Creating buttons along with their click listener
 
-        wall = new ImageButton(textureRegionDrawable);
+        wall = createButton("Textures/Buttons/Wall.png");
         wall.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WALL);
                 System.out.println("Current action: Create wall");
             }
         });
-        building = new ImageButton(textureRegionDrawable);
+        building = createButton("Textures/Buttons/Wall.png");
         building.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.BUILDING);
                 System.out.println("Current action: Create building");
             }
         });
-        door = new ImageButton(textureRegionDrawable);
+        door = createButton("Textures/Buttons/Wall.png");
         door.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DOOR);
                 System.out.println("Current action: Create door");
             }
         });
-        window = new ImageButton(textureRegionDrawable);
+        window = createButton("Textures/Buttons/Wall.png");
         window.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WINDOW);
                 System.out.println("Current action: Create window");
             }
         });
-        sentryTower = new ImageButton(textureRegionDrawable);
+        sentryTower = createButton("Textures/Buttons/Wall.png");
         sentryTower.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.SENTRY_TOWER);
                 System.out.println("Current action: Create sentry tower");
             }
         });
-        hidingArea = new ImageButton(textureRegionDrawable);
+        hidingArea = createButton("Textures/Buttons/Wall.png");
         hidingArea.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.HIDING_AREA);
                 System.out.println("Current action: Create hiding area");
             }
         });
-        targetArea = new ImageButton(textureRegionDrawable);
+        targetArea = createButton("Textures/Buttons/Wall.png");
         targetArea.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.TARGET_AREA);
                 System.out.println("Current action: Create targtet area");
             }
         });
-        guard = new ImageButton(textureRegionDrawable);
+        guard = createButton("Textures/Buttons/Wall.png");
         guard.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.GUARD);
                 System.out.println("Current action: Create guard");
             }
         });
-        intruder = new ImageButton(textureRegionDrawable);
+        intruder = createButton("Textures/Buttons/Wall.png");
         intruder.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.INTRUDER);
@@ -133,34 +127,34 @@ public class HUD implements Disposable {
             }
         });
 
-        load = new ImageButton(textureRegionDrawable);
+        load = createButton("Textures/Buttons/Wall.png");
         load.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Load map");
             }
         });
-        save = new ImageButton(textureRegionDrawable);
+        save = createButton("Textures/Buttons/Wall.png");
         save.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 MapFileReader.saveToFile(mapBuilderScreen.mass.getMap());
                 System.out.println("Current action: Save map");
             }
         });
-        move = new ImageButton(textureRegionDrawable);
+        move = createButton("Textures/Buttons/Wall.png");
         move.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.MOVE);
                 System.out.println("Current action: Move");
             }
         });
-        delete = new ImageButton(textureRegionDrawable);
+        delete = createButton("Textures/Buttons/Wall.png");
         delete.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DELETION);
                 System.out.println("Current action: Delete");
             }
         });
-        clear = new ImageButton(textureRegionDrawable);
+        clear = createButton("Textures/Buttons/Wall.png");
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Clear map");
@@ -172,54 +166,63 @@ public class HUD implements Disposable {
                 mapObjectList.clear();
             }
         });
-        undo = new ImageButton(textureRegionDrawable);
+        undo = createButton("Textures/Buttons/Wall.png");
         undo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Undo");
             }
         });
-        redo = new ImageButton(textureRegionDrawable);
+        redo = createButton("Textures/Buttons/Wall.png");
         redo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Redo");
             }
         });
-        simulate = new ImageButton(textureRegionDrawable);
+        simulate = createButton("Textures/Buttons/Wall.png");
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Simulate");
             }
         });
-        exit = new ImageButton(textureRegionDrawable);
+        exit = createButton("Textures/Buttons/Wall.png");
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit");
             }
         });
 
-        table.add(wall);
-        table.add(building);
-        table.add(door);
-        table.add(window);
-        table.add(sentryTower);
-        table.add(hidingArea);
-        table.add(targetArea);
-        table.add(guard);
-        table.add(intruder);
+        table.add(wall).size(64);
+        table.add(building).size(64);
+        table.add(door).size(64);
+        table.add(window).size(64);
+        table.add(sentryTower).size(64);
+        table.add(hidingArea).size(64);
+        table.add(targetArea).size(64);
+        table.add(guard).size(64);
+        table.add(intruder).size(64);
 
+        //start second row
         table.row();
 
-        table.add(load).padBottom(10);
-        table.add(save).padBottom(10);
-        table.add(move).padBottom(10);
-        table.add(delete).padBottom(10);
-        table.add(clear).padBottom(10);
-        table.add(undo).padBottom(10);
-        table.add(redo).padBottom(10);
-        table.add(simulate).padBottom(10);
-        table.add(exit).padBottom(10);
+        table.add(load).size(64).padBottom(10);
+        table.add(save).size(64).padBottom(10);
+        table.add(move).size(64).padBottom(10);
+        table.add(delete).size(64).padBottom(10);
+        table.add(clear).size(64).padBottom(10);
+        table.add(undo).size(64).padBottom(10);
+        table.add(redo).size(64).padBottom(10);
+        table.add(simulate).size(64).padBottom(10);
+        table.add(exit).size(64).padBottom(10);
 
         stage.addActor(table);
+    }
+
+    private ImageButton createButton(String path) {
+        Texture texture = new Texture(Gdx.files.internal(path));
+        TextureRegion textureRegion = new TextureRegion(texture);
+        TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(textureRegion);
+        ImageButton imageButton = new ImageButton(textureRegionDrawable);
+        return imageButton;
     }
 
     public void update(float dt){

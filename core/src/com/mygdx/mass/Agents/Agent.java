@@ -53,7 +53,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         count++;
     }
 
-    //define the box2d body
+    //define the box2d body and put it into the box2d world
     private void define(Vector2 position) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -95,6 +95,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         direction.y = destination.y - body.getPosition().y;
     }
 
+    //Turn the body to the destination direction
     public void updateAngle() {
         float angle;
         if (Math.PI - Math.abs(Math.PI - Math.abs(Math.atan2(direction.y, direction.x) - body.getAngle())) < 5*Math.PI/180) {
@@ -107,7 +108,6 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         body.setTransform(body.getWorldCenter(), angle);
     }
 
-    //So that direction always point towards destination
     public void updateVelocity() {
         velocity.x = (float) Math.cos(body.getAngle())*moveSpeed;
         velocity.y = (float) Math.sin(body.getAngle())*moveSpeed;
