@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldContactListener;
@@ -42,6 +43,7 @@ public class MASS extends Game {
 	public ShapeRenderer shapeRenderer;
 
 	public MapBuilderScreen mapBuilderScreen;
+	public MainMenuScreen mainMenuScreen;
 
 	@Override
 	public void create () {
@@ -70,7 +72,9 @@ public class MASS extends Game {
 		shapeRenderer = new ShapeRenderer();
 
 		mapBuilderScreen = new MapBuilderScreen(this);
-        setScreen(mapBuilderScreen);
+		mainMenuScreen = new MainMenuScreen(this);
+
+        setScreen(mainMenuScreen);
 	}
 
 	@Override
