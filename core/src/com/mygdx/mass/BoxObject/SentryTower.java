@@ -2,13 +2,14 @@ package com.mygdx.mass.BoxObject;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.mass.MASS;
-import com.mygdx.mass.Test.Constants;
+
+import static com.mygdx.mass.BoxObject.BoxObject.Type.SENTRY_TOWER;
 
 public class SentryTower extends BoxObject {
 
     public SentryTower (MASS mass, Rectangle rectangle) {
         super(mass, rectangle);
-        type = Constants.SENTRY_TOWER;
+        type = SENTRY_TOWER;
     }
 
 }

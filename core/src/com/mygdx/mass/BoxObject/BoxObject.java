@@ -3,16 +3,17 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.MASS;
+import com.mygdx.mass.World.WorldObject;
 
-public abstract class BoxObject implements java.io.Serializable{
+public abstract class BoxObject extends WorldObject implements java.io.Serializable{
 
-    protected int type;
+    public enum Type {WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA};
+    protected Type type;
 
     protected MASS mass;
 
     protected World world;
     protected Rectangle rectangle;
-
     protected Body body;
     protected Fixture fixture;
 
@@ -24,6 +25,7 @@ public abstract class BoxObject implements java.io.Serializable{
         define();
     }
 
+    //Define the box2d object and put it in the box2d world
     public void define() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -42,16 +44,15 @@ public abstract class BoxObject implements java.io.Serializable{
 
         polygonShape.dispose();
     }
-    public Body getBody(){
-        return body;
-    }
 
+    public Type getType() {
+        return type;
+    }
     public Rectangle getRectangle() {
         return rectangle;
     }
-
-    public int getType() {
-        return type;
+    public Body getBody(){
+        return body;
     }
 
 }

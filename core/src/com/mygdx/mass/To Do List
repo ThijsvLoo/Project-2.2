@@ -8,14 +8,14 @@ Tasks that need to be finish ASAP (try to aim for 1 week), as other tasks depend
 - MapSimulator function: decrease speed, play/pause, increase speed
 
 Tasks that aren't constraint with other tasks, in no particular order
-- Main menu screen -> MapBuilder, MapSimulator (Kamil)
+- MainMenuScreen -> MapBuilder, MapSimulator, Options, Exit
 - MapBuilder settings pop up -> Load existing file or start new map with certain settings
 - Find assets: sprites, sounds, music
 - Manage and implement assets using AssetManager
 - MapBuilder function: Multi object selection
 - MapBuilder function: Relocate object(s)
-- MapBuilder function: delete object (DONE) Lilly
-- MapBuilder function: Clear all
+- MapBuilder function: delete object (Lilly) (DONE)
+- MapBuilder function: Clear all (Lilly)
 - MapBuilder function: Undo, Redo
 - Research possible algorithms for next phase (exploring, decision, path finding)
 - Draft introduction and literature review
@@ -23,7 +23,7 @@ Tasks that aren't constraint with other tasks, in no particular order
 Tasks that are not required but nice to have
 - Light cone as indicator for agent vision (Hong) (DONE)
 - Camera follow agent on click
-- Agent path indicator (Hong)
+- Agent path indicator (Hong) (DONE)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 

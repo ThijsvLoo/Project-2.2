@@ -15,7 +15,6 @@
 //
 //
 //import static com.mygdx.mass.BoxObject.Wall.createWall;
-//import static com.mygdx.mass.Test.Constants.*;
 //
 //
 //public class BETAscreen implements Screen {

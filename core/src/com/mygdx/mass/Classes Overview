@@ -1,6 +1,7 @@
 Class Mass
 - The main or root class
 - Contains references to other objects
+- Contains default settings constants (WINDOW_WIDTH, WINDOW_HEIGHT etc)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 

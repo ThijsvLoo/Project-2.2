@@ -15,7 +15,13 @@ import com.mygdx.mass.World.WorldContactListener;
 
 public class MASS extends Game {
 
-	public static final String TITLE = "Multi-Agent Surveyor System";
+	//General settings constants, don't put specific constants here
+	public static final String TITLE = "Multi-Agent Surveillance System";
+	public static final int WINDOW_WIDTH = 800;
+	public static final int WINDOW_HEIGHT = 800;
+	public static final int ANTI_ALIASING = 16;
+
+	public static final float DEFAULT_ZOOM = 3.0f;
 
 	//Camera and Viewport
 	public OrthographicCamera camera;
@@ -29,7 +35,7 @@ public class MASS extends Game {
 	public Box2DDebugRenderer debugRenderer;
 	public WorldContactListener worldContactListener;
 
-	public static Map map;
+	public Map map;
 
 	public RayHandler rayHandler;
 
@@ -41,7 +47,7 @@ public class MASS extends Game {
 	public void create () {
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
-		PPM = 3;
+		PPM = DEFAULT_ZOOM;
 
 		batch = new SpriteBatch();
 
@@ -59,7 +65,7 @@ public class MASS extends Game {
 		RayHandler.useDiffuseLight(true);
 		rayHandler.setShadows(false);
 		rayHandler.setAmbientLight(0.01f, 0.01f, 0.01f, 0.8f);
-		rayHandler.setBlurNum(0);
+		rayHandler.setBlurNum(1);
 
 		shapeRenderer = new ShapeRenderer();
 
@@ -80,13 +86,10 @@ public class MASS extends Game {
 		rayHandler.dispose();
 		world.dispose();
 		shapeRenderer.dispose();
+		mapBuilderScreen.dispose();
 	}
 
-	public Map getMap() {
-		return map;
-	}
+	public Map getMap() { return map; }
 
-	public void setMap(Map map) {
-		this.map = map;
-	}
+	public void setMap(Map map) { this.map = map; }
 }

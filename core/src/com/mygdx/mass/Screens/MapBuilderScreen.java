@@ -16,13 +16,12 @@ import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.MASS;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
-import com.mygdx.mass.Test.Constants;
 
 ;
 
 public class MapBuilderScreen implements Screen {
 
-    public enum State {NONE, WALL, BUILDING, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, SURVEILLANCE, INTRUDER, DELETION};
+    public enum State {NONE, WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, GUARD, INTRUDER, MOVE, DELETION};
     private State currentState;
 
     public MASS mass;
@@ -146,14 +145,16 @@ public class MapBuilderScreen implements Screen {
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
+        //draw the box2d objects
         debugRenderer.render(world, camera.combined);
         world.step(1 / 60f, 6, 2);
 
+        //draw the building with shapes
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (BoxObject boxObject : map.getMapObjects()) {
+        for (BoxObject boxObject : map.getBoxObjects()) {
             Rectangle rectangle = boxObject.getRectangle();
             float alpha;
             if (rectangle.contains(camera.position.x, camera.position.y)) {
@@ -162,19 +163,19 @@ public class MapBuilderScreen implements Screen {
                 alpha = 1.0f;
             }
             switch (boxObject.getType()) {
-                case Constants.WALL:
+                case WALL:
                     shapeRenderer.setColor(0.5f, 0.5f, 0.5f, alpha);
                     break;
-                case Constants.BUILDING:
+                case BUILDING:
                     shapeRenderer.setColor(0.8f, 0.8f, 0.8f, alpha);
                     break;
-                case Constants.SENTRY_TOWER:
+                case SENTRY_TOWER:
                     shapeRenderer.setColor(1.0f, 1.0f, 0.0f, alpha);
                     break;
-                case Constants.HIDING_AREA:
+                case HIDING_AREA:
                     shapeRenderer.setColor(0.0f, 1.0f, 0.0f, alpha);
                     break;
-                case Constants.TARGET_AREA:
+                case TARGET_AREA:
                     shapeRenderer.setColor(1.0f, 0.0f, 1.0f, alpha);
                     break;
             }
@@ -182,10 +183,10 @@ public class MapBuilderScreen implements Screen {
         }
         for (Agent agent: map.getAgents()) {
             switch (agent.getType()) {
-                case Constants.SURVEYOR:
+                case GUARD:
                     shapeRenderer.setColor(0.0f, 0.0f, 1.0f, 1.0f);
                     break;
-                case Constants.INTRUDER:
+                case INTRUDER:
                     shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
                     break;
             }
@@ -202,6 +203,7 @@ public class MapBuilderScreen implements Screen {
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
+        //Draw the mouse selection area with click drag
         if (inputHandler.startDrag != null && inputHandler.endDrag != null) {
 //            shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -276,14 +278,14 @@ public class MapBuilderScreen implements Screen {
                 startDrag = new Vector2(x, y);
                 endDrag = startDrag;
                 return true;
-            } else if (currentState == State.SURVEILLANCE || currentState == State.INTRUDER) {
+            } else if (currentState == State.GUARD || currentState == State.INTRUDER) {
                 float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
                 float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
                 Vector2 position = new Vector2(x, y);
                 if (insideMap(position)) {
                     switch (currentState) {
-                        case SURVEILLANCE:
-                            map.addSurveillance(position);
+                        case GUARD:
+                            map.addGuard(position);
                             break;
                         case INTRUDER:
                             map.addIntruder(position);
@@ -296,14 +298,14 @@ public class MapBuilderScreen implements Screen {
                 float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
                 Vector2 position = new Vector2(x, y);
                 int index =-1;
-                for(int i=0; i<map.getMapObjects().size(); i++){
-                    if(map.getMapObjects().get(i).getRectangle().x<position.x &&map.getMapObjects().get(i).getRectangle().y<position.y && map.getMapObjects().get(i).getRectangle().width+map.getMapObjects().get(i).getRectangle().x> position.x &&
-                            map.getMapObjects().get(i).getRectangle().height + map.getMapObjects().get(i).getRectangle().y > position.y){
+                for(int i = 0; i<map.getBoxObjects().size(); i++){
+                    if(map.getBoxObjects().get(i).getRectangle().x<position.x &&map.getBoxObjects().get(i).getRectangle().y<position.y && map.getBoxObjects().get(i).getRectangle().width+map.getBoxObjects().get(i).getRectangle().x> position.x &&
+                            map.getBoxObjects().get(i).getRectangle().height + map.getBoxObjects().get(i).getRectangle().y > position.y){
                       index =i;
                     }
                 }
-                mass.world.destroyBody( map.getMapObjects().get(index).getBody());
-                map.getMapObjects().remove(index);
+                mass.world.destroyBody( map.getBoxObjects().get(index).getBody());
+                map.getBoxObjects().remove(index);
             }
             return false;
         }
