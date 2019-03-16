@@ -6,7 +6,7 @@ import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.*;
-import com.mygdx.mass.MASS;
+import com.mygdx.mass.Data.MASS;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,9 +15,8 @@ public class Map implements Serializable {
 
     public static final float DEFAULT_WIDTH = 200;
     public static final float DEFAULT_HEIGHT = 200;
-
-    public static float width = DEFAULT_WIDTH;
-    public static float height = DEFAULT_HEIGHT;
+    public float width = DEFAULT_WIDTH;
+    public float height = DEFAULT_WIDTH;
 
     private MASS mass;
 
@@ -46,6 +45,23 @@ public class Map implements Serializable {
         guards = new ArrayList<Guard>();
         intruders = new ArrayList<Intruder>();
     }
+
+	public Map(MASS mass, float width, float height) {
+		this.mass = mass;
+
+		walls = new ArrayList<Wall>();
+		buildings = new ArrayList<Building>();
+		doors = new ArrayList<Door>();
+		windows = new ArrayList<Window>();
+		sentryTowers = new ArrayList<SentryTower>();
+		hidingAreas = new ArrayList<HidingArea>();
+		targetAreas = new ArrayList<TargetArea>();
+
+		guards = new ArrayList<Guard>();
+		intruders = new ArrayList<Intruder>();
+		this.width = width;
+		this.height = height;
+	}
 
     public Wall addWall(Rectangle rectangle) {
         Wall wall = new Wall(mass, rectangle);
@@ -127,8 +143,8 @@ public class Map implements Serializable {
         return agents;
     }
 
-    public static float getWidth() { return width; }
-    public static float getHeight() { return height; }
+    public float getWidth() { return width; }
+    public float getHeight() { return height; }
     public ArrayList<Wall> getWalls() { return walls; }
     public ArrayList<Building> getBuildings() { return buildings; }
     public ArrayList<Door> getDoors() { return doors; }
@@ -139,12 +155,13 @@ public class Map implements Serializable {
     public ArrayList<Guard> getGuards() {
         return guards;
     }
+
     public ArrayList<Intruder> getIntruders() {
         return intruders;
     }
 
-    public void setWidth(float width) { Map.width = width; }
-    public void setHeight(float height) { Map.height = height; }
+    public void setWidth(float width) { this.width = width; }
+    public void setHeight(float height) { this.height = height; }
     public void setWalls(ArrayList<Wall> walls) { this.walls = walls; }
     public void setBuildings(ArrayList<Building> buildings) { this.buildings = buildings; }
     public void setDoors(ArrayList<Door> doors) { this.doors = doors; }

@@ -1,9 +1,9 @@
 package com.mygdx.mass.BoxObject;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.mygdx.mass.MASS;
+import com.mygdx.mass.Data.MASS;
 
-import static com.mygdx.mass.BoxObject.BoxObject.Type.TARGET_AREA;
+import static com.mygdx.mass.BoxObject.BoxObject.ObjectType.TARGET_AREA;
 
 // unknown to guards
 // if intruder stands in this area for 3 seconds they win
@@ -13,7 +13,7 @@ public class TargetArea extends BoxObject {
 
     public TargetArea (MASS mass, Rectangle rectangle) {
         super(mass, rectangle);
-        type = TARGET_AREA;
+        objectType = TARGET_AREA;
     }
 
 }

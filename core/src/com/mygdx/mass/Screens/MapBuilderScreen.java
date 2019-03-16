@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.BoxObject;
-import com.mygdx.mass.MASS;
+import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
 
@@ -55,11 +55,11 @@ public class MapBuilderScreen implements Screen {
         batch = mass.batch;
         world = mass.world;
         debugRenderer = mass.debugRenderer;
-        map = mass.map;
+        map = mass.getMap();
         rayHandler = mass.rayHandler;
         shapeRenderer = mass.shapeRenderer;
 
-        camera.position.set(Map.width /2,Map.height /2,0.0f);
+        camera.position.set(mass.getMap().width /2,mass.getMap().height /2,0.0f);
         viewport.setUnitsPerPixel(1/mass.PPM);
 
         hud = new HUD(this, batch);
@@ -82,19 +82,19 @@ public class MapBuilderScreen implements Screen {
         float thickness = 4;
 
         //North wall
-        Rectangle northWall = new Rectangle(0 - thickness, Map.height, Map.width + 2*thickness, thickness);
+        Rectangle northWall = new Rectangle(0 - thickness, mass.getMap().height, mass.getMap().width + 2*thickness, thickness);
         map.addWall(northWall);
 
         //East wall
-        Rectangle eastWall = new Rectangle(Map.width, 0 - thickness, thickness, Map.height + 2*thickness);
+        Rectangle eastWall = new Rectangle(mass.getMap().width, 0 - thickness, thickness, mass.getMap().height + 2*thickness);
         map.addWall(eastWall);
 
         //South wall
-        Rectangle southWall = new Rectangle(0 - thickness, 0 - thickness, Map.width + 2*thickness, thickness);
+        Rectangle southWall = new Rectangle(0 - thickness, 0 - thickness, mass.getMap().width + 2*thickness, thickness);
         map.addWall(southWall);
 
         //West wall
-        Rectangle westWall = new Rectangle(0 - thickness, 0 - thickness, thickness, Map.height + 2*thickness);
+        Rectangle westWall = new Rectangle(0 - thickness, 0 - thickness, thickness, mass.getMap().height + 2*thickness);
         map.addWall(westWall);
     }
 
@@ -162,7 +162,7 @@ public class MapBuilderScreen implements Screen {
             } else {
                 alpha = 1.0f;
             }
-            switch (boxObject.getType()) {
+            switch (boxObject.getObjectType()) {
                 case WALL:
                     shapeRenderer.setColor(0.5f, 0.5f, 0.5f, alpha);
                     break;
@@ -182,7 +182,7 @@ public class MapBuilderScreen implements Screen {
             shapeRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
         for (Agent agent: map.getAgents()) {
-            switch (agent.getType()) {
+            switch (agent.getAgentType()) {
                 case GUARD:
                     shapeRenderer.setColor(0.0f, 0.0f, 1.0f, 1.0f);
                     break;
@@ -226,17 +226,14 @@ public class MapBuilderScreen implements Screen {
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
@@ -348,7 +345,7 @@ public class MapBuilderScreen implements Screen {
         }
 
         private boolean insideMap(Vector2 point) {
-            return point.x >= 0 && point.x <= Map.width && point.y >= 0 && point.y <= Map.height;
+            return point.x >= 0 && point.x <= mass.getMap().width && point.y >= 0 && point.y <= mass.getMap().height;
         }
 
         @Override
@@ -372,5 +369,9 @@ public class MapBuilderScreen implements Screen {
         public boolean scrolled(int amount) {
             return false;
         }
+    }
+
+    public void setMap(Map map) {
+        this.map = map;
     }
 }

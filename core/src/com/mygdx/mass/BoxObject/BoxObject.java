@@ -1,14 +1,15 @@
 package com.mygdx.mass.BoxObject;
+
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.mass.MASS;
+import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.World.WorldObject;
 
 public abstract class BoxObject extends WorldObject implements java.io.Serializable{
 
-    public enum Type {WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA};
-    protected Type type;
+    public enum ObjectType {WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA};
+    protected ObjectType objectType;
 
     protected MASS mass;
 
@@ -45,8 +46,8 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
         polygonShape.dispose();
     }
 
-    public Type getType() {
-        return type;
+    public ObjectType getObjectType() {
+        return objectType;
     }
     public Rectangle getRectangle() {
         return rectangle;
