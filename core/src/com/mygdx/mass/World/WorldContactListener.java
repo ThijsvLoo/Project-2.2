@@ -3,6 +3,7 @@ package com.mygdx.mass.World;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Agents.Agent;
+import com.mygdx.mass.Data.MASS;
 
 //This class is where all collissions are handled
 public class WorldContactListener implements ContactListener {
@@ -13,11 +14,11 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureB = contact.getFixtureB();
 
         if (fixtureA.getUserData() instanceof Agent) {
-            ((Agent) fixtureA.getUserData()).setDestination(new Vector2((float) Math.random() * Map.width, (float) Math.random() * Map.height));
+            ((Agent) fixtureA.getUserData()).setDestination(new Vector2((float) Math.random() * MASS.map.width, (float) Math.random() * MASS.map.height));
         }
 
         if (fixtureB.getUserData() instanceof Agent) {
-            ((Agent) fixtureB.getUserData()).setDestination(new Vector2((float) Math.random() * Map.width, (float) Math.random() * Map.height));
+            ((Agent) fixtureB.getUserData()).setDestination(new Vector2((float) Math.random() * MASS.map.width, (float) Math.random() * MASS.map.height));
         }
     }
 

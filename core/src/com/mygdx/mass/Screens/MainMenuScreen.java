@@ -1,7 +1,7 @@
 package com.mygdx.mass.Screens;
 
 import com.badlogic.gdx.Screen;
-import com.mygdx.mass.MASS;
+import com.mygdx.mass.Data.MASS;
 
 public class MainMenuScreen implements Screen {
 
