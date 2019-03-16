@@ -15,6 +15,7 @@ import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.MASS;
+import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
 
@@ -166,7 +167,7 @@ public class MapBuilderScreen implements Screen {
     private void drawBoxObjects() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (BoxObject boxObject : map.getBoxObjects()) {
-            switch (boxObject.getType()) {
+            switch (boxObject.getObjectType()) {
                 case WALL:
                     shapeRenderer.setColor(0.50f, 0.50f, 0.50f, 1.00f);
                     break;
@@ -192,7 +193,7 @@ public class MapBuilderScreen implements Screen {
     private void drawAgents() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (Agent agent: map.getAgents()) {
-            switch (agent.getType()) {
+            switch (agent.getAgentType()) {
                 case GUARD:
                     shapeRenderer.setColor(0.0f, 0.0f, 1.0f, 1.0f);
                     break;
@@ -234,17 +235,14 @@ public class MapBuilderScreen implements Screen {
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
@@ -380,5 +378,9 @@ public class MapBuilderScreen implements Screen {
         private boolean insideMap(Vector2 point) {
             return point.x >= 0 && point.x <= Map.width && point.y >= 0 && point.y <= Map.height;
         }
+    }
+
+    public void setMap(Map map) {
+        this.map = map;
     }
 }

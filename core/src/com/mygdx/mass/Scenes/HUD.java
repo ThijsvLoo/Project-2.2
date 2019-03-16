@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.BoxObject.BoxObject;
+import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
 import javafx.scene.control.Tab;
@@ -74,56 +76,56 @@ public class HUD implements Disposable {
                 System.out.println("Current action: Create wall");
             }
         });
-        building = createButton("Textures/Buttons/Wall.png");
+        building = createButton("Textures/Buttons/Building2.png");
         building.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.BUILDING);
                 System.out.println("Current action: Create building");
             }
         });
-        door = createButton("Textures/Buttons/Wall.png");
+        door = createButton("Textures/Buttons/Door2.png");
         door.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DOOR);
                 System.out.println("Current action: Create door");
             }
         });
-        window = createButton("Textures/Buttons/Wall.png");
+        window = createButton("Textures/Buttons/Window.png");
         window.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WINDOW);
                 System.out.println("Current action: Create window");
             }
         });
-        sentryTower = createButton("Textures/Buttons/Wall.png");
+        sentryTower = createButton("Textures/Buttons/Tower.png");
         sentryTower.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.SENTRY_TOWER);
                 System.out.println("Current action: Create sentry tower");
             }
         });
-        hidingArea = createButton("Textures/Buttons/Wall.png");
+        hidingArea = createButton("Textures/Buttons/Hiding2.png");
         hidingArea.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.HIDING_AREA);
                 System.out.println("Current action: Create hiding area");
             }
         });
-        targetArea = createButton("Textures/Buttons/Wall.png");
+        targetArea = createButton("Textures/Buttons/Target.png");
         targetArea.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.TARGET_AREA);
-                System.out.println("Current action: Create targtet area");
+                System.out.println("Current action: Create target area");
             }
         });
-        guard = createButton("Textures/Buttons/Wall.png");
+        guard = createButton("Textures/Buttons/Guard.png");
         guard.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.GUARD);
                 System.out.println("Current action: Create guard");
             }
         });
-        intruder = createButton("Textures/Buttons/Wall.png");
+        intruder = createButton("Textures/Buttons/Intruder2.png");
         intruder.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.INTRUDER);
@@ -131,64 +133,79 @@ public class HUD implements Disposable {
             }
         });
 
-        load = createButton("Textures/Buttons/Wall.png");
+        load = createButton("Textures/Buttons/Load.png");
         load.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
+//                ArrayList<BoxObject> mapObjectList=  MASS.map.getMapObjects();
+//                for(int i = 0; i < MASS.map.getMapObjects().size(); i++){
+//                    mapBuilderScreen.mass.world.destroyBody( MASS.map.getMapObjects().get(i).getBody());
+//                }
+//                mapObjectList.clear();
+//                for(int i = 0; i < MASS.map.getAgents().size(); i++){
+//                    mapBuilderScreen.mass.world.destroyBody( MASS.map.getAgents().get(i).getBody());
+//                }
+				mapBuilderScreen.mass.setMap(MapFileReader.createMapFromFile(mapBuilderScreen.mass));
+				mapBuilderScreen.mass.world.dispose();
+				mapBuilderScreen.mass.rayHandler.dispose();
+				mapBuilderScreen.mass.create();
+                mapBuilderScreen.mass.setMap(MapFileReader.createMapFromFile(mapBuilderScreen.mass));
                 System.out.println("Current action: Load map");
             }
         });
-        save = createButton("Textures/Buttons/Wall.png");
+        save = createButton("Textures/Buttons/Save.png");
         save.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                MapFileReader.saveToFile(mapBuilderScreen.mass.getMap());
+                MapFileReader.saveMapToFile(mapBuilderScreen.mass.getMap());
                 System.out.println("Current action: Save map");
             }
         });
-        move = createButton("Textures/Buttons/Wall.png");
+        move = createButton("Textures/Buttons/Move.png");
         move.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.MOVE);
                 System.out.println("Current action: Move");
             }
         });
-        delete = createButton("Textures/Buttons/Wall.png");
+        delete = createButton("Textures/Buttons/Delete.png");
         delete.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DELETION);
                 System.out.println("Current action: Delete");
             }
         });
-        clear = createButton("Textures/Buttons/Wall.png");
+        clear = createButton("Textures/Buttons/Clear.png");
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Clear map");
-               ArrayList<BoxObject> mapObjectList=  mapBuilderScreen.mass.map.getBoxObjects();
-
+            	System.out.println("Current action: Clear map");
+            	ArrayList<BoxObject> mapObjectList=  mapBuilderScreen.mass.map.getBoxObjects();
                 for(int i=0; i<mapObjectList.size(); i++){
                     mapBuilderScreen.mass.world.destroyBody( mapBuilderScreen.mass.map.getBoxObjects().get(i).getBody());
                 }
                 mapObjectList.clear();
+//				mapBuilderScreen.mass.world.dispose();
+//				mapBuilderScreen.mass.rayHandler.dispose();
+//				mapBuilderScreen.mass.create();
             }
         });
-        undo = createButton("Textures/Buttons/Wall.png");
+        undo = createButton("Textures/Buttons/Undo.png");
         undo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Undo");
             }
         });
-        redo = createButton("Textures/Buttons/Wall.png");
+        redo = createButton("Textures/Buttons/Redo.png");
         redo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Redo");
             }
         });
-        simulate = createButton("Textures/Buttons/Wall.png");
+        simulate = createButton("Textures/Buttons/Simulate.png");
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Simulate");
             }
         });
-        exit = createButton("Textures/Buttons/Wall.png");
+        exit = createButton("Textures/Buttons/Exit.png");
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit");

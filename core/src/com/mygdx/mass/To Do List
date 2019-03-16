@@ -8,7 +8,7 @@ Tasks that need to be finish ASAP (try to aim for 1 week), as other tasks depend
 - MapSimulator function: decrease speed, play/pause, increase speed
 
 Tasks that aren't constraint with other tasks, in no particular order
-- MainMenuScreen -> MapBuilder, MapSimulator, Options, Exit
+- MainMenuScreen -> MapBuilder, MapSimulator, Options, Exit (Kamil)
 - MapBuilder settings pop up -> Load existing file or start new map with certain settings
 - Find assets: sprites, sounds, music
 - Manage and implement assets using AssetManager

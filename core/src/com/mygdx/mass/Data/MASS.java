@@ -1,4 +1,4 @@
-package com.mygdx.mass;
+package com.mygdx.mass.Data;
 
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
@@ -9,11 +9,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldContactListener;
 
-public class MASS extends Game {
+public class MASS extends Game{
 
 	//General settings constants, don't put specific constants here
 	public static final String TITLE = "Multi-Agent Surveillance System";
@@ -37,16 +38,17 @@ public class MASS extends Game {
 	public Box2DDebugRenderer debugRenderer;
 	public WorldContactListener worldContactListener;
 
-	public Map map;
+	public static Map map;
 
 	public RayHandler rayHandler;
 
 	public ShapeRenderer shapeRenderer;
 
 	public MapBuilderScreen mapBuilderScreen;
+	public MainMenuScreen mainMenuScreen;
 
 	@Override
-	public void create () {
+	public void create(){
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
 		PPM = MINIMAL_ZOOM;
@@ -72,16 +74,21 @@ public class MASS extends Game {
 		shapeRenderer = new ShapeRenderer();
 
 		mapBuilderScreen = new MapBuilderScreen(this);
-        setScreen(mapBuilderScreen);
+		mainMenuScreen = new MainMenuScreen(this);
+
+        setScreen(mainMenuScreen);
 	}
 
+	public void reset(){
+
+	}
 	@Override
-	public void render () {
+	public void render(){
 		super.render();
 	}
 	
 	@Override
-	public void dispose () {
+	public void dispose(){
 		super.dispose();
 		batch.dispose();;
 		debugRenderer.dispose();
@@ -91,7 +98,12 @@ public class MASS extends Game {
 		mapBuilderScreen.dispose();
 	}
 
-	public Map getMap() { return map; }
+	public Map getMap(){
+		return map;
+	}
 
-	public void setMap(Map map) { this.map = map; }
+	public void setMap(Map map){
+		mapBuilderScreen.setMap(map);
+		this.map = map;
+	}
 }

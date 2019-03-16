@@ -5,7 +5,7 @@ import box2dLight.PointLight;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.Algorithms.Random;
-import com.mygdx.mass.MASS;
+import com.mygdx.mass.Data.MASS;
 
 public class Guard extends Agent {
 
@@ -13,7 +13,7 @@ public class Guard extends Agent {
 
     public Guard(MASS mass, Vector2 position) {
         super(mass, position);
-        type = Type.GUARD;
+        agentType = AgentType.GUARD;
         moveSpeed = BASE_SPEED;
         turnSpeed = 180f;
         visualRange = 6.0f;
