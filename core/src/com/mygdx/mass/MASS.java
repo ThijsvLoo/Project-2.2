@@ -21,7 +21,9 @@ public class MASS extends Game {
 	public static final int WINDOW_HEIGHT = 800;
 	public static final int ANTI_ALIASING = 16;
 
-	public static final float DEFAULT_ZOOM = 3.0f;
+	public static final float CAMERA_SPEED = 40.0f; //unit in meter per sec
+	public static final float MINIMAL_ZOOM = 3.0f;
+	public static final float MAXIMAL_ZOOM = 30.0f;
 
 	//Camera and Viewport
 	public OrthographicCamera camera;
@@ -47,7 +49,7 @@ public class MASS extends Game {
 	public void create () {
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
-		PPM = DEFAULT_ZOOM;
+		PPM = MINIMAL_ZOOM;
 
 		batch = new SpriteBatch();
 

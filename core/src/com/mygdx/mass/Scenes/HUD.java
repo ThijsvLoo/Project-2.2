@@ -15,10 +15,14 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
+import javafx.scene.control.Tab;
 
 import java.util.ArrayList;
 
 public class HUD implements Disposable {
+
+    public static final float BUTTON_SIZE = 32;
+    public static final float PAD_BOTTOM = 10;
 
     private MapBuilderScreen mapBuilderScreen;
 
@@ -191,28 +195,28 @@ public class HUD implements Disposable {
             }
         });
 
-        table.add(wall).size(64);
-        table.add(building).size(64);
-        table.add(door).size(64);
-        table.add(window).size(64);
-        table.add(sentryTower).size(64);
-        table.add(hidingArea).size(64);
-        table.add(targetArea).size(64);
-        table.add(guard).size(64);
-        table.add(intruder).size(64);
+        table.add(wall).size(BUTTON_SIZE);
+        table.add(building).size(BUTTON_SIZE);
+        table.add(door).size(BUTTON_SIZE);
+        table.add(window).size(BUTTON_SIZE);
+        table.add(sentryTower).size(BUTTON_SIZE);
+        table.add(hidingArea).size(BUTTON_SIZE);
+        table.add(targetArea).size(BUTTON_SIZE);
+        table.add(guard).size(BUTTON_SIZE);
+        table.add(intruder).size(BUTTON_SIZE);
 
         //start second row
         table.row();
 
-        table.add(load).size(64).padBottom(10);
-        table.add(save).size(64).padBottom(10);
-        table.add(move).size(64).padBottom(10);
-        table.add(delete).size(64).padBottom(10);
-        table.add(clear).size(64).padBottom(10);
-        table.add(undo).size(64).padBottom(10);
-        table.add(redo).size(64).padBottom(10);
-        table.add(simulate).size(64).padBottom(10);
-        table.add(exit).size(64).padBottom(10);
+        table.add(load).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(save).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(move).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(delete).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(clear).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(undo).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(redo).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(simulate).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(exit).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
 
         stage.addActor(table);
     }
@@ -229,8 +233,14 @@ public class HUD implements Disposable {
 
     }
 
+    public void resize(int width, int height) {
+
+    }
+
     public void dispose() {
         stage.dispose();
     }
+
+    public Table getTable() { return table; }
 
 }
