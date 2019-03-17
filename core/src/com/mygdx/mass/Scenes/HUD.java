@@ -1,5 +1,6 @@
 package com.mygdx.mass.Scenes;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
 //import javafx.scene.control.Tab;
@@ -209,6 +211,9 @@ public class HUD implements Disposable {
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit");
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen(mapBuilderScreen.mass));
+
+                Gdx.app.getApplicationListener().dispose();
             }
         });
 

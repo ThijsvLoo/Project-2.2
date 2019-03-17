@@ -305,10 +305,15 @@ public class MapBuilderScreen implements Screen {
                     if(map.getBoxObjects().get(i).getRectangle().x<position.x &&map.getBoxObjects().get(i).getRectangle().y<position.y && map.getBoxObjects().get(i).getRectangle().width+map.getBoxObjects().get(i).getRectangle().x> position.x &&
                             map.getBoxObjects().get(i).getRectangle().height + map.getBoxObjects().get(i).getRectangle().y > position.y){
                       index =i;
+                      break;
                     }
                 }
-                mass.world.destroyBody( map.getBoxObjects().get(index).getBody());
-                map.getBoxObjects().remove(index);
+                if(index!=-1) {
+                    map.getBoxObjects().remove(index);
+                    mass.world.destroyBody(map.getBoxObjects().get(index).getBody());
+
+                }
+
             }
             return false;
         }
