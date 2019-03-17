@@ -14,7 +14,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.BoxObject.Wall;
-import com.mygdx.mass.MASS;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
@@ -57,7 +56,7 @@ public class MapBuilderScreen implements Screen {
         this.rayHandler = mass.rayHandler;
         this.shapeRenderer = mass.shapeRenderer;
 
-        camera.position.set(Map.width/2,Map.height/2,0.0f);
+        camera.position.set(map.getWidth()/2,map.getHeight()/2,0.0f);
         viewport.setUnitsPerPixel(1/mass.PPM);
 
         hud = new HUD(this, batch);
@@ -78,19 +77,19 @@ public class MapBuilderScreen implements Screen {
 
     private void createOuterWall() {
         //North wall
-        Rectangle northWall = new Rectangle(0 - Wall.THICKNESS, Map.height, Map.width + 2*Wall.THICKNESS, Wall.THICKNESS);
+        Rectangle northWall = new Rectangle(0 - Wall.THICKNESS, map.getHeight(), map.getWidth() + 2*Wall.THICKNESS, Wall.THICKNESS);
         map.addWall(northWall);
 
         //East wall
-        Rectangle eastWall = new Rectangle(Map.width, 0 - Wall.THICKNESS, Wall.THICKNESS, Map.height + 2*Wall.THICKNESS);
+        Rectangle eastWall = new Rectangle(map.getWidth(), 0 - Wall.THICKNESS, Wall.THICKNESS, map.getHeight() + 2*Wall.THICKNESS);
         map.addWall(eastWall);
 
         //South wall
-        Rectangle southWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, Map.width + 2*Wall.THICKNESS, Wall.THICKNESS);
+        Rectangle southWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, map.getWidth() + 2*Wall.THICKNESS, Wall.THICKNESS);
         map.addWall(southWall);
 
         //West wall
-        Rectangle westWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, Wall.THICKNESS, Map.height + 2*Wall.THICKNESS);
+        Rectangle westWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, Wall.THICKNESS, map.getHeight() + 2*Wall.THICKNESS);
         map.addWall(westWall);
     }
 
@@ -324,22 +323,32 @@ public class MapBuilderScreen implements Screen {
                                                         Math.min(inputHandler.startDrag.y, inputHandler.endDrag.y),
                                                         Math.abs(inputHandler.startDrag.x - inputHandler.endDrag.x),
                                                         Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
-                    switch (currentState) {
-                        case WALL:
-                            map.addWall(rectangle);
+                    boolean overlap = false;
+                    for (BoxObject boxObject : map.getBoxObjects()) {
+                        if (boxObject.getRectangle().overlaps(rectangle)) {
+                            System.out.println("Overlap not allowed");
+                            overlap = true;
                             break;
-                        case BUILDING:
-                            map.addBuilding(rectangle);
-                            break;
-                        case SENTRY_TOWER:
-                            map.addSentryTower(rectangle);
-                            break;
-                        case HIDING_AREA:
-                            map.addHidingArea(rectangle);
-                            break;
-                        case TARGET_AREA:
-                            map.addTargetArea(rectangle);
-                            break;
+                        }
+                    }
+                    if (!overlap) {
+                        switch (currentState) {
+                            case WALL:
+                                map.addWall(rectangle);
+                                break;
+                            case BUILDING:
+                                map.addBuilding(rectangle);
+                                break;
+                            case SENTRY_TOWER:
+                                map.addSentryTower(rectangle);
+                                break;
+                            case HIDING_AREA:
+                                map.addHidingArea(rectangle);
+                                break;
+                            case TARGET_AREA:
+                                map.addTargetArea(rectangle);
+                                break;
+                        }
                     }
                 }
                 startDrag = null;
@@ -376,7 +385,7 @@ public class MapBuilderScreen implements Screen {
         }
 
         private boolean insideMap(Vector2 point) {
-            return point.x >= 0 && point.x <= Map.width && point.y >= 0 && point.y <= Map.height;
+            return point.x >= 0 && point.x <= map.getWidth() && point.y >= 0 && point.y <= map.getHeight();
         }
     }
 

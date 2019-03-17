@@ -73,8 +73,8 @@ public class MASS extends Game{
 
 		shapeRenderer = new ShapeRenderer();
 
-		mapBuilderScreen = new MapBuilderScreen(this);
 		mainMenuScreen = new MainMenuScreen(this);
+		mapBuilderScreen = new MapBuilderScreen(this);
 
         setScreen(mainMenuScreen);
 	}
