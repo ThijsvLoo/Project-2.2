@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public abstract class Agent extends WorldObject implements java.io.Serializable{
 
+    public static final float SIZE = 0.5f;
     public static final float MAX_TURN_SPEED = 180.0f;
 
     public enum AgentType {GUARD, INTRUDER};

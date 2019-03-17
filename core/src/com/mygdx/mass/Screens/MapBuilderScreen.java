@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.BoxObject;
+import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
@@ -26,13 +27,11 @@ public class MapBuilderScreen implements Screen {
 
     public MASS mass;
 
-    //Camera and Viewport
     private OrthographicCamera camera;
     private ScreenViewport viewport;
 
     private SpriteBatch batch;
 
-    //Box2D
     private World world;
     private Box2DDebugRenderer debugRenderer;
 
@@ -46,20 +45,18 @@ public class MapBuilderScreen implements Screen {
 
     private InputHandler inputHandler;
 
-
-
     public MapBuilderScreen(MASS mass) {
         this.mass = mass;
-        camera = mass.camera;
-        viewport = mass.viewport;
-        batch = mass.batch;
-        world = mass.world;
-        debugRenderer = mass.debugRenderer;
-        map = mass.getMap();
-        rayHandler = mass.rayHandler;
-        shapeRenderer = mass.shapeRenderer;
+        this.camera = mass.camera;
+        this.viewport = mass.viewport;
+        this.batch = mass.batch;
+        this.world = mass.world;
+        this.debugRenderer = mass.debugRenderer;
+        this.map = mass.map;
+        this.rayHandler = mass.rayHandler;
+        this.shapeRenderer = mass.shapeRenderer;
 
-        camera.position.set(mass.getMap().width /2,mass.getMap().height /2,0.0f);
+        camera.position.set(map.getWidth()/2,map.getHeight()/2,0.0f);
         viewport.setUnitsPerPixel(1/mass.PPM);
 
         hud = new HUD(this, batch);
@@ -79,27 +76,25 @@ public class MapBuilderScreen implements Screen {
     }
 
     private void createOuterWall() {
-        float thickness = 4;
-
         //North wall
-        Rectangle northWall = new Rectangle(0 - thickness, mass.getMap().height, mass.getMap().width + 2*thickness, thickness);
+        Rectangle northWall = new Rectangle(0 - Wall.THICKNESS, map.getHeight(), map.getWidth() + 2*Wall.THICKNESS, Wall.THICKNESS);
         map.addWall(northWall);
 
         //East wall
-        Rectangle eastWall = new Rectangle(mass.getMap().width, 0 - thickness, thickness, mass.getMap().height + 2*thickness);
+        Rectangle eastWall = new Rectangle(map.getWidth(), 0 - Wall.THICKNESS, Wall.THICKNESS, map.getHeight() + 2*Wall.THICKNESS);
         map.addWall(eastWall);
 
         //South wall
-        Rectangle southWall = new Rectangle(0 - thickness, 0 - thickness, mass.getMap().width + 2*thickness, thickness);
+        Rectangle southWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, map.getWidth() + 2*Wall.THICKNESS, Wall.THICKNESS);
         map.addWall(southWall);
 
         //West wall
-        Rectangle westWall = new Rectangle(0 - thickness, 0 - thickness, thickness, mass.getMap().height + 2*thickness);
+        Rectangle westWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, Wall.THICKNESS, map.getHeight() + 2*Wall.THICKNESS);
         map.addWall(westWall);
     }
 
     public void update(float delta) {
-        handleInput(delta); //handle user input through polling
+        handleInput(delta);
 
         for (Agent agent : map.getAgents()) {
             agent.update(delta);
@@ -112,18 +107,18 @@ public class MapBuilderScreen implements Screen {
 
     public void handleInput(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            camera.position.x -= 100 * delta;
+            camera.position.x -= MASS.CAMERA_SPEED * delta;
         } if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            camera.position.x += 100 * delta;
+            camera.position.x += MASS.CAMERA_SPEED * delta;
         } if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            camera.position.y += 100 * delta;
+            camera.position.y += MASS.CAMERA_SPEED * delta;
         } if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            camera.position.y -= 100 * delta;
-        } if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < 30) {
+            camera.position.y -= MASS.CAMERA_SPEED * delta;
+        } if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < MASS.MAXIMAL_ZOOM) {
             mass.PPM *= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        } if (Gdx.input.isKeyPressed(Input.Keys.O) && mass.PPM > 1) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.O) && mass.PPM > MASS.MINIMAL_ZOOM) {
             mass.PPM /= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
@@ -133,54 +128,69 @@ public class MapBuilderScreen implements Screen {
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0,0,0,1);
-        //anti aliasing
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0));
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0)); //anti aliasing
 
+        //update the states
         update(delta);
 
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        batch.end();
+        //draw the sprites
+        drawSprites();
 
+        //draw the light effects
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
 
-        //draw the box2d objects
+        //draw the box2d debug objects
         debugRenderer.render(world, camera.combined);
         world.step(1 / 60f, 6, 2);
 
-        //draw the building with shapes
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        //draw the shapes and lines
         shapeRenderer.setProjectionMatrix(camera.combined);
+        drawBoxObjects();
+        drawAgents();
+        drawAgentPaths();
+        drawMouseArea();
+
+        //draw the hud
+        batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        hud.stage.draw();
+    }
+
+    private void drawSprites() {
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+
+        batch.end();
+    }
+
+    private void drawBoxObjects() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (BoxObject boxObject : map.getBoxObjects()) {
-            Rectangle rectangle = boxObject.getRectangle();
-            float alpha;
-            if (rectangle.contains(camera.position.x, camera.position.y)) {
-                alpha = 0.2f;
-            } else {
-                alpha = 1.0f;
-            }
             switch (boxObject.getObjectType()) {
                 case WALL:
-                    shapeRenderer.setColor(0.5f, 0.5f, 0.5f, alpha);
+                    shapeRenderer.setColor(0.50f, 0.50f, 0.50f, 1.00f);
                     break;
                 case BUILDING:
-                    shapeRenderer.setColor(0.8f, 0.8f, 0.8f, alpha);
+                    shapeRenderer.setColor(0.93f, 0.93f, 0.93f, 1.00f);
                     break;
                 case SENTRY_TOWER:
-                    shapeRenderer.setColor(1.0f, 1.0f, 0.0f, alpha);
+                    shapeRenderer.setColor(1.00f, 0.81f, 0.00f, 1.00f);
                     break;
                 case HIDING_AREA:
-                    shapeRenderer.setColor(0.0f, 1.0f, 0.0f, alpha);
+                    shapeRenderer.setColor(0.00f, 0.50f, 0.00f, 1.00f);
                     break;
                 case TARGET_AREA:
-                    shapeRenderer.setColor(1.0f, 0.0f, 1.0f, alpha);
+                    shapeRenderer.setColor(1.00f, 0.45f, 0.45f, 1.00f);
                     break;
             }
+            Rectangle rectangle = boxObject.getRectangle();
             shapeRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
+        shapeRenderer.end();
+    }
+
+    private void drawAgents() {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (Agent agent: map.getAgents()) {
             switch (agent.getAgentType()) {
                 case GUARD:
@@ -190,22 +200,22 @@ public class MapBuilderScreen implements Screen {
                     shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
                     break;
             }
-            shapeRenderer.circle(agent.getBody().getPosition().x, agent.getBody().getPosition().y, 1.0f);
+            shapeRenderer.circle(agent.getBody().getPosition().x, agent.getBody().getPosition().y, Agent.SIZE/2);
         }
         shapeRenderer.end();
+    }
 
+    private void drawAgentPaths() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (Agent agent : map.getAgents()) {
             shapeRenderer.setColor(Color.PURPLE);
             shapeRenderer.line(agent.getBody().getPosition(), agent.getDestination());
         }
         shapeRenderer.end();
+    }
 
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-
-        //Draw the mouse selection area with click drag
+    private void drawMouseArea() {
         if (inputHandler.startDrag != null && inputHandler.endDrag != null) {
-//            shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
             shapeRenderer.setColor(Color.RED);
             shapeRenderer.rect(Math.min(inputHandler.startDrag.x, inputHandler.endDrag.x),
@@ -214,14 +224,12 @@ public class MapBuilderScreen implements Screen {
                     Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
             shapeRenderer.end();
         }
-
-        batch.setProjectionMatrix(hud.stage.getCamera().combined);
-        hud.stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width,height);
+        hud.resize(width, height);
     }
 
     @Override
@@ -291,9 +299,7 @@ public class MapBuilderScreen implements Screen {
                 }
                 return true;
             } else if (currentState== State.DELETION) {
-                float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
-                float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
-                Vector2 position = new Vector2(x, y);
+                Vector2 position = toWorldCoordinate(screenX, screenY);
                 int index =-1;
                 for(int i = 0; i<map.getBoxObjects().size(); i++){
                     if(map.getBoxObjects().get(i).getRectangle().x<position.x &&map.getBoxObjects().get(i).getRectangle().y<position.y && map.getBoxObjects().get(i).getRectangle().width+map.getBoxObjects().get(i).getRectangle().x> position.x &&
@@ -311,30 +317,38 @@ public class MapBuilderScreen implements Screen {
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
             if (currentState == State.WALL || currentState == State.BUILDING || currentState == State.SENTRY_TOWER
                     || currentState == State.HIDING_AREA || currentState == State.TARGET_AREA) {
-                float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
-                float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
-                endDrag = new Vector2(x, y);
+                endDrag = toWorldCoordinate(screenX, screenY);
                 if (insideMap(startDrag) && insideMap(endDrag)) {
                     Rectangle rectangle = new Rectangle(Math.min(inputHandler.startDrag.x, inputHandler.endDrag.x),
                                                         Math.min(inputHandler.startDrag.y, inputHandler.endDrag.y),
                                                         Math.abs(inputHandler.startDrag.x - inputHandler.endDrag.x),
                                                         Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
-                    switch (currentState) {
-                        case WALL:
-                            map.addWall(rectangle);
+                    boolean overlap = false;
+                    for (BoxObject boxObject : map.getBoxObjects()) {
+                        if (boxObject.getRectangle().overlaps(rectangle)) {
+                            System.out.println("Overlap not allowed");
+                            overlap = true;
                             break;
-                        case BUILDING:
-                            map.addBuilding(rectangle);
-                            break;
-                        case SENTRY_TOWER:
-                            map.addSentryTower(rectangle);
-                            break;
-                        case HIDING_AREA:
-                            map.addHidingArea(rectangle);
-                            break;
-                        case TARGET_AREA:
-                            map.addTargetArea(rectangle);
-                            break;
+                        }
+                    }
+                    if (!overlap) {
+                        switch (currentState) {
+                            case WALL:
+                                map.addWall(rectangle);
+                                break;
+                            case BUILDING:
+                                map.addBuilding(rectangle);
+                                break;
+                            case SENTRY_TOWER:
+                                map.addSentryTower(rectangle);
+                                break;
+                            case HIDING_AREA:
+                                map.addHidingArea(rectangle);
+                                break;
+                            case TARGET_AREA:
+                                map.addTargetArea(rectangle);
+                                break;
+                        }
                     }
                 }
                 startDrag = null;
@@ -344,17 +358,11 @@ public class MapBuilderScreen implements Screen {
             return false;
         }
 
-        private boolean insideMap(Vector2 point) {
-            return point.x >= 0 && point.x <= mass.getMap().width && point.y >= 0 && point.y <= mass.getMap().height;
-        }
-
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
             if (currentState == State.WALL || currentState == State.BUILDING || currentState == State.SENTRY_TOWER
                     || currentState == State.HIDING_AREA || currentState == State.TARGET_AREA) {
-                float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
-                float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
-                endDrag = new Vector2(x, y);
+                endDrag = toWorldCoordinate(screenX, screenY);
                 return true;
             }
             return false;
@@ -368,6 +376,16 @@ public class MapBuilderScreen implements Screen {
         @Override
         public boolean scrolled(int amount) {
             return false;
+        }
+
+        private Vector2 toWorldCoordinate(int screenX, int screenY) {
+            float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
+            float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
+            return new Vector2(x,y);
+        }
+
+        private boolean insideMap(Vector2 point) {
+            return point.x >= 0 && point.x <= map.getWidth() && point.y >= 0 && point.y <= map.getHeight();
         }
     }
 
