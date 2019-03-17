@@ -8,11 +8,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -35,8 +34,8 @@ public class MainMenuScreen implements Screen {
 
     public MainMenuScreen(MASS mass) {
         this.mass = mass;
-        skin = new Skin(Gdx.files.internal("skin/skin.json"));
-        atlas = new TextureAtlas("skin/skin.atlas");
+        skin = new Skin(Gdx.files.internal("neon/skin/neon-ui.json"));
+        atlas = new TextureAtlas("neon/skin/neon-ui.atlas");
 
         batch = mass.batch;
         camera = mass.camera;
@@ -57,7 +56,15 @@ public class MainMenuScreen implements Screen {
         //Set table to fill stage
         mainTable.setFillParent(true);
         //Set alignment of contents in the table.
-        mainTable.top();
+        mainTable.center();
+
+        //Create Label
+        Label welcome = new Label("Welcome",skin);
+        welcome.setFontScale(2f,2f);
+        //Group top = new Group();
+        //top.addActor(welcome);
+        //top.setScale(2f,2f);
+
 
         //Create buttons
         TextButton playButton = new TextButton("Play", skin);
@@ -78,6 +85,8 @@ public class MainMenuScreen implements Screen {
             }
         });
 
+        mainTable.add(welcome);
+        mainTable.row();
         mainTable.add(playButton);
         mainTable.row();
         mainTable.add(optionsButton);
