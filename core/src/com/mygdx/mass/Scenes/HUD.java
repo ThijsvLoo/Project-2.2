@@ -213,7 +213,7 @@ public class HUD implements Disposable {
                 System.out.println("Current action: Exit");
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen(mapBuilderScreen.mass));
 
-                Gdx.app.getApplicationListener().dispose();
+//                Gdx.app.getApplicationListener().dispose();
             }
         });
 
