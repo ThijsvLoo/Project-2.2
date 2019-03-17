@@ -17,7 +17,7 @@ import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
-import javafx.scene.control.Tab;
+//import javafx.scene.control.Tab;
 
 import java.util.ArrayList;
 
