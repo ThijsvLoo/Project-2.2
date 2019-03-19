@@ -27,6 +27,8 @@ public class MASS extends Game{
 	public static final float MINIMAL_ZOOM = 3.0f;
 	public static final float MAXIMAL_ZOOM = 30.0f;
 
+	public static final float SIMULATION_DELTA = 0.01f;
+
 	//Camera and Viewport
 	public OrthographicCamera camera;
 	public ScreenViewport viewport;
@@ -107,7 +109,7 @@ public class MASS extends Game{
 	@Override
 	public void dispose(){
 		super.dispose();
-		batch.dispose();;
+		batch.dispose();
 		debugRenderer.dispose();
 		rayHandler.dispose();
 		world.dispose();

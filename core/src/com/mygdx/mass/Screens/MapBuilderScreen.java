@@ -15,14 +15,14 @@ import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Scenes.Info;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
 
-;
 
 public class MapBuilderScreen implements Screen {
 
-    public enum State {NONE, WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, GUARD, INTRUDER, MOVE, DELETION};
+    public enum State {NONE, WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, GUARD, INTRUDER, MOVE, DELETION}
     private State currentState;
 
     public MASS mass;
@@ -43,6 +43,8 @@ public class MapBuilderScreen implements Screen {
 
     private HUD hud;
 
+    private Info info;
+
     private InputHandler inputHandler;
 
     public MapBuilderScreen(MASS mass) {
@@ -60,6 +62,7 @@ public class MapBuilderScreen implements Screen {
         viewport.setUnitsPerPixel(1/mass.PPM);
 
         hud = new HUD(this, batch);
+        info = new Info(this.batch);
 
         InputMultiplexer inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(hud.stage);
@@ -103,6 +106,7 @@ public class MapBuilderScreen implements Screen {
         camera.update();
 
         hud.update(delta);
+        info.update(delta);
     }
 
     public void handleInput(float delta) {
@@ -154,6 +158,9 @@ public class MapBuilderScreen implements Screen {
         //draw the hud
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
+
+        mass.batch.setProjectionMatrix(info.stage.getCamera().combined);
+        info.stage.draw();
     }
 
     private void drawSprites() {
