@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -15,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.BoxObject.BoxObject;
-import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
@@ -138,19 +136,7 @@ public class HUD implements Disposable {
         load = createButton("Textures/Buttons/Load.png");
         load.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-//                ArrayList<BoxObject> mapObjectList=  MASS.map.getMapObjects();
-//                for(int i = 0; i < MASS.map.getMapObjects().size(); i++){
-//                    mapBuilderScreen.mass.world.destroyBody( MASS.map.getMapObjects().get(i).getBody());
-//                }
-//                mapObjectList.clear();
-//                for(int i = 0; i < MASS.map.getAgents().size(); i++){
-//                    mapBuilderScreen.mass.world.destroyBody( MASS.map.getAgents().get(i).getBody());
-//                }
-				mapBuilderScreen.mass.setMap(MapFileReader.createMapFromFile(mapBuilderScreen.mass));
-				mapBuilderScreen.mass.world.dispose();
-				mapBuilderScreen.mass.rayHandler.dispose();
-				mapBuilderScreen.mass.create();
-                mapBuilderScreen.mass.setMap(MapFileReader.createMapFromFile(mapBuilderScreen.mass));
+				mapBuilderScreen.mass.loadMap();
                 System.out.println("Current action: Load map");
             }
         });

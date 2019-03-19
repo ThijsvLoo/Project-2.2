@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldContactListener;
 
@@ -44,8 +45,8 @@ public class MASS extends Game{
 
 	public ShapeRenderer shapeRenderer;
 
-	public MapBuilderScreen mapBuilderScreen;
-	public MainMenuScreen mainMenuScreen;
+	private MapBuilderScreen mapBuilderScreen;
+	private MainMenuScreen mainMenuScreen;
 
 	@Override
 	public void create(){
@@ -75,11 +76,27 @@ public class MASS extends Game{
 
 		mainMenuScreen = new MainMenuScreen(this);
 		mapBuilderScreen = new MapBuilderScreen(this);
-
         setScreen(mainMenuScreen);
 	}
 
-	public void reset(){
+	public void loadMap(){
+		world = new World(new Vector2(0, 0), true);
+		//allows for debug lines of our box2d world.
+		debugRenderer = new Box2DDebugRenderer();
+		worldContactListener = new WorldContactListener();
+		world.setContactListener(worldContactListener);
+		rayHandler = new RayHandler(world);
+		RayHandler.setGammaCorrection(true);
+		RayHandler.useDiffuseLight(true);
+		rayHandler.setShadows(false);
+		rayHandler.setAmbientLight(0.01f, 0.01f, 0.01f, 0.8f);
+		rayHandler.setBlurNum(1);
+		shapeRenderer = new ShapeRenderer();
+
+		map = MapFileReader.createMapFromFile(this);
+		mapBuilderScreen = new MapBuilderScreen(this);
+
+		setScreen(mapBuilderScreen);
 
 	}
 	@Override

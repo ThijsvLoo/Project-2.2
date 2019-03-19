@@ -301,17 +301,39 @@ public class MapBuilderScreen implements Screen {
             } else if (currentState== State.DELETION) {
                 Vector2 position = toWorldCoordinate(screenX, screenY);
                 int index =-1;
-                for(int i = 0; i<map.getBoxObjects().size(); i++){
+                for(int i = 0; i < map.getBoxObjects().size(); i++){
                     if(map.getBoxObjects().get(i).getRectangle().x<position.x &&map.getBoxObjects().get(i).getRectangle().y<position.y && map.getBoxObjects().get(i).getRectangle().width+map.getBoxObjects().get(i).getRectangle().x> position.x &&
                             map.getBoxObjects().get(i).getRectangle().height + map.getBoxObjects().get(i).getRectangle().y > position.y){
-                      index =i;
+                      index = i;
                       break;
                     }
                 }
                 if(index!=-1) {
-                    map.getBoxObjects().remove(index);
                     mass.world.destroyBody(map.getBoxObjects().get(index).getBody());
-
+                    //map.getBoxObjects().remove(index);
+					switch(map.getBoxObjects().get(index).getObjectType()){
+						case WALL:
+							map.getWalls().remove(map.getBoxObjects().get(index));
+							break;
+						case BUILDING:
+							map.getBuildings().remove(map.getBoxObjects().get(index));
+							break;
+						case HIDING_AREA:
+							map.getHidingAreas().remove(map.getBoxObjects().get(index));
+							break;
+						case SENTRY_TOWER:
+							map.getSentryTowers().remove(map.getBoxObjects().get(index));
+							break;
+						case TARGET_AREA:
+							map.getTargetAreas().remove(map.getBoxObjects().get(index));
+							break;
+						case DOOR:
+							map.getDoors().remove(map.getBoxObjects().get(index));
+							break;
+						case WINDOW:
+							map.getWindows().remove(map.getBoxObjects().get(index));
+							break;
+					}
                 }
 
             }
