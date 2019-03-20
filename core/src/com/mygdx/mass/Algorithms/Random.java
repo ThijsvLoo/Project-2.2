@@ -14,18 +14,15 @@ public class Random extends Algorithm {
 
     public Random(Agent agent) {
         this.agent = agent;
-        this.agent.setDestination(new Vector2((float) Math.random()* MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
-        count = 0;
+        for (int i = 1; i <= 2; i++) {
+            this.agent.addWaypoint(new Vector2((float) Math.random()* MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
+        }
     }
 
     @Override
     public void act() {
-        count += Gdx.graphics.getDeltaTime();
-        if (count >= 2) {
-            agent.setDestination(new Vector2((float) Math.random()*MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
-            count = 0;
-        }
-        agent.move();
+//        agent.addWaypoint(new Vector2((float) Math.random()* MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
+        agent.followRoute();
     }
 
 }

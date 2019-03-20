@@ -59,20 +59,21 @@ public class MainMenuScreen implements Screen {
         mainTable.center();
 
         //Create Label
-        Label welcome = new Label("Welcome",skin);
-        welcome.setFontScale(2f,2f);
+        Label welcome = new Label("Multi-agent Surveillance",skin);
+        welcome.setFontScale(1f,1f);
         //Group top = new Group();
         //top.addActor(welcome);
         //top.setScale(2f,2f);
 
 
         //Create buttons
-        TextButton playButton = new TextButton("Play", skin);
+        TextButton simulateButton = new TextButton("Simulation", skin);
+        TextButton builderButton = new TextButton("Map builder", skin);
         TextButton optionsButton = new TextButton("Options", skin);
         TextButton exitButton = new TextButton("Exit", skin);
 
         //Add listeners to buttons
-        playButton.addListener(new ClickListener() {
+        builderButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MapBuilderScreen(mass));
@@ -87,7 +88,9 @@ public class MainMenuScreen implements Screen {
 
         mainTable.add(welcome);
         mainTable.row();
-        mainTable.add(playButton);
+        mainTable.add(simulateButton);
+        mainTable.row();
+        mainTable.add(builderButton);
         mainTable.row();
         mainTable.add(optionsButton);
         mainTable.row();

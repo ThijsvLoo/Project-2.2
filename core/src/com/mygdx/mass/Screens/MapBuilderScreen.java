@@ -13,16 +13,19 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.BoxObject;
+import com.mygdx.mass.BoxObject.Building;
+import com.mygdx.mass.BoxObject.Door;
 import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Scenes.Info;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
+import sun.management.resources.agent;
 
-;
 
 public class MapBuilderScreen implements Screen {
 
-    public enum State {NONE, WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, GUARD, INTRUDER, MOVE, DELETION};
+    public enum State {NONE, WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, GUARD, INTRUDER, MOVE, DELETION}
     private State currentState;
 
     public MASS mass;
@@ -43,6 +46,8 @@ public class MapBuilderScreen implements Screen {
 
     private HUD hud;
 
+    private Info info;
+
     private InputHandler inputHandler;
 
     public MapBuilderScreen(MASS mass) {
@@ -60,6 +65,7 @@ public class MapBuilderScreen implements Screen {
         viewport.setUnitsPerPixel(1/mass.PPM);
 
         hud = new HUD(this, batch);
+        info = new Info(this.batch);
 
         InputMultiplexer inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(hud.stage);
@@ -100,9 +106,14 @@ public class MapBuilderScreen implements Screen {
             agent.update(delta);
         }
 
+        for (Door door : map.getDoors()) {
+            door.update(delta);
+        }
+
         camera.update();
 
         hud.update(delta);
+        info.update(delta);
     }
 
     public void handleInput(float delta) {
@@ -122,6 +133,14 @@ public class MapBuilderScreen implements Screen {
             mass.PPM /= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        }
+
+//        for test purpose
+        if (Gdx.input.justTouched()) {
+            for (Agent agent : map.getAgents()) {
+                agent.getRoute().clear();
+                agent.setDestination(inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY()));
+            }
         }
     }
 
@@ -146,14 +165,17 @@ public class MapBuilderScreen implements Screen {
 
         //draw the shapes and lines
         shapeRenderer.setProjectionMatrix(camera.combined);
+        drawAgentPaths();
         drawBoxObjects();
         drawAgents();
-        drawAgentPaths();
-        drawMouseArea();
+        drawPreviewActionResult();
 
         //draw the hud
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
+
+        mass.batch.setProjectionMatrix(info.stage.getCamera().combined);
+        info.stage.draw();
     }
 
     private void drawSprites() {
@@ -163,15 +185,43 @@ public class MapBuilderScreen implements Screen {
         batch.end();
     }
 
+    private void drawAgentPaths() {
+        Gdx.gl.glLineWidth(1);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.PURPLE);
+        for (Agent agent : map.getAgents()) {
+            Vector2 start = agent.getBody().getPosition();
+            Vector2 end = agent.getDestination();
+            if (end != null) {
+                shapeRenderer.line(start, end);
+            }
+            for (Vector2 waypoint : agent.getRoute()) {
+                start = end;
+                end = waypoint;
+                shapeRenderer.line(start, end);
+            }
+        }
+        shapeRenderer.end();
+    }
+
     private void drawBoxObjects() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        Gdx.gl.glLineWidth(4);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (BoxObject boxObject : map.getBoxObjects()) {
             switch (boxObject.getObjectType()) {
                 case WALL:
                     shapeRenderer.setColor(0.50f, 0.50f, 0.50f, 1.00f);
                     break;
                 case BUILDING:
-                    shapeRenderer.setColor(0.93f, 0.93f, 0.93f, 1.00f);
+                    shapeRenderer.setColor(0.41f, 0.59f, 0.73f, 1.00f);
+                    break;
+                case DOOR:
+                    Door door = (Door) boxObject;
+                    if (door.isLocked()) {
+                        shapeRenderer.setColor(1.00f, 1.00f, 0.00f, 1.00f);
+                    } else {
+                        shapeRenderer.setColor(0.00f, 1.00f, 0.00f, 1.00f);
+                    }
                     break;
                 case SENTRY_TOWER:
                     shapeRenderer.setColor(1.00f, 0.81f, 0.00f, 1.00f);
@@ -190,6 +240,7 @@ public class MapBuilderScreen implements Screen {
     }
 
     private void drawAgents() {
+        Gdx.gl.glLineWidth(4);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         for (Agent agent: map.getAgents()) {
             switch (agent.getAgentType()) {
@@ -205,24 +256,52 @@ public class MapBuilderScreen implements Screen {
         shapeRenderer.end();
     }
 
-    private void drawAgentPaths() {
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Agent agent : map.getAgents()) {
-            shapeRenderer.setColor(Color.PURPLE);
-            shapeRenderer.line(agent.getBody().getPosition(), agent.getDestination());
-        }
-        shapeRenderer.end();
-    }
-
-    private void drawMouseArea() {
-        if (inputHandler.startDrag != null && inputHandler.endDrag != null) {
+    private void drawPreviewActionResult() {
+        Gdx.gl.glLineWidth(4);
+        if ((currentState == State.WALL || currentState == State.BUILDING || currentState == State.SENTRY_TOWER
+                || currentState == State.HIDING_AREA || currentState == State.TARGET_AREA)
+                && inputHandler.startDrag != null && inputHandler.endDrag != null) {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.RED);
-            shapeRenderer.rect(Math.min(inputHandler.startDrag.x, inputHandler.endDrag.x),
-                    Math.min(inputHandler.startDrag.y, inputHandler.endDrag.y),
-                    Math.abs(inputHandler.startDrag.x - inputHandler.endDrag.x),
-                    Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
+
+            Rectangle rectangle = new Rectangle(Math.min(inputHandler.startDrag.x, inputHandler.endDrag.x),
+                                                Math.min(inputHandler.startDrag.y, inputHandler.endDrag.y),
+                                                Math.abs(inputHandler.startDrag.x - inputHandler.endDrag.x),
+                                                Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
+
+            if (rectangle.width > Door.SIZE && rectangle.height > Door.SIZE) {
+                shapeRenderer.setColor(0.0f, 1.0f, 1.0f, 1.0f);
+                for (BoxObject boxObject : map.getBoxObjects()) {
+                    if (boxObject.getRectangle().overlaps(rectangle)) {
+                        shapeRenderer.setColor(Color.RED);
+                        break;
+                    }
+                }
+            } else {
+                shapeRenderer.setColor(Color.RED);
+            }
+
+            shapeRenderer.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
             shapeRenderer.end();
+        } else if (currentState == State.DOOR) {
+            Vector2 mouse = inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY());
+            for (Building building : map.getBuildings()) {
+                Rectangle rectangle = building.getRectangle();
+                if (rectangle.contains(mouse)) {
+                    Vector2 pointA = mouse.x - rectangle.x < rectangle.width/2 ? new Vector2(rectangle.x, mouse.y) : new Vector2(rectangle.x + rectangle.width, mouse.y);
+                    Vector2 pointB = mouse.y - rectangle.y < rectangle.height/2 ? new Vector2(mouse.x, rectangle.y) : new Vector2(mouse.x, rectangle.y + rectangle.height);
+                    Vector2 nearest = mouse.dst(pointA) < mouse.dst(pointB) ? pointA : pointB;
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                    shapeRenderer.setColor(1.00f, 1.00f, 0.00f, 1.00f);
+                    if (nearest.equals(pointA)) {
+                        shapeRenderer.rect(nearest.x - 0.5f, nearest.y - Door.SIZE/2, 1.0f, Door.SIZE);
+                    } else if (nearest.equals(pointB)) {
+                        shapeRenderer.rect(nearest.x - Door.SIZE/2, nearest.y - 0.5f, Door.SIZE, 1.0f);
+                    }
+                    shapeRenderer.end();
+                }
+            }
+        } else if (currentState == State.WINDOW) {
+
         }
     }
 
@@ -278,15 +357,31 @@ public class MapBuilderScreen implements Screen {
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             if (currentState == State.WALL || currentState == State.BUILDING || currentState == State.SENTRY_TOWER
                     || currentState == State.HIDING_AREA || currentState == State.TARGET_AREA) {
-                float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
-                float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
-                startDrag = new Vector2(x, y);
+                startDrag = toWorldCoordinate(screenX, screenY);
                 endDrag = startDrag;
                 return true;
+            } else if (currentState == State.DOOR) {
+                Vector2 mouse = toWorldCoordinate(screenX, screenY);
+                for (Building building : map.getBuildings()) {
+                    Rectangle rectangle = building.getRectangle();
+                    if (rectangle.contains(mouse)) {
+                        Vector2 pointA = mouse.x - rectangle.x < rectangle.width/2 ? new Vector2(rectangle.x, mouse.y) : new Vector2(rectangle.x + rectangle.width, mouse.y);
+                        Vector2 pointB = mouse.y - rectangle.y < rectangle.height/2 ? new Vector2(mouse.x, rectangle.y) : new Vector2(mouse.x, rectangle.y + rectangle.height);
+                        Vector2 nearest = mouse.dst(pointA) < mouse.dst(pointB) ? pointA : pointB;
+                        if (nearest.equals(pointA)) {
+                            Rectangle rect = new Rectangle(nearest.x - 0.5f, nearest.y - Door.SIZE/2, 1.0f, Door.SIZE);
+//                            building.addDoor(new Door(door)); //Should add a door object instead of rectangle
+                            //need fix
+                            map.addDoor(rect);
+                        } else if (nearest.equals(pointB)) {
+                            map.addDoor(new Rectangle(nearest.x - Door.SIZE/2, nearest.y - 0.5f, Door.SIZE, 1.0f));
+                        }
+                    }
+                }
+            } else if (currentState == State.WINDOW) {
+
             } else if (currentState == State.GUARD || currentState == State.INTRUDER) {
-                float x = camera.position.x - Gdx.graphics.getWidth() / mass.PPM / 2 + screenX / mass.PPM;
-                float y = camera.position.y - Gdx.graphics.getHeight() / mass.PPM / 2 + (Gdx.graphics.getHeight() - screenY) / mass.PPM;
-                Vector2 position = new Vector2(x, y);
+                Vector2 position = toWorldCoordinate(screenX, screenY);
                 if (insideMap(position)) {
                     switch (currentState) {
                         case GUARD:
@@ -301,14 +396,41 @@ public class MapBuilderScreen implements Screen {
             } else if (currentState== State.DELETION) {
                 Vector2 position = toWorldCoordinate(screenX, screenY);
                 int index =-1;
-                for(int i = 0; i<map.getBoxObjects().size(); i++){
+                for(int i = 0; i < map.getBoxObjects().size(); i++){
                     if(map.getBoxObjects().get(i).getRectangle().x<position.x &&map.getBoxObjects().get(i).getRectangle().y<position.y && map.getBoxObjects().get(i).getRectangle().width+map.getBoxObjects().get(i).getRectangle().x> position.x &&
                             map.getBoxObjects().get(i).getRectangle().height + map.getBoxObjects().get(i).getRectangle().y > position.y){
-                      index =i;
+                      index = i;
+                      break;
                     }
                 }
-                mass.world.destroyBody( map.getBoxObjects().get(index).getBody());
-                map.getBoxObjects().remove(index);
+                if(index!=-1) {
+                    mass.world.destroyBody(map.getBoxObjects().get(index).getBody());
+                    //map.getBoxObjects().remove(index);
+					switch(map.getBoxObjects().get(index).getObjectType()){
+						case WALL:
+							map.getWalls().remove(map.getBoxObjects().get(index));
+							break;
+						case BUILDING:
+							map.getBuildings().remove(map.getBoxObjects().get(index));
+							break;
+						case HIDING_AREA:
+							map.getHidingAreas().remove(map.getBoxObjects().get(index));
+							break;
+						case SENTRY_TOWER:
+							map.getSentryTowers().remove(map.getBoxObjects().get(index));
+							break;
+						case TARGET_AREA:
+							map.getTargetAreas().remove(map.getBoxObjects().get(index));
+							break;
+						case DOOR:
+							map.getDoors().remove(map.getBoxObjects().get(index));
+							break;
+						case WINDOW:
+							map.getWindows().remove(map.getBoxObjects().get(index));
+							break;
+					}
+                }
+
             }
             return false;
         }
@@ -318,15 +440,14 @@ public class MapBuilderScreen implements Screen {
             if (currentState == State.WALL || currentState == State.BUILDING || currentState == State.SENTRY_TOWER
                     || currentState == State.HIDING_AREA || currentState == State.TARGET_AREA) {
                 endDrag = toWorldCoordinate(screenX, screenY);
-                if (insideMap(startDrag) && insideMap(endDrag)) {
-                    Rectangle rectangle = new Rectangle(Math.min(inputHandler.startDrag.x, inputHandler.endDrag.x),
-                                                        Math.min(inputHandler.startDrag.y, inputHandler.endDrag.y),
-                                                        Math.abs(inputHandler.startDrag.x - inputHandler.endDrag.x),
-                                                        Math.abs(inputHandler.startDrag.y - inputHandler.endDrag.y));
+                if (insideMap(startDrag) && insideMap(endDrag) && Math.abs(startDrag.x - endDrag.x) > Door.SIZE && Math.abs(startDrag.y - endDrag.y) > Door.SIZE) {
+                    Rectangle rectangle = new Rectangle(Math.min(startDrag.x, endDrag.x),
+                                                        Math.min(startDrag.y, endDrag.y),
+                                                        Math.abs(startDrag.x - endDrag.x),
+                                                        Math.abs(startDrag.y - endDrag.y));
                     boolean overlap = false;
                     for (BoxObject boxObject : map.getBoxObjects()) {
                         if (boxObject.getRectangle().overlaps(rectangle)) {
-                            System.out.println("Overlap not allowed");
                             overlap = true;
                             break;
                         }
