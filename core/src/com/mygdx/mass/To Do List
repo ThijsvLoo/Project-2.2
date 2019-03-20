@@ -17,6 +17,8 @@ Tasks that aren't constraint with other tasks, in no particular order
 - MapBuilder function: delete object (Lilly) (DONE)
 - MapBuilder function: Clear all (Lilly)
 - MapBuilder function: Undo, Redo
+- Mini-map class, which extends map: used by agents to simulate their world model
+- MapSimulator mini-map functions: Perspective view guard/intruder, show route, show algorithm illustration
 - Research possible algorithms for next phase (exploring, decision, path finding)
 - Draft introduction and literature review
 
@@ -39,6 +41,7 @@ Tasks that need to be finish ASAP (try within 1 week), good coding, as other tas
 - MapSimulator algorithm menu
 
 Tasks that doesn't really have a time constraint
+- Patrol algorithm (generate route for guards, cover as much area as possible)
 - Search algorithm: Collaborate Diffusion
 - Decision algorithm: MCTS
 - Cover algorithm (cover the area as efficient as possible with the available agent)
@@ -51,3 +54,10 @@ Tasks that doesn't really have a time constraint
 Research materials:
 - https://www.youtube.com/watch?v=1jATP-_CWr4
 - https://www.youtube.com/watch?time_continue=80&v=B-OoL2bOXl0
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+Phase 3
+
+Research questions:
+- ...

@@ -11,18 +11,11 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
     public enum ObjectType {WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA};
     protected ObjectType objectType;
 
-    protected MASS mass;
-
-    protected World world;
     protected Rectangle rectangle;
-    protected Body body;
-    protected Fixture fixture;
 
     public BoxObject (MASS mass, Rectangle rectangle) {
-        this.mass = mass;
-        world = mass.world;
+        super(mass);
         this.rectangle = rectangle;
-
         define();
     }
 
@@ -32,18 +25,23 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
         bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set(rectangle.getCenter(new Vector2()));
 
-        PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(rectangle.getWidth()/2, rectangle.getHeight()/2);
+        ChainShape chainShape = new ChainShape();
+        Vector2[] vertices = new Vector2[4];
+        vertices[0] = new Vector2(-rectangle.width/2, -rectangle.height/2);
+        vertices[1] = new Vector2(-rectangle.width/2, rectangle.height/2);
+        vertices[2] = new Vector2(rectangle.width/2, rectangle.height/2);
+        vertices[3] = new Vector2(rectangle.width/2, -rectangle.height/2);
+        chainShape.createLoop(vertices);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = polygonShape;
+        fixtureDef.shape = chainShape;
         fixtureDef.density = 1.0f;
 
         body = world.createBody(bodyDef);
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
 
-        polygonShape.dispose();
+        chainShape.dispose();
     }
 
     public ObjectType getObjectType() {
@@ -51,9 +49,6 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
     }
     public Rectangle getRectangle() {
         return rectangle;
-    }
-    public Body getBody(){
-        return body;
     }
 
 }

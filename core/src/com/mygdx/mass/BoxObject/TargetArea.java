@@ -1,6 +1,7 @@
 package com.mygdx.mass.BoxObject;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.mass.Data.MASS;
 
 import static com.mygdx.mass.BoxObject.BoxObject.ObjectType.TARGET_AREA;
@@ -13,6 +14,10 @@ public class TargetArea extends BoxObject {
 
     public TargetArea (MASS mass, Rectangle rectangle) {
         super(mass, rectangle);
+        Filter filter = new Filter();
+        filter.categoryBits = TARGET_AREA_BIT;
+        filter.maskBits = INTRUDER_BIT;
+        fixture.setFilterData(filter);
         objectType = TARGET_AREA;
     }
 

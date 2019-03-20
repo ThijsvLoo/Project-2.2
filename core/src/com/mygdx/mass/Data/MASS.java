@@ -25,7 +25,7 @@ public class MASS extends Game{
 
 	public static final float CAMERA_SPEED = 40.0f; //unit in meter per sec
 	public static final float MINIMAL_ZOOM = 3.0f;
-	public static final float MAXIMAL_ZOOM = 30.0f;
+	public static final float MAXIMAL_ZOOM = 40.0f;
 
 	public static final float SIMULATION_DELTA = 0.01f;
 
