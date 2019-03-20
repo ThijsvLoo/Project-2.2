@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.Agents.Guard;
+import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
@@ -166,13 +168,22 @@ public class HUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
             	System.out.println("Current action: Clear map");
             	ArrayList<BoxObject> mapObjectList=  mapBuilderScreen.mass.map.getBoxObjects();
+                ArrayList<Intruder> intruderList=  mapBuilderScreen.mass.map.getIntruders();
+                ArrayList<Guard> guardList=  mapBuilderScreen.mass.map.getGuards();
+
                 for(int i=0; i<mapObjectList.size(); i++){
                     mapBuilderScreen.mass.world.destroyBody( mapBuilderScreen.mass.map.getBoxObjects().get(i).getBody());
                 }
+                for(int i=0; i<intruderList.size(); i++){
+                    mapBuilderScreen.mass.world.destroyBody( intruderList.get(i).getBody());
+                }
+                for(int i=0; i<guardList.size(); i++){
+                    mapBuilderScreen.mass.world.destroyBody( guardList.get(i).getBody());
+                }
                 mapObjectList.clear();
-//				mapBuilderScreen.mass.world.dispose();
-//				mapBuilderScreen.mass.rayHandler.dispose();
-//				mapBuilderScreen.mass.create();
+				mapBuilderScreen.mass.world.dispose();
+				mapBuilderScreen.mass.rayHandler.dispose();
+				mapBuilderScreen.mass.create();
             }
         });
         undo = createButton("Textures/Buttons/Undo.png");
