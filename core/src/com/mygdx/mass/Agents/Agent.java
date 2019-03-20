@@ -9,6 +9,10 @@ import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.World.WorldObject;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Agent extends WorldObject implements java.io.Serializable{
 
@@ -17,13 +21,6 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public enum AgentType {GUARD, INTRUDER};
     protected AgentType agentType;
-
-    public MASS mass;
-
-    protected World world;
-
-    protected Body body;
-    protected Fixture fixture;
 
     protected float moveSpeed;
     protected float turnSpeed;
@@ -35,7 +32,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected ConeLight coneLight;
 
     protected Vector2 destination;
-    protected ArrayList<Vector2> path;
+    protected LinkedBlockingQueue<Vector2> route;
     protected Vector2 direction;
     protected Vector2 velocity;
 
@@ -44,11 +41,10 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public static int count = 0;
 
     public Agent(MASS mass, Vector2 position) {
-        this.mass = mass;
-        world = mass.world;
+        super(mass);
         define(position);
         destination = new Vector2();
-        path = new ArrayList<Vector2>();
+        route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
         velocity = new Vector2();
         count++;
@@ -61,7 +57,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         bodyDef.position.set(position);
 
         CircleShape circleShape = new CircleShape();
-        circleShape.setRadius(0.5f);
+        circleShape.setRadius(SIZE/2);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circleShape;
@@ -73,21 +69,26 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public void update(float delta) {
         algorithm.act();
-        pointLight.setPosition(body.getPosition());
-        coneLight.setPosition(body.getPosition());
-        coneLight.setDirection((float) (body.getAngle()*180/Math.PI));
-        coneLight.setDistance(visualRange*10);
-    };
+    }
 
-    //Move towards a destination with constant velocity
-    public void move() {
-        updateDirection();
-        updateAngle();
-        if (turnSide == 0) {
+    public void addWaypoint(Vector2 waypoint) {
+        route.offer(waypoint);
+    }
+
+    //Need to recheck this part
+    public void followRoute() {
+        if (destination != null && atPosition(destination)) {
+            destination = null;
+        }
+        if (destination == null && !route.isEmpty()) {
+            destination = route.poll();
+        }
+        if (destination != null && !atPosition(destination)) {
+            updateDirection();
+            updateAngle();
             updateVelocity();
-            body.setLinearVelocity(velocity.x, velocity.y);
         } else {
-            body.setLinearVelocity(0, 0);
+            body.setLinearVelocity(0.0f,0.0f);
         }
     }
 
@@ -110,8 +111,18 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     }
 
     public void updateVelocity() {
-        velocity.x = (float) Math.cos(body.getAngle())*moveSpeed;
-        velocity.y = (float) Math.sin(body.getAngle())*moveSpeed;
+        if (turnSide == 0) {
+            velocity.x = (float) Math.cos(body.getAngle())*moveSpeed;
+            velocity.y = (float) Math.sin(body.getAngle())*moveSpeed;
+            body.setLinearVelocity(velocity.x, velocity.y);
+        } else {
+            body.setLinearVelocity(0, 0);
+        }
+    }
+
+    //point, coordinate, vector, position,
+    public boolean atPosition(Vector2 vector2) {
+        return body.getPosition().dst(vector2) < 0.05f;
     }
 
     //get the unit vector with length 1
@@ -126,13 +137,12 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 //    }
 
     public AgentType getAgentType() { return agentType; }
-    public Body getBody() { return body; }
     public float getMoveSpeed() { return moveSpeed; }
     public float getTurnSpeed() { return turnSpeed; }
     public float getVisualRange() { return visualRange; }
     public float getViewAngle() { return viewAngle; }
     public Vector2 getDestination() { return destination; }
-    public ArrayList<Vector2> getPath() { return path; }
+    public LinkedBlockingQueue<Vector2> getRoute() { return route; }
     public Vector2 getDirection() { return direction; }
     public Vector2 getVelocity() { return velocity; }
 
@@ -141,7 +151,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void setVisualRange(float visualRange) { this.visualRange = visualRange; }
     public void setViewAngle(float viewAngle) { this.viewAngle = viewAngle; }
     public void setDestination(Vector2 destination) { this.destination = destination; }
-    public void setPath(ArrayList<Vector2> path) { this.path = path; }
+    public void setRoute(LinkedBlockingQueue<Vector2> route) { this.route = route; }
     public void setDirection(Vector2 direction) { this.direction = direction; }
     public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
 
