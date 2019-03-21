@@ -11,8 +11,10 @@ public class Node {
     public ArrayList<Edge> connections;
     public Vector2 position;
 
-    public Node(int i, BoxObject type) {
+    public Node(int i, BoxObject type, Vector2 position) {
         this.name = type.getObjectType().toString() + i;
+        this.position = position;
+        System.out.println("node " + name + " created");
         //Graph.nodes.add(this);
         //Graph.adjVertices.put(this,connections);
     }

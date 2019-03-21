@@ -17,10 +17,11 @@ import com.mygdx.mass.BoxObject.Building;
 import com.mygdx.mass.BoxObject.Door;
 import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Graph.Graph;
 import com.mygdx.mass.Scenes.Info;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
-import sun.management.resources.agent;
+//import sun.management.resources.agent;
 
 
 public class MapBuilderScreen implements Screen {
@@ -49,6 +50,7 @@ public class MapBuilderScreen implements Screen {
     private Info info;
 
     private InputHandler inputHandler;
+    private Graph graph;
 
     public MapBuilderScreen(MASS mass) {
         this.mass = mass;
@@ -74,6 +76,7 @@ public class MapBuilderScreen implements Screen {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         currentState = State.NONE;
+        graph = new Graph(mass);
     }
 
     @Override

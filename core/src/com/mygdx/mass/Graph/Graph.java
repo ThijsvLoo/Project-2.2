@@ -30,25 +30,24 @@ public class Graph {
             switch(map.getBoxObjects().get(i).getObjectType()){
                 case WALL:
                     for (int j = 0; j < 4; j++) {
-                        Node n = new Node(Walls, map.getBoxObjects().get(i));
-                        nodes.add(n);
+                        System.out.println("yeah");
+                        Node newNode = new Node(Walls, map.getBoxObjects().get(i), map.getBoxObjects().get(i).getVertices()[j]);
+                        nodes.add(newNode);
+                        System.out.println("yeah2");
                         Walls++;
-                        n.setPosition(map.getBoxObjects().get(i).getVertices()[j]);
                     }
                     break;
                 case BUILDING:
                     for (int j = 0; j < 4; j++) {
-                        Node n = new Node(Buildings, map.getBoxObjects().get(i));
-                        nodes.add(n);
+                        Node n = new Node(Buildings, map.getBoxObjects().get(i), map.getBoxObjects().get(i).getVertices()[j]);
                         Buildings++;
-                        n.setPosition(map.getBoxObjects().get(i).getVertices()[j]);
+                        nodes.add(n);
                     }
                 case SENTRY_TOWER:
                     for (int j = 0; j < 4; j++) {
-                        Node n = new Node(Towers, map.getBoxObjects().get(i));
-                        nodes.add(n);
+                        Node n = new Node(Towers, map.getBoxObjects().get(i), map.getBoxObjects().get(i).getVertices()[j]);
                         Towers++;
-                        n.setPosition(map.getBoxObjects().get(i).getVertices()[j]);
+                        nodes.add(n);
                     }
             }
         }
