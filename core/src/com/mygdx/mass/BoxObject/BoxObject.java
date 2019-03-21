@@ -13,6 +13,8 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
 
     protected Rectangle rectangle;
 
+    protected Vector2[] vertices;
+
     public BoxObject (MASS mass, Rectangle rectangle) {
         super(mass);
         this.rectangle = rectangle;
@@ -26,7 +28,7 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
         bodyDef.position.set(rectangle.getCenter(new Vector2()));
 
         ChainShape chainShape = new ChainShape();
-        Vector2[] vertices = new Vector2[4];
+        vertices = new Vector2[4];
         vertices[0] = new Vector2(-rectangle.width/2, -rectangle.height/2);
         vertices[1] = new Vector2(-rectangle.width/2, rectangle.height/2);
         vertices[2] = new Vector2(rectangle.width/2, rectangle.height/2);
@@ -50,5 +52,6 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
     public Rectangle getRectangle() {
         return rectangle;
     }
+    public Vector2[] getVertices() { return vertices; }
 
 }
