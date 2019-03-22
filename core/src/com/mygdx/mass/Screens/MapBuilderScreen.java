@@ -459,12 +459,15 @@ public class MapBuilderScreen implements Screen {
                         switch (currentState) {
                             case WALL:
                                 map.addWall(rectangle);
+                                //graph.convertMap();
                                 break;
                             case BUILDING:
                                 map.addBuilding(rectangle);
+                                //graph.convertMap();
                                 break;
                             case SENTRY_TOWER:
                                 map.addSentryTower(rectangle);
+                                //graph.convertMap();
                                 break;
                             case HIDING_AREA:
                                 map.addHidingArea(rectangle);

@@ -4,25 +4,21 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.BoxObject.BoxObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Node {
     public String name;
     public ArrayList<Edge> connections;
-    public Vector2 position;
+    private Vector2 position;
 
     public Node(int i, BoxObject type, Vector2 position) {
+        connections = new ArrayList<Edge>();
         this.name = type.getObjectType().toString() + i;
         this.position = position;
-        System.out.println("node " + name + " created");
-        //Graph.nodes.add(this);
-        //Graph.adjVertices.put(this,connections);
+        //System.out.println("node " + name + " created " + position );
     }
 
     public void connect(Node connected) {
-        Edge e = new Edge();
-        e.start = this;
-        e.end = connected;
+        Edge e = new Edge(this, connected);
         connections.add(e);
         //connected.connections.add(e);
     }
