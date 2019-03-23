@@ -102,8 +102,8 @@ public class MapBuilderScreen implements Screen {
     }
 
     private float accumulator = 0;
-    private int worldSpeedFactor = 50;
-    private int unitSpeedFactor = 5; //keep this max 5 for now
+    private int worldSpeedFactor = 50; //how fast the world update per time unit, more steps etc
+    private int unitSpeedFactor = 5; //how fast the agents update per world step, keep this max 5 for now
 
     public void update(float delta) {
         float timePassed = Math.min(delta, 0.25f);
