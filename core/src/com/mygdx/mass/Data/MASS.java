@@ -23,11 +23,11 @@ public class MASS extends Game{
 	public static final int WINDOW_HEIGHT = 800;
 	public static final int ANTI_ALIASING = 16;
 
+	public static final float FIXED_TIME_STEP = 1/60f;
+
 	public static final float CAMERA_SPEED = 40.0f; //unit in meter per sec
 	public static final float MINIMAL_ZOOM = 3.0f;
 	public static final float MAXIMAL_ZOOM = 40.0f;
-
-	public static final float SIMULATION_DELTA = 0.01f;
 
 	//Camera and Viewport
 	public OrthographicCamera camera;

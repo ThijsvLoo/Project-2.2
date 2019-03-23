@@ -63,10 +63,8 @@ public class Intruder extends Agent {
     }
 
     private void breakThroughWindow(float delta) {
-        System.out.println(window + " " + breakThroughProgress);
         if (window != null && breakThroughProgress < 100.0f) {
             breakThroughProgress += delta*100/WINDOW_BREAK_THROUGH_TIME;
-            System.out.println(breakThroughProgress);
         }
     }
 

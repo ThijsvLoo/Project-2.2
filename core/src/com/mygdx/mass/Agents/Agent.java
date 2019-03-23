@@ -42,7 +42,6 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public Agent(MASS mass, Vector2 position) {
         super(mass);
         define(position);
-        destination = new Vector2();
         route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
         velocity = new Vector2();

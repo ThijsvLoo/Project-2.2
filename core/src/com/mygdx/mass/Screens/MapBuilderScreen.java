@@ -101,11 +101,20 @@ public class MapBuilderScreen implements Screen {
         map.addWall(westWall);
     }
 
-    public void update(float delta) {
-        handleInput(delta);
+    private float accumulator = 0;
+    private int worldSpeedFactor = 10;
 
-        for (Agent agent : map.getAgents()) {
-            agent.update(delta);
+    public void update(float delta) {
+        float timePassed = Math.min(delta, 0.25f);
+        accumulator += timePassed;
+        while (accumulator >= MASS.FIXED_TIME_STEP) {
+            for (int i = 0; i < worldSpeedFactor; i++) {
+                for (Agent agent : map.getAgents()) {
+                    agent.update(MASS.FIXED_TIME_STEP);
+                }
+                world.step(MASS.FIXED_TIME_STEP, 6, 2);
+            }
+            accumulator -= MASS.FIXED_TIME_STEP;
         }
 
         camera.update();
@@ -134,21 +143,22 @@ public class MapBuilderScreen implements Screen {
         }
 
 //        for test purpose
-        if (Gdx.input.justTouched()) {
-            for (Agent agent : map.getAgents()) {
-                agent.getRoute().clear();
-                agent.setDestination(inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY()));
-            }
-        }
+//        if (Gdx.input.justTouched()) {
+//            for (Agent agent : map.getAgents()) {
+//                agent.getRoute().clear();
+//                agent.setDestination(inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY()));
+//            }
+//        }
     }
 
     @Override
     public void render(float delta) {
+        handleInput(delta);
+
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0)); //anti aliasing
 
-        //update the states
-        update(delta);
+        debugRenderer.render(world, camera.combined);
 
         //draw the sprites
         drawSprites();
@@ -156,10 +166,6 @@ public class MapBuilderScreen implements Screen {
         //draw the light effects
         rayHandler.setCombinedMatrix(camera);
         rayHandler.updateAndRender();
-
-        //draw the box2d debug objects
-        debugRenderer.render(world, camera.combined);
-        world.step(delta*30, 6, 2);
 
         //draw the shapes and lines
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -174,6 +180,8 @@ public class MapBuilderScreen implements Screen {
 
         mass.batch.setProjectionMatrix(info.stage.getCamera().combined);
         info.stage.draw();
+
+        update(delta);
     }
 
     private void drawSprites() {
@@ -196,7 +204,9 @@ public class MapBuilderScreen implements Screen {
             for (Vector2 waypoint : agent.getRoute()) {
                 start = end;
                 end = waypoint;
-                shapeRenderer.line(start, end);
+                if (start != null) {
+                    shapeRenderer.line(start, end);
+                }
             }
         }
         shapeRenderer.end();
