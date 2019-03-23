@@ -55,7 +55,16 @@ public class Graph {
                         Towers++;
                     }
                     break;
+                case HIDING_AREA:
+                    break;
+                case TARGET_AREA:
+                    break;
+                case DOOR:
+                    break;
+                case WINDOW:
+                    break;
             }
+
         }
         connectNodes();
     }
