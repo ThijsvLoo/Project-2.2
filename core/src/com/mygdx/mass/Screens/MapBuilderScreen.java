@@ -102,7 +102,8 @@ public class MapBuilderScreen implements Screen {
     }
 
     private float accumulator = 0;
-    private int worldSpeedFactor = 10;
+    private int worldSpeedFactor = 50;
+    private int unitSpeedFactor = 5; //keep this max 5 for now
 
     public void update(float delta) {
         float timePassed = Math.min(delta, 0.25f);
@@ -110,9 +111,9 @@ public class MapBuilderScreen implements Screen {
         while (accumulator >= MASS.FIXED_TIME_STEP) {
             for (int i = 0; i < worldSpeedFactor; i++) {
                 for (Agent agent : map.getAgents()) {
-                    agent.update(MASS.FIXED_TIME_STEP);
+                    agent.update(MASS.FIXED_TIME_STEP*unitSpeedFactor);
                 }
-                world.step(MASS.FIXED_TIME_STEP, 6, 2);
+                world.step(MASS.FIXED_TIME_STEP*unitSpeedFactor, 6, 2);
             }
             accumulator -= MASS.FIXED_TIME_STEP;
         }

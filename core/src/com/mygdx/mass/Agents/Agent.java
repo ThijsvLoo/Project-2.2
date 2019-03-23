@@ -121,7 +121,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     //point, coordinate, vector, position,
     public boolean atPosition(Vector2 vector2) {
-        return body.getPosition().dst(vector2) < 0.05f;
+        return body.getPosition().dst(vector2) < 0.25;
     }
 
     //get the unit vector with length 1
