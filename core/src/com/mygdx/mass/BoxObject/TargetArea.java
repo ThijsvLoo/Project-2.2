@@ -18,6 +18,7 @@ public class TargetArea extends BoxObject {
         filter.categoryBits = TARGET_AREA_BIT;
         filter.maskBits = INTRUDER_BIT;
         fixture.setFilterData(filter);
+        fixture.setSensor(true);
         objectType = TARGET_AREA;
     }
 

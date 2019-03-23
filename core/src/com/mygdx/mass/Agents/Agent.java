@@ -9,9 +9,6 @@ import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.World.WorldObject;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class Agent extends WorldObject implements java.io.Serializable{
@@ -36,6 +33,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected Vector2 direction;
     protected Vector2 velocity;
 
+    protected ArrayList<Object> collisions;
+
     protected Algorithm algorithm;
 
     public static int count = 0;
@@ -47,6 +46,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
         velocity = new Vector2();
+        collisions = new ArrayList<Object>();
         count++;
     }
 
@@ -136,6 +136,14 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 //        return (float) Math.sqrt(Math.pow(vector2.x, 2) + Math.pow(vector2.y, 2));
 //    }
 
+    public void addCollision(Object collision) {
+        collisions.add(collision);
+    }
+
+    public void removeCollision(Object collision) {
+        collisions.remove(collision);
+    }
+
     public AgentType getAgentType() { return agentType; }
     public float getMoveSpeed() { return moveSpeed; }
     public float getTurnSpeed() { return turnSpeed; }
@@ -145,6 +153,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public LinkedBlockingQueue<Vector2> getRoute() { return route; }
     public Vector2 getDirection() { return direction; }
     public Vector2 getVelocity() { return velocity; }
+    public ArrayList<Object> getCollisions() { return collisions; }
 
     public void setMoveSpeed(float moveSpeed) { this.moveSpeed = moveSpeed; }
     public void setTurnSpeed(float turnSpeed) { this.turnSpeed = turnSpeed; }
@@ -154,6 +163,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void setRoute(LinkedBlockingQueue<Vector2> route) { this.route = route; }
     public void setDirection(Vector2 direction) { this.direction = direction; }
     public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
+    public void setCollisions(ArrayList<Object> collisions) { this.collisions = collisions; }
 
     public String toString() {
         return "AgentType = "+this.agentType +" count of Agents = "+ count;

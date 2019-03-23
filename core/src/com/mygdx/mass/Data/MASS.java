@@ -47,8 +47,8 @@ public class MASS extends Game{
 
 	public ShapeRenderer shapeRenderer;
 
-	private MapBuilderScreen mapBuilderScreen;
-	private MainMenuScreen mainMenuScreen;
+	public MapBuilderScreen mapBuilderScreen;
+	public MainMenuScreen mainMenuScreen;
 
 	@Override
 	public void create(){
@@ -62,7 +62,7 @@ public class MASS extends Game{
 		world = new World(new Vector2(0, 0), true);
 		//allows for debug lines of our box2d world.
 		debugRenderer = new Box2DDebugRenderer();
-		worldContactListener = new WorldContactListener();
+		worldContactListener = new WorldContactListener(this);
 		world.setContactListener(worldContactListener);
 
 		map = new Map(this);
@@ -85,7 +85,7 @@ public class MASS extends Game{
 		world = new World(new Vector2(0, 0), true);
 		//allows for debug lines of our box2d world.
 		debugRenderer = new Box2DDebugRenderer();
-		worldContactListener = new WorldContactListener();
+		worldContactListener = new WorldContactListener(this);
 		world.setContactListener(worldContactListener);
 		rayHandler = new RayHandler(world);
 		RayHandler.setGammaCorrection(true);

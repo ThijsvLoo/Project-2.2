@@ -12,16 +12,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
-import com.mygdx.mass.BoxObject.BoxObject;
-import com.mygdx.mass.BoxObject.Building;
-import com.mygdx.mass.BoxObject.Door;
-import com.mygdx.mass.BoxObject.Wall;
+import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Graph.Graph;
 import com.mygdx.mass.Scenes.Info;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.HUD;
 //import sun.management.resources.agent;
+
+import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 
 public class MapBuilderScreen implements Screen {
@@ -109,10 +108,6 @@ public class MapBuilderScreen implements Screen {
             agent.update(delta);
         }
 
-        for (Door door : map.getDoors()) {
-            door.update(delta);
-        }
-
         camera.update();
 
         hud.update(delta);
@@ -164,7 +159,7 @@ public class MapBuilderScreen implements Screen {
 
         //draw the box2d debug objects
         debugRenderer.render(world, camera.combined);
-        world.step(1 / 60f, 6, 2);
+        world.step(delta*30, 6, 2);
 
         //draw the shapes and lines
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -220,11 +215,14 @@ public class MapBuilderScreen implements Screen {
                     break;
                 case DOOR:
                     Door door = (Door) boxObject;
-                    if (door.isLocked()) {
+                    if (door.getCurrentState() == CLOSED) {
                         shapeRenderer.setColor(1.00f, 1.00f, 0.00f, 1.00f);
                     } else {
                         shapeRenderer.setColor(0.00f, 1.00f, 0.00f, 1.00f);
                     }
+                    break;
+                case WINDOW:
+                    shapeRenderer.setColor(1.00f, 1.00f, 1.00f, 1.00f);
                     break;
                 case SENTRY_TOWER:
                     shapeRenderer.setColor(1.00f, 0.81f, 0.00f, 1.00f);
@@ -296,15 +294,31 @@ public class MapBuilderScreen implements Screen {
                     shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                     shapeRenderer.setColor(1.00f, 1.00f, 0.00f, 1.00f);
                     if (nearest.equals(pointA)) {
-                        shapeRenderer.rect(nearest.x - 0.5f, nearest.y - Door.SIZE/2, 1.0f, Door.SIZE);
+                        shapeRenderer.rect(nearest.x - Door.THICKNESS/2, nearest.y - Door.SIZE/2, Door.THICKNESS, Door.SIZE);
                     } else if (nearest.equals(pointB)) {
-                        shapeRenderer.rect(nearest.x - Door.SIZE/2, nearest.y - 0.5f, Door.SIZE, 1.0f);
+                        shapeRenderer.rect(nearest.x - Door.SIZE/2, nearest.y - Door.THICKNESS/2, Door.SIZE, Door.THICKNESS);
                     }
                     shapeRenderer.end();
                 }
             }
         } else if (currentState == State.WINDOW) {
-
+            Vector2 mouse = inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY());
+            for (Building building : map.getBuildings()) {
+                Rectangle rectangle = building.getRectangle();
+                if (rectangle.contains(mouse)) {
+                    Vector2 pointA = mouse.x - rectangle.x < rectangle.width/2 ? new Vector2(rectangle.x, mouse.y) : new Vector2(rectangle.x + rectangle.width, mouse.y);
+                    Vector2 pointB = mouse.y - rectangle.y < rectangle.height/2 ? new Vector2(mouse.x, rectangle.y) : new Vector2(mouse.x, rectangle.y + rectangle.height);
+                    Vector2 nearest = mouse.dst(pointA) < mouse.dst(pointB) ? pointA : pointB;
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                    shapeRenderer.setColor(1.00f, 1.00f, 1.00f, 1.00f);
+                    if (nearest.equals(pointA)) {
+                        shapeRenderer.rect(nearest.x - Window.THICKNESS/2, nearest.y - Window.SIZE/2, Window.THICKNESS, Window.SIZE);
+                    } else if (nearest.equals(pointB)) {
+                        shapeRenderer.rect(nearest.x - Window.SIZE/2, nearest.y - Window.THICKNESS/2, Window.SIZE, Window.THICKNESS);
+                    }
+                    shapeRenderer.end();
+                }
+            }
         }
     }
 
@@ -372,17 +386,33 @@ public class MapBuilderScreen implements Screen {
                         Vector2 pointB = mouse.y - rectangle.y < rectangle.height/2 ? new Vector2(mouse.x, rectangle.y) : new Vector2(mouse.x, rectangle.y + rectangle.height);
                         Vector2 nearest = mouse.dst(pointA) < mouse.dst(pointB) ? pointA : pointB;
                         if (nearest.equals(pointA)) {
-                            Rectangle rect = new Rectangle(nearest.x - 0.5f, nearest.y - Door.SIZE/2, 1.0f, Door.SIZE);
+                            Rectangle rect = new Rectangle(nearest.x - Door.THICKNESS/2, nearest.y - Door.SIZE/2, Door.THICKNESS, Door.SIZE);
 //                            building.addDoor(new Door(door)); //Should add a door object instead of rectangle
                             //need fix
                             map.addDoor(rect);
                         } else if (nearest.equals(pointB)) {
-                            map.addDoor(new Rectangle(nearest.x - Door.SIZE/2, nearest.y - 0.5f, Door.SIZE, 1.0f));
+                            map.addDoor(new Rectangle(nearest.x - Door.SIZE/2, nearest.y - Door.THICKNESS/2, Door.SIZE, Door.THICKNESS));
                         }
                     }
                 }
             } else if (currentState == State.WINDOW) {
-
+                Vector2 mouse = toWorldCoordinate(screenX, screenY);
+                for (Building building : map.getBuildings()) {
+                    Rectangle rectangle = building.getRectangle();
+                    if (rectangle.contains(mouse)) {
+                        Vector2 pointA = mouse.x - rectangle.x < rectangle.width/2 ? new Vector2(rectangle.x, mouse.y) : new Vector2(rectangle.x + rectangle.width, mouse.y);
+                        Vector2 pointB = mouse.y - rectangle.y < rectangle.height/2 ? new Vector2(mouse.x, rectangle.y) : new Vector2(mouse.x, rectangle.y + rectangle.height);
+                        Vector2 nearest = mouse.dst(pointA) < mouse.dst(pointB) ? pointA : pointB;
+                        if (nearest.equals(pointA)) {
+                            Rectangle rect = new Rectangle(nearest.x - Window.THICKNESS/2, nearest.y - Window.SIZE/2, Window.THICKNESS, Window.SIZE);
+//                            building.addWindow(new Window(window)); //Should add a window object instead of rectangle
+                            //need fix
+                            map.addWindow(rect);
+                        } else if (nearest.equals(pointB)) {
+                            map.addWindow(new Rectangle(nearest.x - Window.SIZE/2, nearest.y - Window.THICKNESS/2, Window.SIZE, Window.THICKNESS));
+                        }
+                    }
+                }
             } else if (currentState == State.GUARD || currentState == State.INTRUDER) {
                 Vector2 position = toWorldCoordinate(screenX, screenY);
                 if (insideMap(position)) {

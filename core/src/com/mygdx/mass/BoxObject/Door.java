@@ -2,10 +2,7 @@ package com.mygdx.mass.BoxObject;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Filter;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.Data.MASS;
 
@@ -15,48 +12,50 @@ import static com.mygdx.mass.BoxObject.BoxObject.ObjectType.DOOR;
 
 public class Door extends BoxObject {
 
-    public static final float SIZE = 3.0f; //2 meter
-    public static final float UNLOCK_TIME = 12.0f;
+    public enum State {OPEN, CLOSED};
+    protected State currentState;
 
-    private boolean locked;
-    private float unlockTimeRemain;
+    public static final float SIZE = 3.0f; //3 meter
+    public static final float THICKNESS = 0.5f;
 
-    private ArrayList<Intruder> intruders;
+    private Building building;
 
     public Door (MASS mass, Rectangle rectangle) {
         super(mass, rectangle);
-        Filter filter = new Filter();
-        filter.categoryBits = DOOR_BIT;
-        filter.maskBits = GUARD_BIT | INTRUDER_BIT;
-        fixture.setFilterData(filter);
-        fixture.setSensor(true);
         objectType = DOOR;
-        locked = true;
-        unlockTimeRemain = UNLOCK_TIME;
-        intruders = new ArrayList<Intruder>();
+        currentState = State.CLOSED;
     }
 
-    public void update(float delta) {
-        unlock(delta);
+    //Define the box2d object and put it in the box2d world
+    public void define() {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(rectangle.getCenter(new Vector2()));
+
+        PolygonShape polygonShape = new PolygonShape();
+        polygonShape.setAsBox(rectangle.width/2, rectangle.height/2);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = polygonShape;
+        fixtureDef.density = 1.0f;
+        fixtureDef.filter.categoryBits = DOOR_BIT;
+        fixtureDef.filter.maskBits = GUARD_BIT | INTRUDER_BIT;
+        fixtureDef.isSensor = true;
+
+        body = world.createBody(bodyDef);
+        fixture = body.createFixture(fixtureDef);
+        fixture.setUserData(this);
+
+        polygonShape.dispose();
     }
 
-    public void unlock(float delta) {
-        if (intruders.size() > 0 && unlockTimeRemain > 0) {
-            unlockTimeRemain -= intruders.size()*delta;
-            if (unlockTimeRemain <= 0) {
-                locked = false;
-                for (Intruder intruder : intruders) {
-                    short maskBits = GUARD_BIT | INTRUDER_BIT;
-                    intruder.setMaskBits(maskBits);
-                }
-            }
-        }
+    public State getCurrentState() {
+        return currentState;
     }
+    public Building getBuilding() { return this.building; }
 
-    public boolean isLocked() {
-        return locked;
+    public void setCurrentState(Door.State state) {
+        currentState = state;
     }
-
-    public ArrayList<Intruder> getIntruders() { return intruders; }
 
 }
