@@ -13,6 +13,7 @@ public class HidingArea extends BoxObject {
         Filter filter = new Filter();
         filter.categoryBits = HIDING_AREA_BIT;
         fixture.setFilterData(filter);
+        fixture.setSensor(true);
         objectType = HIDING_AREA;
     }
 
