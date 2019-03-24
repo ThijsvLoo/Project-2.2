@@ -1,14 +1,47 @@
 package com.mygdx.mass.Tools;
 
 import com.mygdx.mass.Data.MASS;
+//import com.mygdx.mass.Scenes.FileChooserDemo;
 import com.mygdx.mass.World.Map;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.*;
 
+public class MapFileReader extends JPanel implements Serializable{
 
-public class MapFileReader implements Serializable{
+    static String filePath = "blank.ser";
+    static FileNameExtensionFilter serfilter = new FileNameExtensionFilter(
+            "MASS Map Files (*.ser)", "ser");
+
     public static void saveMapToFile(Map map) {
+        // File Chooser
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File("."));
+        fc.setFileFilter(serfilter);
+        JFrame f = new JFrame();
+        f.setVisible(true);
+        f.toFront();
+        f.setVisible(false);
+        int res = fc.showSaveDialog(f);
+        f.dispose();
+        if (res == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            filePath = file.getPath();
+            String extension = "";
+            int i = filePath.lastIndexOf('.');
+            if (i > 0) {
+                extension = "." + filePath.substring(i+1);
+            }
+            System.out.println(extension);
+            if (!extension.equals(".ser")){
+                filePath = filePath + ".ser";
+            }
+
+        // Save Code
         try {
-        	File mapFile = new File("map1.ser");
+        	File mapFile = new File(filePath);
             OutputStream outStream = new FileOutputStream(mapFile);
             ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
             MapData mapData = new MapData(map);
@@ -21,12 +54,32 @@ public class MapFileReader implements Serializable{
             e.getMessage();
             System.out.println("input IO error");
         }
-
+        }
     }
     public static Map createMapFromFile(MASS mass){
         MapData mapData;
+        // File Chooser
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+                JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File("."));
+                fc.setFileFilter(serfilter);
+                JFrame f = new JFrame();
+                f.setVisible(true);
+                f.toFront();
+                f.setVisible(false);
+                int res = fc.showOpenDialog(f);
+                f.dispose();
+                if (res == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    filePath = file.getPath();
+                }
+//            }
+//        }).start();
+        // Loading Code
         try{
-        	File mapFile = new File("map1.ser");
+        	File mapFile = new File(filePath);
             InputStream inStream = new FileInputStream(mapFile);
 			ObjectInputStream fileObjectIn = new ObjectInputStream(inStream);
 			mapData = (MapData) fileObjectIn.readObject();
