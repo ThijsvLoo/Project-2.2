@@ -19,11 +19,10 @@ import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
-//import javafx.scene.control.Tab;
 
 import java.util.ArrayList;
 
-public class HUD implements Disposable {
+public class MapBuilderHUD implements Disposable {
 
     public static final float BUTTON_SIZE = 32;
     public static final float PAD_BOTTOM = 10;
@@ -57,7 +56,7 @@ public class HUD implements Disposable {
     private ImageButton simulate;
     private ImageButton exit;
 
-    public HUD(final MapBuilderScreen mapBuilderScreen, SpriteBatch batch){
+    public MapBuilderHUD(final MapBuilderScreen mapBuilderScreen, SpriteBatch batch){
         this.mapBuilderScreen = mapBuilderScreen;
 
         camera = new OrthographicCamera();
@@ -202,6 +201,7 @@ public class HUD implements Disposable {
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Simulate");
+                mapBuilderScreen.mass.setScreen(mapBuilderScreen.mass.mapSimulatorScreen);
             }
         });
         exit = createButton("Textures/Buttons/Exit.png");

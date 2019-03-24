@@ -2,6 +2,7 @@ package com.mygdx.mass.Graph;
 import java.lang.Math.*;
 
 public class Edge {
+
     public Node start;
     public Node end;
     public double time;

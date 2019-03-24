@@ -6,7 +6,9 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.mass.Data.MASS;
 
-public abstract class WorldObject {
+import java.io.Serializable;
+
+public abstract class WorldObject implements Serializable {
 
     //Box2D Collision Bits, to identify which world object
     public static final short NOTHING_BIT = 0;

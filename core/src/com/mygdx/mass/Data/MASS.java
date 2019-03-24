@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.Screens.MapSimulatorScreen;
 import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldContactListener;
@@ -47,8 +48,9 @@ public class MASS extends Game{
 
 	public ShapeRenderer shapeRenderer;
 
-	public MapBuilderScreen mapBuilderScreen;
 	public MainMenuScreen mainMenuScreen;
+	public MapBuilderScreen mapBuilderScreen;
+	public MapSimulatorScreen mapSimulatorScreen;
 
 	@Override
 	public void create(){
@@ -78,12 +80,12 @@ public class MASS extends Game{
 
 		mainMenuScreen = new MainMenuScreen(this);
 		mapBuilderScreen = new MapBuilderScreen(this);
+		mapSimulatorScreen = new MapSimulatorScreen(this);
         setScreen(mainMenuScreen);
 	}
 
 	public void loadMap(){
 		world = new World(new Vector2(0, 0), true);
-		//allows for debug lines of our box2d world.
 		debugRenderer = new Box2DDebugRenderer();
 		worldContactListener = new WorldContactListener(this);
 		world.setContactListener(worldContactListener);
@@ -121,8 +123,6 @@ public class MASS extends Game{
 		return map;
 	}
 
-	public void setMap(Map map){
-		mapBuilderScreen.setMap(map);
-		this.map = map;
-	}
+	public void setMap(Map map){ this.map = map; }
+
 }

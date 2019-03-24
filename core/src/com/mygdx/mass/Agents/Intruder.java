@@ -16,12 +16,18 @@ public class Intruder extends Agent {
 
     public static final float BASE_SPEED = 1.4f;
     public static final float SPRINT_SPEED = 3.0f;
+
+    public static final float DEFAULT_VISUAL_RANGE = 7.5f;
+
+    public static final float SPRINT_MAX_TURN_SPEED = 180.0f;
+
     public static final float DOOR_UNLOCK_TIME_SLOW = 12.0f;
     public static final float DOOR_UNLOCK_TIME_FAST = 5.0f;
     public static final float WINDOW_BREAK_THROUGH_TIME = 3.0f;
 
     protected float restTime;
     protected boolean sprinting;
+    protected float sprintDuration;
 
     protected Door door;
     protected Window window;
@@ -39,7 +45,7 @@ public class Intruder extends Agent {
         agentType = INTRUDER;
         moveSpeed = BASE_SPEED;
         turnSpeed = 180f;
-        visualRange = 7.5f;
+        visualRange = DEFAULT_VISUAL_RANGE;
         viewAngle = 45.0f;
 //        pointLight = new PointLight(mass.rayHandler, 360, new Color(1,0,0,1), 10, body.getPosition().x, body.getPosition().y);
         coneLight = new ConeLight(mass.rayHandler, 45, new Color(1,0,0,1), visualRange*5, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);

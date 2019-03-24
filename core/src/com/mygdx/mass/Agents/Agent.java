@@ -14,7 +14,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public static final float SIZE = 0.5f;
-    public static final float MAX_TURN_SPEED = 180.0f;
+    public static final float DEFAULT_VIEW_ANGLE = 45.0f;
+    public static final float DECREASE_VISION_FACTOR = 0.5f;
+    public static final float DEFAULT_MAX_TURN_SPEED = 180.0f;
+
+    private float blindDuration;
+    private float immobilityDuration;
+
+    private boolean stealth;
 
     public enum AgentType {GUARD, INTRUDER};
     protected AgentType agentType;

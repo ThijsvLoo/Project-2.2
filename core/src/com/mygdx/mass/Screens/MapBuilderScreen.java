@@ -14,14 +14,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
-import com.mygdx.mass.Graph.Graph;
-import com.mygdx.mass.Scenes.Info;
+import com.mygdx.mass.Scenes.MapBuilderInfo;
 import com.mygdx.mass.World.Map;
-import com.mygdx.mass.Scenes.HUD;
-//import sun.management.resources.agent;
+import com.mygdx.mass.Scenes.MapBuilderHUD;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
-
 
 public class MapBuilderScreen implements Screen {
 
@@ -44,12 +41,11 @@ public class MapBuilderScreen implements Screen {
 
     private ShapeRenderer shapeRenderer;
 
-    private HUD hud;
+    private MapBuilderHUD hud;
+    private MapBuilderInfo info;
 
-    private Info info;
-
+    private InputMultiplexer inputMultiplexer;
     private InputHandler inputHandler;
-    private Graph graph;
 
     public MapBuilderScreen(MASS mass) {
         this.mass = mass;
@@ -65,21 +61,19 @@ public class MapBuilderScreen implements Screen {
         camera.position.set(map.getWidth()/2,map.getHeight()/2,0.0f);
         viewport.setUnitsPerPixel(1/mass.PPM);
 
-        hud = new HUD(this, batch);
-        info = new Info(this.batch);
+        hud = new MapBuilderHUD(this, batch);
+        info = new MapBuilderInfo(mass);
 
-        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer = new InputMultiplexer();
         inputMultiplexer.addProcessor(hud.stage);
         inputHandler = new InputHandler();
         inputMultiplexer.addProcessor(inputHandler);
-        Gdx.input.setInputProcessor(inputMultiplexer);
-
-        currentState = State.NONE;
-        graph = new Graph(mass);
     }
 
     @Override
     public void show() {
+        Gdx.input.setInputProcessor(inputMultiplexer);
+        currentState = State.NONE;
         createOuterWall();
     }
 
@@ -101,55 +95,34 @@ public class MapBuilderScreen implements Screen {
         map.addWall(westWall);
     }
 
-    private float accumulator = 0;
-    private int worldSpeedFactor = 50; //how fast the world update per time unit, more steps etc
-    private int unitSpeedFactor = 5; //how fast the agents update per world step, keep this max 5 for now
-
-    public void update(float delta) {
-        float timePassed = Math.min(delta, 0.25f);
-        accumulator += timePassed;
-        while (accumulator >= MASS.FIXED_TIME_STEP) {
-            for (int i = 0; i < worldSpeedFactor; i++) {
-                for (Agent agent : map.getAgents()) {
-                    agent.update(MASS.FIXED_TIME_STEP*unitSpeedFactor);
-                }
-                world.step(MASS.FIXED_TIME_STEP*unitSpeedFactor, 6, 2);
-            }
-            accumulator -= MASS.FIXED_TIME_STEP;
-        }
-
+    private void update(float delta) {
         camera.update();
-
         hud.update(delta);
         info.update(delta);
     }
 
-    public void handleInput(float delta) {
+    private void handleInput(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camera.position.x -= MASS.CAMERA_SPEED * delta;
-        } if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             camera.position.x += MASS.CAMERA_SPEED * delta;
-        } if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             camera.position.y += MASS.CAMERA_SPEED * delta;
-        } if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             camera.position.y -= MASS.CAMERA_SPEED * delta;
-        } if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < MASS.MAXIMAL_ZOOM) {
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < MASS.MAXIMAL_ZOOM) {
             mass.PPM *= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        } if (Gdx.input.isKeyPressed(Input.Keys.O) && mass.PPM > MASS.MINIMAL_ZOOM) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.O) && mass.PPM > MASS.MINIMAL_ZOOM) {
             mass.PPM /= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         }
-
-//        for test purpose
-//        if (Gdx.input.justTouched()) {
-//            for (Agent agent : map.getAgents()) {
-//                agent.getRoute().clear();
-//                agent.setDestination(inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY()));
-//            }
-//        }
     }
 
     @Override
@@ -170,7 +143,7 @@ public class MapBuilderScreen implements Screen {
 
         //draw the shapes and lines
         shapeRenderer.setProjectionMatrix(camera.combined);
-        drawAgentPaths();
+//        drawAgentPaths();
         drawBoxObjects();
         drawAgents();
         drawPreviewActionResult();
@@ -190,27 +163,6 @@ public class MapBuilderScreen implements Screen {
         batch.begin();
 
         batch.end();
-    }
-
-    private void drawAgentPaths() {
-        Gdx.gl.glLineWidth(1);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.PURPLE);
-        for (Agent agent : map.getAgents()) {
-            Vector2 start = agent.getBody().getPosition();
-            Vector2 end = agent.getDestination();
-            if (end != null) {
-                shapeRenderer.line(start, end);
-            }
-            for (Vector2 waypoint : agent.getRoute()) {
-                start = end;
-                end = waypoint;
-                if (start != null) {
-                    shapeRenderer.line(start, end);
-                }
-            }
-        }
-        shapeRenderer.end();
     }
 
     private void drawBoxObjects() {
@@ -557,7 +509,4 @@ public class MapBuilderScreen implements Screen {
         }
     }
 
-    public void setMap(Map map) {
-        this.map = map;
-    }
 }

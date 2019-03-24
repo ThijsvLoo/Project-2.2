@@ -8,6 +8,8 @@ import static com.mygdx.mass.BoxObject.BoxObject.ObjectType.SENTRY_TOWER;
 
 public class SentryTower extends BoxObject {
 
+    private boolean alarm;
+
     public SentryTower (MASS mass, Rectangle rectangle) {
         super(mass, rectangle);
         Filter filter = new Filter();
