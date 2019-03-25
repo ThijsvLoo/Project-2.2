@@ -120,12 +120,12 @@ public class MapSimulatorScreen implements Screen {
         }
 
 //        for test purpose
-        if (Gdx.input.justTouched()) {
-            for (Agent agent : map.getAgents()) {
-                agent.getRoute().clear();
-                agent.setDestination(inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY()));
-            }
-        }
+//        if (Gdx.input.justTouched()) {
+//            for (Agent agent : map.getAgents()) {
+//                agent.getRoute().clear();
+//                agent.setDestination(inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY()));
+//            }
+//        }
     }
 
     @Override

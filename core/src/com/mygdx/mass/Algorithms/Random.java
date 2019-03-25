@@ -14,14 +14,14 @@ public class Random extends Algorithm {
 
     public Random(Agent agent) {
         this.agent = agent;
-        for (int i = 1; i <= 2; i++) {
-            this.agent.addWaypoint(new Vector2((float) Math.random()* MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
-        }
+        this.agent.addWaypoint(new Vector2((float) Math.random()* MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
     }
 
     @Override
     public void act() {
-//        agent.addWaypoint(new Vector2((float) Math.random()* MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
+        if (agent.getRoute().isEmpty()) {
+            agent.addWaypoint(new Vector2((float) Math.random() * MASS.map.getWidth(), (float) Math.random() * MASS.map.getHeight()));
+        }
         agent.followRoute();
     }
 
