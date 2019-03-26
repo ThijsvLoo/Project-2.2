@@ -123,6 +123,8 @@ public class MASS extends Game{
 		return map;
 	}
 
-	public void setMap(Map map){ this.map = map; }
-
+	public void setMap(Map map){
+		mapSimulatorScreen.setMap(map);
+		this.map = map;
+	}
 }

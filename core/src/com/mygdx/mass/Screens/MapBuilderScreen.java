@@ -104,21 +104,17 @@ public class MapBuilderScreen implements Screen {
     private void handleInput(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camera.position.x -= MASS.CAMERA_SPEED * delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             camera.position.x += MASS.CAMERA_SPEED * delta;
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             camera.position.y += MASS.CAMERA_SPEED * delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             camera.position.y -= MASS.CAMERA_SPEED * delta;
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < MASS.MAXIMAL_ZOOM) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < MASS.MAXIMAL_ZOOM) {
             mass.PPM *= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        } else if (Gdx.input.isKeyPressed(Input.Keys.O) && mass.PPM > MASS.MINIMAL_ZOOM) {
+        } if (Gdx.input.isKeyPressed(Input.Keys.O) && mass.PPM > MASS.MINIMAL_ZOOM) {
             mass.PPM /= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());

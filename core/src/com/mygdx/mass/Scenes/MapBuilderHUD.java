@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -16,9 +19,11 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.BoxObject;
+import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
+import com.mygdx.mass.World.WorldContactListener;
 
 import java.util.ArrayList;
 
@@ -56,7 +61,10 @@ public class MapBuilderHUD implements Disposable {
     private ImageButton simulate;
     private ImageButton exit;
 
+    private MASS mass;
+
     public MapBuilderHUD(final MapBuilderScreen mapBuilderScreen, SpriteBatch batch){
+        mass = mapBuilderScreen.mass;
         this.mapBuilderScreen = mapBuilderScreen;
 
         camera = new OrthographicCamera();
@@ -137,7 +145,22 @@ public class MapBuilderHUD implements Disposable {
         load = createButton("Textures/Buttons/Load.png");
         load.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-				mapBuilderScreen.mass.loadMap();
+                mass = mapBuilderScreen.mass;
+				//mapBuilderScreen.mass.loadMap();
+                mass.world = new World(new Vector2(0, 0), true);
+
+                //allows for debug lines of our box2d world.
+                mass.debugRenderer = new Box2DDebugRenderer();
+                mass.worldContactListener = new WorldContactListener(mass);
+                mass.world.setContactListener(mapBuilderScreen.mass.worldContactListener);
+                mass.rayHandler.removeAll();
+
+                mass.map = MapFileReader.createMapFromFile(mapBuilderScreen.mass);
+                //mapBuilderScreen.updateMap();
+                mass.mapBuilderScreen = new MapBuilderScreen(mapBuilderScreen.mass);
+                //mapBuilderScreen = mass.mapBuilderScreen;
+
+                mass.setScreen(mapBuilderScreen);
                 System.out.println("Current action: Load map");
             }
         });
