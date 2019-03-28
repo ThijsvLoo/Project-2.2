@@ -42,7 +42,6 @@ Tasks that need to be finish ASAP (try within 1 week), good coding, as other tas
 
 Tasks that doesn't really have a time constraint
 - Patrol algorithm (generate route for guards, cover as much area as possible)
-- Search algorithm: Collaborate Diffusion
 - Decision algorithm: MCTS
 - Cover algorithm (cover the area as efficient as possible with the available agent)
 - Path finding algorithm: Dijkstra
