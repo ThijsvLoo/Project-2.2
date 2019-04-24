@@ -39,7 +39,7 @@ public class Door extends BoxObject {
         fixtureDef.shape = polygonShape;
         fixtureDef.density = 1.0f;
         fixtureDef.filter.categoryBits = DOOR_BIT;
-        fixtureDef.filter.maskBits = GUARD_BIT | INTRUDER_BIT;
+        fixtureDef.filter.maskBits = GUARD_BIT | INTRUDER_BIT | LIGHT_BIT;
         fixtureDef.isSensor = true;
 
         body = world.createBody(bodyDef);

@@ -1,9 +1,12 @@
 package com.mygdx.mass.World;
 
 import com.badlogic.gdx.physics.box2d.*;
+import com.mygdx.mass.Agents.Agent;
+import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Sensors.VisualField;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 import static com.mygdx.mass.BoxObject.Door.State.OPEN;
@@ -48,6 +51,13 @@ public class WorldContactListener implements ContactListener {
                 intruder.setWindow(window);
                 break;
             }
+            case VISUAL_FIELD_BIT | GUARD_BIT :
+            case VISUAL_FIELD_BIT | INTRUDER_BIT : {
+                VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
+                Agent agent = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
+                visualField.getAgent().getObjectsInSight().add(agent);
+                break;
+            }
         }
     }
 
@@ -78,6 +88,13 @@ public class WorldContactListener implements ContactListener {
                 Intruder intruder = fixtureA.getUserData() instanceof Intruder ? (Intruder) fixtureA.getUserData() : (Intruder) fixtureB.getUserData();
                 intruder.setWindow(null);
                 intruder.setBreakThroughProgress(0.0f);
+                break;
+            }
+            case VISUAL_FIELD_BIT | GUARD_BIT :
+            case VISUAL_FIELD_BIT | INTRUDER_BIT : {
+                VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
+                Agent agent = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
+                visualField.getAgent().getObjectsInSight().remove(agent);
                 break;
             }
         }

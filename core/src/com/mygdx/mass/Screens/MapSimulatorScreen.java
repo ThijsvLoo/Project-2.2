@@ -74,7 +74,7 @@ public class MapSimulatorScreen implements Screen {
     }
 
     private float accumulator = 0;
-    private int worldSpeedFactor = 1; //how fast the world update per time unit, more steps etc
+    private int worldSpeedFactor = 20; //how fast the world update per time unit, more steps etc
     private int unitSpeedFactor = 1; //how fast the agents update per world step, should pretty much always be 1
 
     public void update(float delta) {
@@ -135,6 +135,7 @@ public class MapSimulatorScreen implements Screen {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0)); //anti aliasing
 
+        Gdx.gl.glLineWidth(1);
         debugRenderer.render(world, camera.combined);
 
         //draw the sprites

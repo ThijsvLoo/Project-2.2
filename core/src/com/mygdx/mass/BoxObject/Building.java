@@ -18,7 +18,7 @@ public class Building extends BoxObject {
         super(mass, rectangle);
         Filter filter = new Filter();
         filter.categoryBits = BUILDING_BIT;
-        filter.maskBits = GUARD_BIT | INTRUDER_BIT;
+        filter.maskBits = GUARD_BIT | INTRUDER_BIT | LIGHT_BIT;
         fixture.setFilterData(filter);
         objectType = BUILDING;
         doors = new ArrayList<Door>();

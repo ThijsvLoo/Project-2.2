@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Algorithms.Algorithm;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Sensors.VisualField;
 import com.mygdx.mass.World.WorldObject;
 
 import java.util.ArrayList;
@@ -35,12 +36,20 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected PointLight pointLight;
     protected ConeLight coneLight;
 
+    protected ArrayList<WorldObject> objectsInSight;
+
+    protected VisualField agentDetection;
+    protected VisualField buildingDetection;
+    protected VisualField TowerDetection;
+
+    protected NoiseField noiseField;
+
     protected Vector2 destination;
     protected LinkedBlockingQueue<Vector2> route;
     protected Vector2 direction;
     protected Vector2 velocity;
 
-    protected ArrayList<Object> collisions;
+//    protected ArrayList<Object> collisions;
 
     protected Algorithm algorithm;
 
@@ -48,16 +57,16 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public Agent(MASS mass, Vector2 position) {
         super(mass);
-        define(position);
+        objectsInSight = new ArrayList<WorldObject>();
         route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
         velocity = new Vector2();
-        collisions = new ArrayList<Object>();
+//        collisions = new ArrayList<Object>();
         count++;
     }
 
     //define the box2d body and put it into the box2d world
-    private void define(Vector2 position) {
+    public void define(Vector2 position) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(position);
@@ -71,6 +80,10 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         body = world.createBody(bodyDef);
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
+
+        agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
+
+        noiseField = new NoiseField(this);
     }
 
     public void update(float delta) {
@@ -142,34 +155,39 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 //        return (float) Math.sqrt(Math.pow(vector2.x, 2) + Math.pow(vector2.y, 2));
 //    }
 
-    public void addCollision(Object collision) {
-        collisions.add(collision);
-    }
+//    public void addCollision(Object collision) {
+//        collisions.add(collision);
+//    }
 
-    public void removeCollision(Object collision) {
-        collisions.remove(collision);
-    }
+//    public void removeCollision(Object collision) {
+//        collisions.remove(collision);
+//    }
 
     public AgentType getAgentType() { return agentType; }
     public float getMoveSpeed() { return moveSpeed; }
     public float getTurnSpeed() { return turnSpeed; }
     public float getVisualRange() { return visualRange; }
     public float getViewAngle() { return viewAngle; }
+    public ArrayList<WorldObject> getObjectsInSight() { return objectsInSight; }
     public Vector2 getDestination() { return destination; }
     public LinkedBlockingQueue<Vector2> getRoute() { return route; }
     public Vector2 getDirection() { return direction; }
     public Vector2 getVelocity() { return velocity; }
-    public ArrayList<Object> getCollisions() { return collisions; }
+//    public ArrayList<Object> getCollisions() { return collisions; }
 
-    public void setMoveSpeed(float moveSpeed) { this.moveSpeed = moveSpeed; }
+    public void setMoveSpeed(float moveSpeed) {
+        this.moveSpeed = moveSpeed;
+        noiseField.update();
+    }
     public void setTurnSpeed(float turnSpeed) { this.turnSpeed = turnSpeed; }
     public void setVisualRange(float visualRange) { this.visualRange = visualRange; }
     public void setViewAngle(float viewAngle) { this.viewAngle = viewAngle; }
+    public void setObjectsInSight(ArrayList<WorldObject> objectsInSight) { this.objectsInSight = objectsInSight; }
     public void setDestination(Vector2 destination) { this.destination = destination; }
     public void setRoute(LinkedBlockingQueue<Vector2> route) { this.route = route; }
     public void setDirection(Vector2 direction) { this.direction = direction; }
     public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
-    public void setCollisions(ArrayList<Object> collisions) { this.collisions = collisions; }
+//    public void setCollisions(ArrayList<Object> collisions) { this.collisions = collisions; }
 
     public String toString() {
         return "AgentType = "+this.agentType +" count of Agents = "+ count;
