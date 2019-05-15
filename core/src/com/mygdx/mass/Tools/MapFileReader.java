@@ -5,8 +5,6 @@ import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.World.Map;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.*;
 
 public class MapFileReader extends JPanel implements Serializable{
@@ -56,7 +54,7 @@ public class MapFileReader extends JPanel implements Serializable{
         }
         }
     }
-    public static Map createMapFromFile(MASS mass){
+    public static void loadMapFromFile(MASS mass){
         MapData mapData;
         // File Chooser
 //        new Thread(new Runnable() {
@@ -85,16 +83,13 @@ public class MapFileReader extends JPanel implements Serializable{
 			mapData = (MapData) fileObjectIn.readObject();
 			fileObjectIn.close();
 			inStream.close();
+            mapData.loadMap(mass);
         } catch(IOException e){
 			System.out.println("IO error");
 			e.printStackTrace();
-			return null;
         } catch(ClassNotFoundException e){
 			System.out.println("Class not found");
 			e.printStackTrace();
-			return null;
         }
-        return mapData.getMap(mass);
     }
-
 }

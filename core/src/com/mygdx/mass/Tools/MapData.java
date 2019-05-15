@@ -55,8 +55,8 @@ public class MapData implements Serializable {
 
 	}
 
-	public Map getMap(MASS mass){
-		Map map = new Map(mass, width, height);
+	public void loadMap(MASS mass){
+		Map map = mass.getMap();
 
 		for(int i = 0; i < agentType.length; i++){
 			switch(agentType[i]){
@@ -92,6 +92,5 @@ public class MapData implements Serializable {
 					break;
 			}
 		}
-		return map;
 	}
 }

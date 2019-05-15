@@ -16,16 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.mass.Agents.Guard;
-import com.mygdx.mass.Agents.Intruder;
-import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.World.WorldContactListener;
-
-import java.util.ArrayList;
 
 public class MapBuilderHUD implements Disposable {
 
@@ -145,23 +140,26 @@ public class MapBuilderHUD implements Disposable {
         load = createButton("Textures/Buttons/Load.png");
         load.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mass = mapBuilderScreen.mass;
-				//mapBuilderScreen.mass.loadMap();
-                mass.world = new World(new Vector2(0, 0), true);
+				System.out.println("Current action: Load map");
+				mass.getMap().clearMap();
+				MapFileReader.loadMapFromFile(mass);
+//                mass = mapBuilderScreen.mass;
+//				//mapBuilderScreen.mass.loadMap();
+//                mass.world = new World(new Vector2(0, 0), true);
+//
+//                //allows for debug lines of our box2d world.
+//                mass.debugRenderer = new Box2DDebugRenderer();
+//                mass.worldContactListener = new WorldContactListener(mass);
+//                mass.world.setContactListener(mapBuilderScreen.mass.worldContactListener);
+//                mass.rayHandler.removeAll();
+//
+//                mass.map = MapFileReader.loadMapFromFile(mapBuilderScreen.mass);
+//                //mapBuilderScreen.updateMap();
+//                mass.mapBuilderScreen = new MapBuilderScreen(mapBuilderScreen.mass);
+//                //mapBuilderScreen = mass.mapBuilderScreen;
+//
+//                mass.setScreen(mapBuilderScreen);
 
-                //allows for debug lines of our box2d world.
-                mass.debugRenderer = new Box2DDebugRenderer();
-                mass.worldContactListener = new WorldContactListener(mass);
-                mass.world.setContactListener(mapBuilderScreen.mass.worldContactListener);
-                mass.rayHandler.removeAll();
-
-                mass.map = MapFileReader.createMapFromFile(mapBuilderScreen.mass);
-                //mapBuilderScreen.updateMap();
-                mass.mapBuilderScreen = new MapBuilderScreen(mapBuilderScreen.mass);
-                //mapBuilderScreen = mass.mapBuilderScreen;
-
-                mass.setScreen(mapBuilderScreen);
-                System.out.println("Current action: Load map");
             }
         });
         save = createButton("Textures/Buttons/Save.png");

@@ -77,24 +77,6 @@ public class MapBuilderScreen implements Screen {
         mass.map.addOuterWalls();
     }
 
-    private void createOuterWall() {
-        //North wall
-        Rectangle northWall = new Rectangle(0 - Wall.THICKNESS, map.getHeight(), map.getWidth() + 2*Wall.THICKNESS, Wall.THICKNESS);
-        map.addWall(northWall);
-
-        //East wall
-        Rectangle eastWall = new Rectangle(map.getWidth(), 0 - Wall.THICKNESS, Wall.THICKNESS, map.getHeight() + 2*Wall.THICKNESS);
-        map.addWall(eastWall);
-
-        //South wall
-        Rectangle southWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, map.getWidth() + 2*Wall.THICKNESS, Wall.THICKNESS);
-        map.addWall(southWall);
-
-        //West wall
-        Rectangle westWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, Wall.THICKNESS, map.getHeight() + 2*Wall.THICKNESS);
-        map.addWall(westWall);
-    }
-
     private void update(float delta) {
         camera.update();
         hud.update(delta);

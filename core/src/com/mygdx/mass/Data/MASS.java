@@ -84,25 +84,6 @@ public class MASS extends Game{
         setScreen(mainMenuScreen);
 	}
 
-	public void loadMap(){
-		world = new World(new Vector2(0, 0), true);
-		debugRenderer = new Box2DDebugRenderer();
-		worldContactListener = new WorldContactListener(this);
-		world.setContactListener(worldContactListener);
-		rayHandler = new RayHandler(world);
-		RayHandler.setGammaCorrection(true);
-		RayHandler.useDiffuseLight(true);
-		rayHandler.setShadows(false);
-		rayHandler.setAmbientLight(0.01f, 0.01f, 0.01f, 0.8f);
-		rayHandler.setBlurNum(1);
-		shapeRenderer = new ShapeRenderer();
-
-		map = MapFileReader.createMapFromFile(this);
-		mapBuilderScreen = new MapBuilderScreen(this);
-
-		setScreen(mapBuilderScreen);
-
-	}
 	@Override
 	public void render(){
 		super.render();
