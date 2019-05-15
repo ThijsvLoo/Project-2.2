@@ -23,8 +23,9 @@ public class Random extends Algorithm {
 
     @Override
     public void act() {
-        if (Math.random() < 0.001)
-            agent.setMoveSpeed((float) Math.random()*3);
+//        if (Math.random() < 0.001)
+//            agent.setMoveSpeed((float) Math.random()*3);
+        agent.setMoveSpeed(3.0f);
         if (agent.getAgentType() == Agent.AgentType.GUARD) {
             ArrayList<WorldObject> objectsInSight = agent.getObjectsInSight();
             ArrayList<Intruder> intruders = new ArrayList<Intruder>();

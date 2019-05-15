@@ -14,12 +14,13 @@ import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 public class Intruder extends Agent {
 
-    public static final float BASE_SPEED = 1.4f;
     public static final float SPRINT_SPEED = 3.0f;
 
     public static final float DEFAULT_VISUAL_RANGE = 7.5f;
 
-    public static final float SPRINT_MAX_TURN_SPEED = 180.0f;
+    public static final float SPRINT_MAX_TURN_SPEED = 10.0f;
+    public static final float SPRINT_REST_TIME = 10.0f;
+    public static final float SPRINT_MAX_DURATION = 5.0f;
 
     public static final float DOOR_UNLOCK_TIME_SLOW = 12.0f;
     public static final float DOOR_UNLOCK_TIME_FAST = 5.0f;
@@ -43,6 +44,8 @@ public class Intruder extends Agent {
         turnSpeed = 180f;
         visualRange = DEFAULT_VISUAL_RANGE;
         viewAngle = 45.0f;
+        restTime = 0;
+        sprintDuration = 5.0f;
 
         define(position);
         Filter filter = new Filter();
@@ -58,9 +61,30 @@ public class Intruder extends Agent {
     }
 
     public void update(float delta) {
+        if (moveSpeed > 1.4f) {
+            if (sprintDuration > 0.0f) {
+                sprintDuration -= delta;
+                if (sprintDuration < 0.0f) {
+                    sprintDuration = 0.0f;
+                    setMoveSpeed(1.4f);
+                }
+            } else {
+                setMoveSpeed(1.4f);
+            }
+        }
+        if (moveSpeed == 0.0f && sprintDuration < SPRINT_MAX_DURATION) {
+            sprintDuration += delta * SPRINT_MAX_DURATION / SPRINT_REST_TIME;
+            if (sprintDuration > SPRINT_MAX_DURATION) {
+                sprintDuration = SPRINT_MAX_DURATION;
+            }
+        }
         super.update(delta);
-        unlockDoorSlow(delta);
-        breakThroughWindow(delta);
+        if (door != null) {
+            unlockDoorSlow(delta);
+        }
+        if (window != null) {
+            breakThroughWindow(delta);
+        }
     }
 
     private void unlockDoorSlow(float delta) {

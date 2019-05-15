@@ -6,11 +6,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Algorithms.Algorithm;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Sensors.NoiseField;
 import com.mygdx.mass.Sensors.VisualField;
 import com.mygdx.mass.World.WorldObject;
 
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import static com.mygdx.mass.Agents.Intruder.SPRINT_MAX_TURN_SPEED;
 
 public abstract class Agent extends WorldObject implements java.io.Serializable{
 
@@ -18,6 +21,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public static final float DEFAULT_VIEW_ANGLE = 45.0f;
     public static final float DECREASE_VISION_FACTOR = 0.5f;
     public static final float DEFAULT_MAX_TURN_SPEED = 180.0f;
+    public static final float BASE_SPEED = 1.4f;
 
     private float blindDuration;
     private float immobilityDuration;
@@ -29,6 +33,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     protected float moveSpeed;
     protected float turnSpeed;
+    protected float maxTurnSpeed;
     protected int turnSide; //or Counter Clock
 
     protected float visualRange;
@@ -57,6 +62,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public Agent(MASS mass, Vector2 position) {
         super(mass);
+        maxTurnSpeed = DEFAULT_MAX_TURN_SPEED;
         objectsInSight = new ArrayList<WorldObject>();
         route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
@@ -176,10 +182,34 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 //    public ArrayList<Object> getCollisions() { return collisions; }
 
     public void setMoveSpeed(float moveSpeed) {
-        this.moveSpeed = moveSpeed;
+        if (moveSpeed >= 0.0f && moveSpeed <= Intruder.SPRINT_SPEED) {
+            if (moveSpeed <= BASE_SPEED) {
+                this.moveSpeed = moveSpeed;
+                setMaxTurnSpeed(DEFAULT_MAX_TURN_SPEED);
+            } else if (moveSpeed >= BASE_SPEED && this instanceof Intruder && ((Intruder) this).sprintDuration > 0.0f) {
+                this.moveSpeed = moveSpeed;
+                setMaxTurnSpeed(SPRINT_MAX_TURN_SPEED);
+            }
+        } else {
+            System.out.println("Move Speed Must Be Between 0.0 and 3.0 m/s");
+        }
         noiseField.update();
     }
-    public void setTurnSpeed(float turnSpeed) { this.turnSpeed = turnSpeed; }
+
+    public void setTurnSpeed(float turnSpeed) {
+        if (this.turnSpeed >= 0.0f && this.turnSpeed <= maxTurnSpeed) {
+            this.turnSpeed = turnSpeed;
+        } else if (this.turnSpeed > maxTurnSpeed) {
+            this.turnSpeed = maxTurnSpeed;
+        }
+    }
+
+    public void setMaxTurnSpeed(float maxTurnSpeed) {
+        this.maxTurnSpeed = maxTurnSpeed;
+        if (turnSpeed > this.maxTurnSpeed) {
+            turnSpeed = this.maxTurnSpeed;
+        }
+    }
     public void setVisualRange(float visualRange) { this.visualRange = visualRange; }
     public void setViewAngle(float viewAngle) { this.viewAngle = viewAngle; }
     public void setObjectsInSight(ArrayList<WorldObject> objectsInSight) { this.objectsInSight = objectsInSight; }
