@@ -5,9 +5,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Algorithms.Algorithm;
+import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Sensors.NoiseField;
 import com.mygdx.mass.Sensors.VisualField;
+import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldObject;
 
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     private float immobilityDuration;
 
     private boolean stealth;
+
+    public Map map = new Map(mass);
 
     public enum AgentType {GUARD, INTRUDER};
     protected AgentType agentType;
@@ -221,6 +225,74 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public String toString() {
         return "AgentType = "+this.agentType +" count of Agents = "+ count;
+    }
+
+    public void shareMap(Agent agent){
+        for (int i = 0; i < this.map.walls.size(); i++){
+            if ( !(agent.map.walls.contains(this.map.walls.get(i)))) {
+                ArrayList<Wall> walls = agent.map.getWalls();
+                walls.add(this.map.walls.get(i));
+                agent.map.setWalls(walls);
+            }
+        }
+        for (int i = 0; i < this.map.buildings.size(); i++){
+            if ( !(agent.map.buildings.contains(this.map.buildings.get(i)))) {
+                ArrayList<Building> buildings = agent.map.getBuildings();
+                buildings.add(this.map.buildings.get(i));
+                agent.map.setBuildings(buildings);
+            }
+        }
+        for (int i = 0; i < this.map.doors.size(); i++){
+            if ( !(agent.map.doors.contains(this.map.doors.get(i)))) {
+                ArrayList<Door> doors = agent.map.getDoors();
+                doors.add(this.map.doors.get(i));
+                agent.map.setDoors(doors);
+            }
+        }
+        for (int i = 0; i < this.map.windows.size(); i++){
+            if ( !(agent.map.windows.contains(this.map.windows.get(i)))) {
+                ArrayList<Window> windows = agent.map.getWindows();
+                windows.add(this.map.windows.get(i));
+                agent.map.setWindows(windows);
+            }
+        }
+        for (int i = 0; i < this.map.sentryTowers.size(); i++){
+            if ( !(agent.map.sentryTowers.contains(this.map.sentryTowers.get(i)))) {
+                ArrayList<SentryTower> sentryTowers = agent.map.getSentryTowers();
+                sentryTowers.add(this.map.sentryTowers.get(i));
+                agent.map.setSentryTowers(sentryTowers);
+            }
+        }
+        for (int i = 0; i < this.map.hidingAreas.size(); i++){
+            if ( !(agent.map.hidingAreas.contains(this.map.hidingAreas.get(i)))) {
+                ArrayList<HidingArea> hidingAreas = agent.map.getHidingAreas();
+                hidingAreas.add(this.map.hidingAreas.get(i));
+                agent.map.setHidingAreas(hidingAreas);
+            }
+        }
+        for (int i = 0; i < this.map.targetAreas.size(); i++){
+            if ( !(agent.map.targetAreas.contains(this.map.targetAreas.get(i)))) {
+                ArrayList<TargetArea> targetAreas = agent.map.getTargetAreas();
+                targetAreas.add(this.map.targetAreas.get(i));
+                agent.map.setTargetAreas(targetAreas);
+            }
+        }
+
+        for (int i = 0; i < this.map.removedMarkers.size(); i++){
+            if ( (agent.map.markers.contains(this.map.removedMarkers.get(i)))) {
+                agent.map.removeMarker(this.map.removedMarkers.get(i));
+            }
+        }
+
+        for (int i = 0; i < this.map.markers.size(); i++){
+            if ( !(agent.map.markers.contains(this.map.markers.get(i)))) {
+                ArrayList<Marker> markers = agent.map.getMarkers();
+                markers.add(this.map.markers.get(i));
+                agent.map.setMarkers(markers);
+            }
+        }
+
+
     }
 
 }

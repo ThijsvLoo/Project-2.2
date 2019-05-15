@@ -20,13 +20,15 @@ public class Map implements Serializable {
 
     private MASS mass;
 
-    private ArrayList<Wall> walls;
-    private ArrayList<Building> buildings;
-    private ArrayList<Door> doors;
-    private ArrayList<Window> windows;
-    private ArrayList<SentryTower> sentryTowers;
-    private ArrayList<HidingArea> hidingAreas;
-    private ArrayList<TargetArea> targetAreas;
+    public ArrayList<Wall> walls;
+    public ArrayList<Building> buildings;
+    public ArrayList<Door> doors;
+    public ArrayList<Window> windows;
+    public ArrayList<SentryTower> sentryTowers;
+    public ArrayList<HidingArea> hidingAreas;
+    public ArrayList<TargetArea> targetAreas;
+    public ArrayList<Marker> markers;
+    public ArrayList<Marker> removedMarkers;
 
     private ArrayList<Guard> guards;
     private ArrayList<Intruder> intruders;
@@ -41,6 +43,8 @@ public class Map implements Serializable {
         sentryTowers = new ArrayList<SentryTower>();
         hidingAreas = new ArrayList<HidingArea>();
         targetAreas = new ArrayList<TargetArea>();
+        markers = new ArrayList<Marker>();
+        removedMarkers = new ArrayList<Marker>();
 
         guards = new ArrayList<Guard>();
         intruders = new ArrayList<Intruder>();
@@ -56,6 +60,8 @@ public class Map implements Serializable {
 		sentryTowers = new ArrayList<SentryTower>();
 		hidingAreas = new ArrayList<HidingArea>();
 		targetAreas = new ArrayList<TargetArea>();
+		markers = new ArrayList<Marker>();
+        removedMarkers = new ArrayList<Marker>();
 
 		guards = new ArrayList<Guard>();
 		intruders = new ArrayList<Intruder>();
@@ -104,6 +110,18 @@ public class Map implements Serializable {
         targetAreas.add(targetArea);
         return targetArea;
     }
+
+//    public Marker addMarker(Rectangle rectangle) {
+//        Marker marker = new Marker(mass, rectangle, color);
+//        markers.add(marker);
+//        return marker;
+//    }
+
+    public void removeMarker(Marker marker){
+        removedMarkers.add(marker);
+        markers.remove(marker);
+    }
+
 
     public Guard addGuard(Vector2 position) {
         Guard guard = new Guard(mass, position);
@@ -155,6 +173,8 @@ public class Map implements Serializable {
     public ArrayList<Guard> getGuards() {
         return guards;
     }
+    public ArrayList<Marker> getMarkers() { return markers; }
+    public ArrayList<Marker> getRemovedMarkers() {return removedMarkers; }
 
     public ArrayList<Intruder> getIntruders() {
         return intruders;
@@ -171,5 +191,6 @@ public class Map implements Serializable {
     public void setTargetAreas(ArrayList<TargetArea> targetAreas) { this.targetAreas = targetAreas; }
     public void setGuards(ArrayList<Guard> guards) { this.guards = guards; }
     public void setIntruders(ArrayList<Intruder> intruders) { this.intruders = intruders; }
-
+    public void setRemovedMarkers(ArrayList<Marker> removedMarkers) { this.removedMarkers = removedMarkers; }
+    public void setMarkers(ArrayList<Marker> markers) { this.markers = markers; }
 }

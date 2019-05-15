@@ -8,7 +8,7 @@ import com.mygdx.mass.World.WorldObject;
 
 public abstract class BoxObject extends WorldObject implements java.io.Serializable{
 
-    public enum ObjectType {WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA};
+    public enum ObjectType {WALL, BUILDING, DOOR, WINDOW, SENTRY_TOWER, HIDING_AREA, TARGET_AREA, MARKER}
     protected ObjectType objectType;
 
     protected Rectangle rectangle;
