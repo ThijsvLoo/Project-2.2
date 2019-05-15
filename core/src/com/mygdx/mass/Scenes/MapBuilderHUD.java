@@ -189,23 +189,9 @@ public class MapBuilderHUD implements Disposable {
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
             	System.out.println("Current action: Clear map");
-            	ArrayList<BoxObject> mapObjectList=  mapBuilderScreen.mass.map.getBoxObjects();
-                ArrayList<Intruder> intruderList=  mapBuilderScreen.mass.map.getIntruders();
-                ArrayList<Guard> guardList=  mapBuilderScreen.mass.map.getGuards();
+            	mapBuilderScreen.mass.getMap().clearMap();
+            	mapBuilderScreen.mass.getMap().addOuterWalls();
 
-                for(int i=0; i<mapObjectList.size(); i++){
-                    mapBuilderScreen.mass.world.destroyBody( mapBuilderScreen.mass.map.getBoxObjects().get(i).getBody());
-                }
-                for(int i=0; i<intruderList.size(); i++){
-                    mapBuilderScreen.mass.world.destroyBody( intruderList.get(i).getBody());
-                }
-                for(int i=0; i<guardList.size(); i++){
-                    mapBuilderScreen.mass.world.destroyBody( guardList.get(i).getBody());
-                }
-                mapObjectList.clear();
-				mapBuilderScreen.mass.world.dispose();
-				mapBuilderScreen.mass.rayHandler.dispose();
-				mapBuilderScreen.mass.create();
             }
         });
         undo = createButton("Textures/Buttons/Undo.png");

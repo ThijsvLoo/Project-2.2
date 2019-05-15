@@ -74,7 +74,7 @@ public class MapBuilderScreen implements Screen {
     public void show() {
         Gdx.input.setInputProcessor(inputMultiplexer);
         currentState = State.NONE;
-        createOuterWall();
+        mass.map.addOuterWalls();
     }
 
     private void createOuterWall() {

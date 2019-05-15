@@ -161,6 +161,64 @@ public class Map implements Serializable {
         return agents;
     }
 
+    public void clearMap(){
+        mass.rayHandler.removeAll();
+        for(BoxObject box: walls){
+            mass.world.destroyBody(box.getBody());
+        }
+        walls.clear();
+        for(BoxObject box: buildings){
+            mass.world.destroyBody(box.getBody());
+        }
+        buildings.clear();
+        for(BoxObject box: doors){
+            mass.world.destroyBody(box.getBody());
+        }
+        doors.clear();
+        for(BoxObject box: windows){
+            mass.world.destroyBody(box.getBody());
+        }
+        windows.clear();
+        for(BoxObject box: sentryTowers){
+            mass.world.destroyBody(box.getBody());
+        }
+        sentryTowers.clear();
+        for(BoxObject box: hidingAreas){
+            mass.world.destroyBody(box.getBody());
+        }
+        hidingAreas.clear();
+        for(BoxObject box: targetAreas){
+            mass.world.destroyBody(box.getBody());
+        }
+        targetAreas.clear();
+        for(Agent agent: intruders){
+            mass.world.destroyBody(agent.getBody());
+        }
+        intruders.clear();
+        for(Agent agent: guards){
+            mass.world.destroyBody(agent.getBody());
+        }
+        guards.clear();
+    }
+
+    public void addOuterWalls(){
+        //North wall
+        Rectangle northWall = new Rectangle(0 - Wall.THICKNESS, this.getHeight(), this.getWidth() + 2*Wall.THICKNESS, Wall.THICKNESS);
+        this.addWall(northWall);
+
+        //East wall
+        Rectangle eastWall = new Rectangle(this.getWidth(), 0 - Wall.THICKNESS, Wall.THICKNESS, this.getHeight() + 2*Wall.THICKNESS);
+        this.addWall(eastWall);
+
+        //South wall
+        Rectangle southWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, this.getWidth() + 2*Wall.THICKNESS, Wall.THICKNESS);
+        this.addWall(southWall);
+
+        //West wall
+        Rectangle westWall = new Rectangle(0 - Wall.THICKNESS, 0 - Wall.THICKNESS, Wall.THICKNESS, this.getHeight() + 2*Wall.THICKNESS);
+        this.addWall(westWall);
+    }
+
     public float getWidth() { return width; }
     public float getHeight() { return height; }
     public ArrayList<Wall> getWalls() { return walls; }
