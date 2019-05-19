@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
@@ -196,12 +197,66 @@ public class MapBuilderHUD implements Disposable {
         undo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Undo");
+                if (mass.map.undo.size()>4) {
+                    BoxObject temp = mass.map.undo.pop();
+                    mass.map.redo.push(temp);
+                    switch (temp.getObjectType()) {
+                        case WALL:
+                            mass.map.getWalls().remove(temp);
+                            break;
+                        case BUILDING:
+                            mass.map.getBuildings().remove(temp);
+                            break;
+                        case HIDING_AREA:
+                            mass.map.getHidingAreas().remove(temp);
+                            break;
+                        case SENTRY_TOWER:
+                            mass.map.getSentryTowers().remove(temp);
+                            break;
+                        case TARGET_AREA:
+                            mass.map.getTargetAreas().remove(temp);
+                            break;
+                        case DOOR:
+                            mass.map.getDoors().remove(temp);
+                            break;
+                        case WINDOW:
+                            mass.map.getWindows().remove(temp);
+                            break;
+                    }
+                }
+
             }
         });
         redo = createButton("Textures/Buttons/Redo.png");
         redo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Redo");
+                if (mass.map.redo.size()>0) {
+                    BoxObject temp = mass.map.redo.pop();
+                    switch (temp.getObjectType()) {
+                        case WALL:
+                            mass.map.addWall(temp.getRectangle());
+                            break;
+                        case BUILDING:
+                            mass.map.addBuilding(temp.getRectangle());
+                            break;
+                        case HIDING_AREA:
+                            mass.map.addHidingArea(temp.getRectangle());
+                            break;
+                        case SENTRY_TOWER:
+                            mass.map.addSentryTower(temp.getRectangle());
+                            break;
+                        case TARGET_AREA:
+                            mass.map.addTargetArea(temp.getRectangle());
+                            break;
+                        case DOOR:
+                            mass.map.addDoor(temp.getRectangle());
+                            break;
+                        case WINDOW:
+                            mass.map.addWindow(temp.getRectangle());
+                            break;
+                    }
+                }
             }
         });
         simulate = createButton("Textures/Buttons/Simulate.png");

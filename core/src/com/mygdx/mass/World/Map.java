@@ -10,6 +10,7 @@ import com.mygdx.mass.Data.MASS;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Map implements Serializable {
 
@@ -29,6 +30,9 @@ public class Map implements Serializable {
     public ArrayList<TargetArea> targetAreas;
     public ArrayList<Marker> markers;
     public ArrayList<Marker> removedMarkers;
+
+    public Stack<BoxObject> undo = new Stack();
+    public Stack<BoxObject> redo = new Stack();
 
     private ArrayList<Guard> guards;
     private ArrayList<Intruder> intruders;
@@ -72,42 +76,49 @@ public class Map implements Serializable {
     public Wall addWall(Rectangle rectangle) {
         Wall wall = new Wall(mass, rectangle);
         walls.add(wall);
+        undo.add(wall);
         return wall;
     }
 
     public Building addBuilding(Rectangle rectangle) {
         Building building = new Building(mass, rectangle);
         buildings.add(building);
+        undo.add(building);
         return building;
     }
 
     public Door addDoor(Rectangle rectangle) {
         Door door = new Door(mass, rectangle);
         doors.add(door);
+        undo.add(door);
         return door;
     }
 
     public Window addWindow(Rectangle rectangle) {
         Window window = new Window(mass, rectangle);
         windows.add(window);
+        undo.add(window);
         return window;
     }
 
     public SentryTower addSentryTower(Rectangle rectangle) {
         SentryTower sentryTower = new SentryTower(mass, rectangle);
         sentryTowers.add(sentryTower);
+        undo.add(sentryTower);
         return sentryTower;
     }
 
     public HidingArea addHidingArea(Rectangle rectangle) {
         HidingArea hidingArea = new HidingArea(mass, rectangle);
         hidingAreas.add(hidingArea);
+        undo.add(hidingArea);
         return hidingArea;
     }
 
     public TargetArea addTargetArea(Rectangle rectangle) {
         TargetArea targetArea = new TargetArea(mass, rectangle);
         targetAreas.add(targetArea);
+        undo.add(targetArea);
         return targetArea;
     }
 
@@ -200,6 +211,7 @@ public class Map implements Serializable {
         }
         guards.clear();
     }
+
 
     public void addOuterWalls(){
         //North wall

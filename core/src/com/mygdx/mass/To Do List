@@ -4,8 +4,9 @@ Tasks that need to be finish ASAP (try to aim for 1 week), as other tasks depend
 - Box2D contact listener for handling collision (Hong)
 - MapBuilder: Save/Load Function (Thijs)
 - MapSimulator: Basic structure, see MapBuilder for insight
-- MapSimulator HUD, HUD buttons, buttons listener
-- MapSimulator function: decrease speed, play/pause, increase speed
+- MapSimulator HUD, HUD buttons, buttons listener (Rhys)
+- MapSimulator function: play/pause (Rhys)
+- MapSimulator function: decrease speed, increase speed
 
 Tasks that aren't constraint with other tasks, in no particular order
 - MainMenuScreen -> MapBuilder, MapSimulator, Options, Exit (Kamil)
@@ -16,7 +17,7 @@ Tasks that aren't constraint with other tasks, in no particular order
 - MapBuilder function: Relocate object(s)
 - MapBuilder function: delete object (Lilly) (DONE)
 - MapBuilder function: Clear all (Lilly)
-- MapBuilder function: Undo, Redo
+- MapBuilder function: Undo, Redo (Rhys WIP)
 - Mini-map class, which extends map: used by agents to simulate their world model
 - MapSimulator mini-map functions: Perspective view guard/intruder, show route, show algorithm illustration
 - Research possible algorithms for next phase (exploring, decision, path finding)

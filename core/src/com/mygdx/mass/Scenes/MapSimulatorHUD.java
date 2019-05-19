@@ -18,9 +18,10 @@ import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Screens.*;
+import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
-import com.mygdx.mass.Tools.MapFileReader;
 
 import java.util.ArrayList;
 
@@ -47,11 +48,11 @@ public class MapSimulatorHUD implements Disposable {
     private ImageButton load;
     private ImageButton save;
     private ImageButton move;
-    private ImageButton delete;
-    private ImageButton clear;
+    private ImageButton pause;
+    private ImageButton exit;
 
-    public MapSimulatorHUD(MASS mass){
-        this.mass = mass;
+    public MapSimulatorHUD(final MapSimulatorScreen mapSimulatorScreen){
+        this.mass = mapSimulatorScreen.mass;
 
         camera = new OrthographicCamera();
         viewport = new ScreenViewport(camera);
@@ -113,33 +114,35 @@ public class MapSimulatorHUD implements Disposable {
                 System.out.println("Current action: Move");
             }
         });
-        delete = createButton("Textures/Buttons/Delete.png");
-        delete.addListener(new ClickListener() {
+        pause = createButton("Textures/Buttons/Pause.png");
+        pause.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Delete");
+                System.out.println("Current action: Pause");
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new MapBuilderScreen(mapSimulatorScreen.mass));
             }
         });
-        clear = createButton("Textures/Buttons/Clear.png");
-        clear.addListener(new ClickListener() {
+        exit = createButton("Textures/Buttons/Exit.png");
+        exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Clear map");
+                System.out.println("Current action: Exit Simulation");
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen(mapSimulatorScreen.mass));
             }
         });
 
-        table.add(wall).size(BUTTON_SIZE);
-        table.add(building).size(BUTTON_SIZE);
-        table.add(door).size(BUTTON_SIZE);
-        table.add(window).size(BUTTON_SIZE);
-        table.add(sentryTower).size(BUTTON_SIZE);
-
-        //start second row
-        table.row();
-
-        table.add(load).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(save).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(move).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(delete).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(clear).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+//        table.add(wall).size(BUTTON_SIZE);
+//        table.add(building).size(BUTTON_SIZE);
+//        table.add(door).size(BUTTON_SIZE);
+//        table.add(window).size(BUTTON_SIZE);
+//        table.add(sentryTower).size(BUTTON_SIZE);
+//
+//        //start second row
+//        table.row();
+//
+//        table.add(load).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+//        table.add(save).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+//        table.add(move).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(pause).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(exit).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
 
         stage.addActor(table);
     }

@@ -31,20 +31,31 @@ public class MainMenuScreen implements Screen {
     private OrthographicCamera camera;
     private TextureAtlas atlas;
 
+    //Change ui skin
+    private boolean glassy = false;
+
 
     public MainMenuScreen(MASS mass) {
         this.mass = mass;
+
+        //Chooses ui skin
         skin = new Skin(Gdx.files.internal("neon/skin/neon-ui.json"));
         atlas = new TextureAtlas("neon/skin/neon-ui.atlas");
+        if (glassy == true) {
+            skin = new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json"));
+            atlas = new TextureAtlas("glassy/glassyui/glassy-ui.atlas");
+        }
 
         batch = mass.batch;
         camera = mass.camera;
         viewport = mass.viewport;
         viewport.apply();
-        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, -5);
         camera.update();
 
         stage = new Stage(viewport, batch);
+
+
     }
 
     @Override
@@ -55,11 +66,14 @@ public class MainMenuScreen implements Screen {
         Table mainTable = new Table();
         //Set table to fill stage
         mainTable.setFillParent(true);
+        //Reduces button size
+        mainTable.setTransform(true);
+
         //Set alignment of contents in the table.
         mainTable.center();
 
         //Create Label
-        Label welcome = new Label("Multi-agent Surveillance",skin);
+        Label welcome = new Label("Multi-Agent Surveillance System",skin);
         welcome.setFontScale(1f,1f);
         //Group top = new Group();
         //top.addActor(welcome);
@@ -71,6 +85,13 @@ public class MainMenuScreen implements Screen {
         TextButton builderButton = new TextButton("Map builder", skin);
         TextButton optionsButton = new TextButton("Options", skin);
         TextButton exitButton = new TextButton("Exit", skin);
+        if (glassy == true){
+            simulateButton = new TextButton("Simulation", skin, "small");
+            builderButton = new TextButton("Map builder", skin, "small");
+            optionsButton = new TextButton("Options", skin, "small");
+            exitButton = new TextButton("Exit", skin, "small");
+            mainTable.defaults().pad(5.0f);
+        }
 
         //Add listeners to buttons
         builderButton.addListener(new ClickListener() {
@@ -85,6 +106,20 @@ public class MainMenuScreen implements Screen {
                 Gdx.app.exit();
             }
         });
+        simulateButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new MapBuilderScreen(mass));
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new MapSimulatorScreen(mass));
+            }
+        });
+        optionsButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                ((Game) Gdx.app.getApplicationListener()).setScreen(new OptionsScreen(mass));
+            }
+        });
+
 
         mainTable.add(welcome);
         mainTable.row();

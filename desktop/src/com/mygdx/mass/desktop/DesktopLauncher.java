@@ -11,6 +11,11 @@ public class DesktopLauncher {
 		config.width = MASS.WINDOW_WIDTH;
 		config.height = MASS.WINDOW_HEIGHT;
 		config.samples = MASS.ANTI_ALIASING; //anti aliasing
+
+		boolean fs = false;
+		if (fs == true) {
+			config.fullscreen = true;
+		}
 		new LwjglApplication(new MASS(), config);
 	}
 }

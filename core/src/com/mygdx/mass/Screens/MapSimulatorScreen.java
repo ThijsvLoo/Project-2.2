@@ -59,7 +59,7 @@ public class MapSimulatorScreen implements Screen {
         camera.position.set(map.getWidth()/2,map.getHeight()/2,0.0f);
         viewport.setUnitsPerPixel(1/mass.PPM);
 
-        hud = new MapSimulatorHUD(mass);
+        hud = new MapSimulatorHUD(this);
         info = new MapSimulatorInfo(this, batch);
 
         inputMultiplexer = new InputMultiplexer();

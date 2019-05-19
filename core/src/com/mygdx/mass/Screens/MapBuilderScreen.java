@@ -384,26 +384,40 @@ public class MapBuilderScreen implements Screen {
 					switch(map.getBoxObjects().get(index).getObjectType()){
 						case WALL:
 							map.getWalls().remove(map.getBoxObjects().get(index));
+//							map.undo.add(map.getBoxObjects().get(index));
 							break;
 						case BUILDING:
 							map.getBuildings().remove(map.getBoxObjects().get(index));
+//                            map.undo.add(map.getBoxObjects().get(index));
 							break;
 						case HIDING_AREA:
 							map.getHidingAreas().remove(map.getBoxObjects().get(index));
+//                            map.undo.add(map.getBoxObjects().get(index));
 							break;
 						case SENTRY_TOWER:
 							map.getSentryTowers().remove(map.getBoxObjects().get(index));
+//                            map.undo.add(map.getBoxObjects().get(index));
 							break;
 						case TARGET_AREA:
 							map.getTargetAreas().remove(map.getBoxObjects().get(index));
+//                            map.undo.add(map.getBoxObjects().get(index));
 							break;
 						case DOOR:
 							map.getDoors().remove(map.getBoxObjects().get(index));
+//                            map.undo.add(map.getBoxObjects().get(index));
 							break;
 						case WINDOW:
 							map.getWindows().remove(map.getBoxObjects().get(index));
+//                            map.undo.add(map.getBoxObjects().get(index));
 							break;
 					}
+//                    switch(map.getAgents().get(index).getAgentType()){
+//                        case GUARD:
+//                            map.getGuards().remove(map.getGuards().get(index));
+//                            break;
+//                        case INTRUDER:
+//                            map.getIntruders().remove(map.getIntruders().get(index));
+//                    }
                 }
 
             }
