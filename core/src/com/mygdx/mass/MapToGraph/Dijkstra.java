@@ -22,6 +22,7 @@ public class Dijkstra {
     public Dijkstra(Graph graph){
         this.vertices = graph.getVertices();
         this.edges = graph.getEdges();
+        graph.connectVerticesList(vertices);
         this.start = graph.getStart();
         this.destination = graph.getDestination();
 
