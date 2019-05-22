@@ -53,6 +53,11 @@ public class Graph {
                 return false;
             }
         }
+        for(SentryTower sentryTower: MASS.map.getSentryTowers()){
+            if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(),sentryTower.getRectangle())){
+                return false;
+            }
+        }
         return true;
     }
     public ArrayList<Vertex> getPathVertices(Vertex start, Vertex destination) {
