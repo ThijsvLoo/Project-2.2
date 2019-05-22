@@ -203,24 +203,31 @@ public class MapBuilderHUD implements Disposable {
                     switch (temp.getObjectType()) {
                         case WALL:
                             mass.map.getWalls().remove(temp);
+                            mass.world.destroyBody(temp.getBody());
                             break;
                         case BUILDING:
                             mass.map.getBuildings().remove(temp);
+                            mass.world.destroyBody(temp.getBody());
                             break;
                         case HIDING_AREA:
                             mass.map.getHidingAreas().remove(temp);
+                            mass.world.destroyBody(temp.getBody());
                             break;
                         case SENTRY_TOWER:
                             mass.map.getSentryTowers().remove(temp);
+                            mass.world.destroyBody(temp.getBody());
                             break;
                         case TARGET_AREA:
                             mass.map.getTargetAreas().remove(temp);
+                            mass.world.destroyBody(temp.getBody());
                             break;
                         case DOOR:
                             mass.map.getDoors().remove(temp);
+                            mass.world.destroyBody(temp.getBody());
                             break;
                         case WINDOW:
                             mass.map.getWindows().remove(temp);
+                            mass.world.destroyBody(temp.getBody());
                             break;
                     }
                 }
