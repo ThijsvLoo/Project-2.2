@@ -60,7 +60,7 @@ public class Graph {
             }
         }
         while (proceed){
-            System.out.println(8);
+
             ArrayList<Vertex> newVertices = new ArrayList<Vertex>();
             for(BoxObject newBox: newBoxes){
               if (newBox != null) newVertices.addAll(add4Corners(newBox));
@@ -85,8 +85,7 @@ public class Graph {
                     }
                 }
             }
-            System.out.println(8);
-            System.out.println(proceed);
+
         }
 
     }
