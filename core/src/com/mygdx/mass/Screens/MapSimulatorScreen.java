@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -18,6 +19,8 @@ import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Scenes.MapSimulatorHUD;
 import com.mygdx.mass.Scenes.MapSimulatorInfo;
 import com.mygdx.mass.World.Map;
+
+import java.util.ArrayList;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
@@ -280,7 +283,12 @@ public class MapSimulatorScreen implements Screen {
         public boolean keyTyped(char character) { return false; }
 
         @Override
-        public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            for (Agent agent : MASS.map.getAgents()) {
+                agent.goTo(toWorldCoordinate(screenX, screenY));
+            }
+            return true;
+        }
 
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }

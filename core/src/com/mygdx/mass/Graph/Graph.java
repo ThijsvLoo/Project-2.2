@@ -72,11 +72,12 @@ public class Graph {
     public void connectNodes() {
         for (int i = 0; i < nodes.size(); i++) {
             for (int j = 0; j < nodes.size(); j++) {
-             if (i == j) continue;
-             nodes.get(i).connect(nodes.get(j));
+                if (i == j) continue;
+                nodes.get(i).connect(nodes.get(j));
             }
             adjVertices.put(nodes.get(i), nodes.get(i).connections);
         }
     }
 
 }
+

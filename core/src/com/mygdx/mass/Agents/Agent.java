@@ -7,6 +7,10 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Algorithms.Algorithm;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.MapToGraph.Dijkstra;
+import com.mygdx.mass.MapToGraph.Edge;
+import com.mygdx.mass.MapToGraph.Graph;
+import com.mygdx.mass.MapToGraph.Vertex;
 import com.mygdx.mass.Sensors.NoiseField;
 import com.mygdx.mass.Sensors.VisualField;
 import com.mygdx.mass.World.Map;
@@ -97,7 +101,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     }
 
     public void update(float delta) {
-        algorithm.act();
+//        algorithm.act();
+        followRoute();
     }
 
     public void addWaypoint(Vector2 waypoint) {
@@ -118,6 +123,19 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             updateVelocity();
         } else {
             body.setLinearVelocity(0.0f,0.0f);
+        }
+    }
+
+    public void goTo(Vector2 destination) {
+        Vertex start = new Vertex(body.getPosition().x, body.getPosition().y);
+        Vertex end = new Vertex(destination.x, destination.y);
+        Graph graph = new Graph(new ArrayList<Vertex>(), new ArrayList<Edge>());
+        graph.getPathVertices(start, end);
+        Dijkstra dijkstra = new Dijkstra(graph);
+        ArrayList<Vector2> bestPath = dijkstra.computePath();
+        route.clear();
+        for (Vector2 waypoint : bestPath) {
+            addWaypoint(waypoint);
         }
     }
 
@@ -194,10 +212,10 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
                 this.moveSpeed = moveSpeed;
                 setMaxTurnSpeed(SPRINT_MAX_TURN_SPEED);
             }
+            noiseField.update();
         } else {
             System.out.println("Move Speed Must Be Between 0.0 and 3.0 m/s");
         }
-        noiseField.update();
     }
 
     public void setTurnSpeed(float turnSpeed) {

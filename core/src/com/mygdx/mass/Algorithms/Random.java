@@ -18,7 +18,7 @@ public class Random extends Algorithm {
 
     public Random(Agent agent) {
         this.agent = agent;
-        this.agent.addWaypoint(new Vector2((float) Math.random()* MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
+//        this.agent.addWaypoint(new Vector2((float) Math.random()* MASS.map.getWidth(), (float) Math.random()*MASS.map.getHeight()));
     }
 
     @Override
