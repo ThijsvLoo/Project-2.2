@@ -19,6 +19,12 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Data.Properties;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 //import com.mygdx.mass.MASS;
 //import sun.tools.java.Constants;
 
@@ -35,16 +41,42 @@ public class OptionsScreen implements Screen {
     private TextureAtlas atlas;
 
     //Change ui skin
-    private boolean glassy = false;
-    private boolean fs = false;
+    private boolean neon;
+    private boolean fs;
+
+    private Properties fstrue = new Properties("fs", "true");
+    private Properties fsfalse = new Properties("fs", "true");
+    private Properties uitrue = new Properties("ui", "true");
+    private Properties uifalse = new Properties("ui", "false");
+
 
     public OptionsScreen(MASS mass) {
+
+
+        for(int i = 0; i<mass.getSettings().size(); i++){
+            if (mass.getSettings().get(i).getName().equals("neon") && mass.getSettings().get(i).getSetting().equals("true")) {
+                neon = true;
+                break;
+            } else {
+                neon = false;
+            }
+        }
+
+        for(int i = 0; i<mass.getSettings().size(); i++){
+            if (mass.getSettings().get(i).getName().equals("fs") && mass.getSettings().get(i).getSetting().equals("true")) {
+                fs = true;
+                break;
+            } else {
+                fs = false;
+            }
+        }
+
         this.mass = mass;
 
         //Chooses ui skin
         skin = new Skin(Gdx.files.internal("neon/skin/neon-ui.json"));
         atlas = new TextureAtlas("neon/skin/neon-ui.atlas");
-        if (glassy == true) {
+        if (neon == false) {
             skin = new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json"));
             atlas = new TextureAtlas("glassy/glassyui/glassy-ui.atlas");
         }
@@ -76,7 +108,7 @@ public class OptionsScreen implements Screen {
 
         //Create buttons
         TextButton backButton = new TextButton("Back", skin);
-        if (glassy == true){
+        if (neon == false){
             backButton = new TextButton("Back", skin, "small");
             optionsTable.defaults().pad(5.0f);
         }
@@ -110,6 +142,7 @@ public class OptionsScreen implements Screen {
         buttonGroup.add(uiCheck);
         optionsTable.add(uiCheck);
         uiCheck = new CheckBox("Glassy", skin, "radio");
+        uiCheck.setChecked(!neon);
         buttonGroup.add(uiCheck);
         optionsTable.add(uiCheck);
         optionsTable.row();
@@ -126,7 +159,7 @@ public class OptionsScreen implements Screen {
         buttonGroup2.add(fsCheck);
         optionsTable.add(fsCheck);
         fsCheck = new CheckBox("Off", skin, "radio");
-        fsCheck.setChecked(true);
+        fsCheck.setChecked(!fs);
         buttonGroup2.add(fsCheck);
         optionsTable.add(fsCheck);
         optionsTable.row();
@@ -134,26 +167,63 @@ public class OptionsScreen implements Screen {
         //Add listeners
         uiCheck.addListener(new ChangeListener() {
             @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                if(glassy){
-                    glassy = false;
-                    System.out.println(glassy);
+            public void changed(ChangeEvent event, Actor actor) {
+                System.out.println("ui radio clicked");
+                if(neon) {
+                    neon = false;
                 } else {
-                    glassy = true;
-                    System.out.println(glassy);
+                    neon = true;
                 }
+                for(int i = 0; i<mass.getSettings().size(); i++){
+                    if (mass.getSettings().get(i).getName().equals("neon")) {
+                            mass.getSettings().get(i).setSetting(String.valueOf(neon));
+                            mass.writeSettings();
+                            break;
+                        }
+                    }
+
+//                ArrayList<Properties> temp = mass.getSettings();
+//                if (temp.contains(uitrue)){
+//                    temp.remove(uitrue);
+//                    temp.add(uifalse);
+//                    mass.writeSettings(temp);
+//                } else {
+//                    temp.add(uitrue);
+//                    temp.remove(uifalse);
+//                    mass.writeSettings(temp);
+//                }
             }
         });
         fsCheck.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                if(fs){
+                System.out.println("fs radio clicked");
+                if(fs) {
                     fs = false;
-                    System.out.println(fs);
                 } else {
                     fs = true;
-                    System.out.println(fs);
                 }
+                for(int i = 0; i<mass.getSettings().size(); i++){
+                        if (mass.getSettings().get(i).getName().equals("fs")) {
+                            mass.getSettings().get(i).setSetting(String.valueOf(fs));
+                            mass.writeSettings();
+                            break;
+                        }
+                    }
+//                ArrayList<Properties> temp2 = mass.getSettings();
+//                if (temp2.contains(fstrue)){
+//                    temp2.remove(fstrue);
+//                    temp2.add(fsfalse);
+//                    mass.writeSettings(temp2);
+//                } else {
+//                    temp2.remove(fsfalse);
+//                    temp2.add(fstrue);
+//                    System.out.println("temp2 size: " + temp2.size());
+//
+//                    mass.writeSettings(temp2);
+//                }
+
+//                System.out.println(mass.getSettingStrings().toString());
             }
         });
 
@@ -163,6 +233,8 @@ public class OptionsScreen implements Screen {
         //Add table to stage
         stage.addActor(optionsTable);
     }
+
+
 
     @Override
     public void render(float delta) {

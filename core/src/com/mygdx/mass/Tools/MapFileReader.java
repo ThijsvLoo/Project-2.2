@@ -83,6 +83,7 @@ public class MapFileReader extends JPanel implements Serializable{
 			mapData = (MapData) fileObjectIn.readObject();
 			fileObjectIn.close();
 			inStream.close();
+            mass.getMap().clearMap();
             mapData.loadMap(mass);
         } catch(IOException e){
 			System.out.println("IO error");

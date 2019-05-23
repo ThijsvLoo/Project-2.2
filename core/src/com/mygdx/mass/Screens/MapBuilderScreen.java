@@ -502,4 +502,8 @@ public class MapBuilderScreen implements Screen {
         }
     }
 
+    public MapBuilderInfo getInfo() {
+        return info;
+    }
+
 }

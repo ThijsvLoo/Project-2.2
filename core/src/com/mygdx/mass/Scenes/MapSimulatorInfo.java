@@ -26,6 +26,10 @@ public class MapSimulatorInfo implements Disposable {
     private Label simstepNameLabel;
     private Label simstepLabel;
 
+    private Label currentLabel;
+    private Label builderLabel;
+    private String currentBuildTool;
+
     public MapSimulatorInfo(MapSimulatorScreen mapSimulatorScreen, SpriteBatch spritebatch) {
         fpsCount = 0;
         simStep = 0;
@@ -43,6 +47,9 @@ public class MapSimulatorInfo implements Disposable {
         fpsLabel = new Label(String.format("%03d", fpsCount), labelstyle);
         simstepNameLabel = new Label("Simulation step:", labelstyle);
         simstepLabel = new Label(String.format("%06d", simStep), labelstyle);
+
+        currentLabel = new Label("Current:", labelstyle);
+        builderLabel = new Label(currentBuildTool, labelstyle);
 
         table.add(fpsNameLabel).padTop(10).expandX();
         table.add(simstepNameLabel).padTop(10).expandX();
@@ -63,6 +70,10 @@ public class MapSimulatorInfo implements Disposable {
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    public void updateBuildTool(String tool){
+        builderLabel.setText(tool);
     }
 
 }
