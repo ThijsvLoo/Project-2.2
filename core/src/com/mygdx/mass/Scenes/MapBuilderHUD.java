@@ -23,6 +23,8 @@ import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.World.WorldContactListener;
 
+import java.util.Arrays;
+
 public class MapBuilderHUD implements Disposable {
 
     public static final float BUTTON_SIZE = 32;
@@ -197,6 +199,7 @@ public class MapBuilderHUD implements Disposable {
         undo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Undo");
+                System.out.println(mass.map.undo.size());
                 if (mass.map.undo.size()>4) {
                     BoxObject temp = mass.map.undo.pop();
                     mass.map.redo.push(temp);
@@ -282,6 +285,8 @@ public class MapBuilderHUD implements Disposable {
 //                Gdx.app.getApplicationListener().dispose();
             }
         });
+
+        table.defaults().pad(2.0f);
 
         table.add(wall).size(BUTTON_SIZE);
         table.add(building).size(BUTTON_SIZE);
