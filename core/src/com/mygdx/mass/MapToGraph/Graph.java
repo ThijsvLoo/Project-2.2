@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.BoxObject.Building;
 import com.mygdx.mass.BoxObject.SentryTower;
+import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.Data.MASS;
 
 import java.lang.reflect.Array;
@@ -108,6 +109,15 @@ public class Graph {
 
             }
         }
+        for(Wall wall: MASS.map.getWalls()){
+            if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(),wall.getRectangle())){
+
+
+                return wall;
+
+
+            }
+        }
         return null;
     }
     public ArrayList<Vertex> getPathVertices(Vertex start, Vertex destination) {
@@ -130,6 +140,12 @@ public class Graph {
             if (Intersector.intersectSegmentRectangle(start.getCoordinates(), destination.getCoordinates(),sentryTower.getRectangle())) {
                 exploredBuilding.add(sentryTower);
                 add4Corners(sentryTower);
+            }
+        }
+        for (Wall wall: MASS.map.getWalls()){
+            if (Intersector.intersectSegmentRectangle(start.getCoordinates(), destination.getCoordinates(), wall.getRectangle())) {
+                exploredBuilding.add(wall);
+                add4Corners(wall);
             }
         }
 
