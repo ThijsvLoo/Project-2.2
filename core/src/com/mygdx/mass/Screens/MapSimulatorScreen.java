@@ -10,10 +10,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
+import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Scenes.MapSimulatorHUD;
@@ -105,11 +107,40 @@ public class MapSimulatorScreen implements Screen {
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             camera.position.x += MASS.CAMERA_SPEED * delta;
         }
-
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             camera.position.y += MASS.CAMERA_SPEED * delta;
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             camera.position.y -= MASS.CAMERA_SPEED * delta;
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            ArrayList<Intruder> intuders = map.getIntruders();
+            if(!intuders.isEmpty()){
+                Body body = intuders.get(0).getBody();
+                body.setTransform(body.getWorldCenter(), (float)((body.getAngle()-(Math.PI)*delta)));
+            }
+
+        } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            ArrayList<Intruder> intuders = map.getIntruders();
+            if(!intuders.isEmpty()){
+                Body body = intuders.get(0).getBody();
+                body.setTransform(body.getWorldCenter(), (float)(body.getAngle()+(Math.PI)*delta));
+            }
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            ArrayList<Intruder> intuders = map.getIntruders();
+            if(!intuders.isEmpty()) {
+                Body body = intuders.get(0).getBody();
+                float x = (float) Math.cos(body.getAngle()) * Agent.BASE_SPEED*2;
+                float y = (float) Math.sin(body.getAngle()) * Agent.BASE_SPEED*2;
+                body.setLinearVelocity(x, y);
+            }
+        } else {
+            ArrayList<Intruder> intuders = map.getIntruders();
+            if(!intuders.isEmpty()) {
+                Body body = intuders.get(0).getBody();
+                body.setLinearVelocity(0, 0);
+            }
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < MASS.MAXIMAL_ZOOM) {
