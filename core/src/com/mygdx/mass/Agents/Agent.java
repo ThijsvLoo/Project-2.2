@@ -116,6 +116,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
                 destination = route.poll();
             } else {
                 destination = null;
+                body.setLinearVelocity(0.0f,0.0f);
+
             }
         }
         if (destination == null && !route.isEmpty()) {
@@ -125,8 +127,6 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             updateDirection();
             updateAngle();
             updateVelocity();
-        } else {
-            body.setLinearVelocity(0.0f,0.0f);
         }
     }
 
