@@ -7,7 +7,7 @@ import com.mygdx.mass.BoxObject.SentryTower;
 import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.Data.MASS;
 
-import java.lang.reflect.Array;
+
 import java.util.ArrayList;
 
 public class Graph {
@@ -93,29 +93,17 @@ public class Graph {
     private BoxObject connectVertices(Vertex v1, Vertex v2){
         for(Building building: MASS.map.getBuildings()){
             if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(), building.getRectangle())){
-
-
                     return building;
-
-
             }
         }
         for(SentryTower sentryTower: MASS.map.getSentryTowers()){
             if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(),sentryTower.getRectangle())){
-
-
                     return sentryTower;
-
-
             }
         }
         for(Wall wall: MASS.map.getWalls()){
             if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(),wall.getRectangle())){
-
-
                 return wall;
-
-
             }
         }
         return null;
@@ -155,14 +143,22 @@ public class Graph {
     private <T extends BoxObject> ArrayList<Vertex> add4Corners(T obj){
         ArrayList<Vertex> corners = new ArrayList<Vertex>();
 
-            corners.add(new Vertex(obj.getRectangle().x-1,obj.getRectangle().y-1));
-            corners.add(new Vertex(obj.getRectangle().x-1,obj.getRectangle().y+obj.getRectangle().height+1));
-            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+1, obj.getRectangle().y+obj.getRectangle().height+1));
-            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+1, obj.getRectangle().y-1));
+            corners.add(new Vertex(obj.getRectangle().x-((float)0.5),obj.getRectangle().y-((float)0.5)));
+            corners.add(new Vertex(obj.getRectangle().x-((float)0.5),obj.getRectangle().y+obj.getRectangle().height+((float)0.5)));
+            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)0.5), obj.getRectangle().y+obj.getRectangle().height+((float)0.5)));
+            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)0.5), obj.getRectangle().y-((float)0.5)));
 
             vertices.addAll(corners);
 
         return corners;
+    }
+
+    public void connectTSP(Vertex start){
+        for(Vertex v: vertices){
+            edges.add(new Edge(start,v));
+        }
+
+
     }
     public ArrayList<Vertex> getVertices(){
         return vertices;
