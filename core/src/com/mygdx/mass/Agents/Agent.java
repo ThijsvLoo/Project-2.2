@@ -112,7 +112,11 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     //Need to recheck this part
     public void followRoute() {
         if (destination != null && atPosition(destination)) {
-            destination = null;
+            if (!route.isEmpty()) {
+                destination = route.poll();
+            } else {
+                destination = null;
+            }
         }
         if (destination == null && !route.isEmpty()) {
             destination = route.poll();
