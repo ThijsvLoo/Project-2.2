@@ -134,6 +134,8 @@ public class MapSimulatorHUD implements Disposable {
             }
         });
 
+
+          table.defaults().pad(2.0f);
 //        table.add(wall).size(BUTTON_SIZE);
 //        table.add(building).size(BUTTON_SIZE);
 //        table.add(door).size(BUTTON_SIZE);
