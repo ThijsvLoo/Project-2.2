@@ -27,8 +27,10 @@ public class TSP {
         ArrayList<Vector2> path = new ArrayList<Vector2>();
         while(vertices.size()>0){
             Vertex nextVertex = getClosest(start, vertices).getVertex2();
+            start = nextVertex;
             path.add(nextVertex.getCoordinates());
             vertices.remove(nextVertex);
+
         }
 
         return path;
@@ -42,6 +44,7 @@ public class TSP {
             edges.add(edge);
             if(closest==null) closest= edge;
             else if(edge.getWeight()<closest.getWeight()) closest = edge;
+
 
         }
         return closest;
