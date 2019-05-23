@@ -170,13 +170,13 @@ public class MapBuilderHUD implements Disposable {
                 System.out.println("Current action: Save map");
             }
         });
-        move = createButton("Textures/Buttons/Move.png");
-        move.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.MOVE);
-                System.out.println("Current action: Move");
-            }
-        });
+//        move = createButton("Textures/Buttons/Move.png");
+//        move.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.MOVE);
+//                System.out.println("Current action: Move");
+//            }
+//        });
         delete = createButton("Textures/Buttons/Delete.png");
         delete.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
@@ -298,7 +298,7 @@ public class MapBuilderHUD implements Disposable {
 
         table.add(load).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(save).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(move).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+//        table.add(move).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(delete).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(clear).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(undo).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);

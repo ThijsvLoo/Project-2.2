@@ -22,6 +22,7 @@ import com.mygdx.mass.Screens.*;
 import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.World.AgentsMap;
 
 import java.util.ArrayList;
 
@@ -64,60 +65,64 @@ public class MapSimulatorHUD implements Disposable {
         table.bottom();
 
         //Creating buttons along with their click listener
-
-        wall = createButton("Textures/Buttons/Wall.png");
-        wall.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Create wall");
-            }
-        });
-        building = createButton("Textures/Buttons/Building2.png");
-        building.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Create building");
-            }
-        });
-        door = createButton("Textures/Buttons/Door2.png");
-        door.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Create door");
-            }
-        });
-        window = createButton("Textures/Buttons/Window.png");
-        window.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Create window");
-            }
-        });
-        sentryTower = createButton("Textures/Buttons/Tower.png");
-        sentryTower.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Create sentry tower");
-            }
-        });
-
-        load = createButton("Textures/Buttons/Load.png");
-        load.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Load map");
-            }
-        });
-        save = createButton("Textures/Buttons/Save.png");
-        save.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Save map");
-            }
-        });
-        move = createButton("Textures/Buttons/Move.png");
-        move.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y){
-                System.out.println("Current action: Move");
-            }
-        });
+//
+//        wall = createButton("Textures/Buttons/Wall.png");
+//        wall.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                System.out.println("Current action: Create wall");
+//            }
+//        });
+//        building = createButton("Textures/Buttons/Building2.png");
+//        building.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                System.out.println("Current action: Create building");
+//            }
+//        });
+//        door = createButton("Textures/Buttons/Door2.png");
+//        door.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                System.out.println("Current action: Create door");
+//            }
+//        });
+//        window = createButton("Textures/Buttons/Window.png");
+//        window.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                System.out.println("Current action: Create window");
+//            }
+//        });
+//        sentryTower = createButton("Textures/Buttons/Tower.png");
+//        sentryTower.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                System.out.println("Current action: Create sentry tower");
+//            }
+//        });
+//
+//        load = createButton("Textures/Buttons/Load.png");
+//        load.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                System.out.println("Current action: Load map");
+//            }
+//        });
+//        save = createButton("Textures/Buttons/Save.png");
+//        save.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                System.out.println("Current action: Save map");
+//            }
+//        });
+//        move = createButton("Textures/Buttons/Move.png");
+//        move.addListener(new ClickListener() {
+//            public void clicked(InputEvent event, float x, float y){
+//                System.out.println("Current action: Move");
+//            }
+//        });
         pause = createButton("Textures/Buttons/Pause.png");
         pause.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Pause");
+                for(int i = 0; i < mass.map.getAgents().size(); i++) {
+                    mass.map.getAgents().get(i).route.clear();
+                    mass.map.getAgents().get(i).setDestination(null);
+                }
                 ((Game) Gdx.app.getApplicationListener()).setScreen(new MapBuilderScreen(mapSimulatorScreen.mass));
             }
         });

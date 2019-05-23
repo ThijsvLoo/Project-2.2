@@ -58,7 +58,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected NoiseField noiseField;
 
     protected Vector2 destination;
-    protected LinkedBlockingQueue<Vector2> route;
+    public LinkedBlockingQueue<Vector2> route;
     protected Vector2 direction;
     protected Vector2 velocity;
 

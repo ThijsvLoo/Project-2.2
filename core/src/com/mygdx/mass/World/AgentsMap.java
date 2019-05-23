@@ -29,6 +29,8 @@ public class AgentsMap {
         toVisit.add(vector2);
     }
 
+    public void clearToVisitList() {toVisit.clear();}
+
     public Queue<Vector2> getToVisit(){
         return toVisit;
     }
