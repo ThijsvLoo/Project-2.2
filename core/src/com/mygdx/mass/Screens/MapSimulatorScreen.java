@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Intruder;
+import com.mygdx.mass.Algorithms.Explore;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Scenes.MapSimulatorHUD;
@@ -315,8 +316,13 @@ public class MapSimulatorScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+//            for (Agent agent : MASS.map.getAgents()) {
+//                agent.goTo(toWorldCoordinate(screenX, screenY));
+//            }
+            //for testing
+            Explore explore = new Explore();
             for (Agent agent : MASS.map.getAgents()) {
-                agent.goTo(toWorldCoordinate(screenX, screenY));
+                explore.start(agent);
             }
             return true;
         }
