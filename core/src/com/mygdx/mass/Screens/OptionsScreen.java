@@ -4,8 +4,10 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -44,10 +46,7 @@ public class OptionsScreen implements Screen {
     private boolean neon;
     private boolean fs;
 
-    private Properties fstrue = new Properties("fs", "true");
-    private Properties fsfalse = new Properties("fs", "true");
-    private Properties uitrue = new Properties("ui", "true");
-    private Properties uifalse = new Properties("ui", "false");
+    private Label notice;
 
 
     public OptionsScreen(MASS mass) {
@@ -107,10 +106,10 @@ public class OptionsScreen implements Screen {
 //        optionsTable.center();
 
         //Create buttons
-        TextButton backButton = new TextButton("Back", skin);
+        TextButton backButton = new TextButton("Save and go back", skin);
         if (neon == false){
-            backButton = new TextButton("Back", skin, "small");
-            optionsTable.defaults().pad(5.0f);
+            backButton = new TextButton("Save and go back", skin, "small");
+//            optionsTable.defaults().pad(5.0f);
         }
 
         //Add listeners to buttons
@@ -129,6 +128,11 @@ public class OptionsScreen implements Screen {
         title.setFontScale(1f,1f);
         title.setAlignment(Align.top);
         optionsTable.row();
+
+        //Create label
+        BitmapFont myFont = new BitmapFont();
+        myFont.getData().setScale(1, 1);
+        notice = new Label(null, new Label.LabelStyle(myFont, Color.YELLOW));
 
         //Add heading
         Label ui = new Label("UI Style:",skin);
@@ -203,6 +207,7 @@ public class OptionsScreen implements Screen {
                 } else {
                     fs = true;
                 }
+                notice.setText("Restart required for fullscreen");
                 for(int i = 0; i<mass.getSettings().size(); i++){
                         if (mass.getSettings().get(i).getName().equals("fs")) {
                             mass.getSettings().get(i).setSetting(String.valueOf(fs));
@@ -227,8 +232,10 @@ public class OptionsScreen implements Screen {
             }
         });
 
-        //Add back button
-        optionsTable.add(backButton);
+        //Add back button and label
+        optionsTable.add(backButton).colspan(3).center();
+        optionsTable.row();
+        optionsTable.add(notice).colspan(3).center();
 
         //Add table to stage
         stage.addActor(optionsTable);
