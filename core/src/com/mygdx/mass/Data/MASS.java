@@ -13,8 +13,12 @@ import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Screens.MapSimulatorScreen;
 import com.mygdx.mass.Tools.MapFileReader;
+import com.mygdx.mass.Data.Properties;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldContactListener;
+
+import java.io.*;
+import java.util.ArrayList;
 
 public class MASS extends Game{
 
@@ -52,8 +56,12 @@ public class MASS extends Game{
 	public MapBuilderScreen mapBuilderScreen;
 	public MapSimulatorScreen mapSimulatorScreen;
 
+	private Properties properties;
+	private ArrayList<Properties> settings = new ArrayList<Properties>();
+
 	@Override
 	public void create(){
+		readSettings();
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
 		PPM = MINIMAL_ZOOM;
@@ -107,5 +115,76 @@ public class MASS extends Game{
 	public void setMap(Map map){
 		mapSimulatorScreen.setMap(map);
 		this.map = map;
+	}
+
+	protected void readSettings(){
+		settings.clear();
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader(
+					"config.properties"));
+			String line = br.readLine();
+			while (line != null) {
+				String split[] = line.split(": ");
+				Properties toAdd = new Properties(split);
+				settings.add(toAdd);
+				// read next line
+				line = br.readLine();
+			}
+			System.out.println("File was read. The size was " + settings.size());
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public ArrayList<Properties> getSettings(){
+		return settings;
+	}
+
+
+	public void writeSettings(){
+//		settings = newSettings;
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+
+//		System.out.println(getSettings().size());
+		try {
+			fw = new FileWriter("config.properties", false);
+			bw = new BufferedWriter(fw);
+
+			ArrayList<String> listy = new ArrayList<String>();
+			String prop;
+			for(int i = 0; i < 2; i++){
+				Properties current = getSettings().get(i);
+				prop = (current.getLine());
+				listy.add(prop);
+			}
+//			System.out.println(listy.size());
+			for (int j = 0; j < listy.size(); j++){
+				prop = listy.get(j);
+				bw.write(prop);
+				bw.newLine();
+			}
+			listy.clear();
+
+			System.out.println("File was written. The size was " + settings.size() + ". The contents was: ");
+			System.out.println(getSettingStrings()[0]);
+			System.out.println(getSettingStrings()[1]);
+
+			bw.close();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		readSettings();
+	}
+
+	public String[] getSettingStrings(){
+		String[] pop = new String[settings.size()];
+		for (int k=0; k<settings.size(); k++){
+			pop[k] = getSettings().get(k).getLine();
+		}
+		return pop;
 	}
 }

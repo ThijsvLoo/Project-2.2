@@ -4,8 +4,10 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -19,6 +21,12 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Data.Properties;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 //import com.mygdx.mass.MASS;
 //import sun.tools.java.Constants;
 
@@ -35,16 +43,39 @@ public class OptionsScreen implements Screen {
     private TextureAtlas atlas;
 
     //Change ui skin
-    private boolean glassy = false;
-    private boolean fs = false;
+    private boolean neon;
+    private boolean fs;
+
+    private Label notice;
+
 
     public OptionsScreen(MASS mass) {
+
+
+        for(int i = 0; i<mass.getSettings().size(); i++){
+            if (mass.getSettings().get(i).getName().equals("neon") && mass.getSettings().get(i).getSetting().equals("true")) {
+                neon = true;
+                break;
+            } else {
+                neon = false;
+            }
+        }
+
+        for(int i = 0; i<mass.getSettings().size(); i++){
+            if (mass.getSettings().get(i).getName().equals("fs") && mass.getSettings().get(i).getSetting().equals("true")) {
+                fs = true;
+                break;
+            } else {
+                fs = false;
+            }
+        }
+
         this.mass = mass;
 
         //Chooses ui skin
         skin = new Skin(Gdx.files.internal("neon/skin/neon-ui.json"));
         atlas = new TextureAtlas("neon/skin/neon-ui.atlas");
-        if (glassy == true) {
+        if (neon == false) {
             skin = new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json"));
             atlas = new TextureAtlas("glassy/glassyui/glassy-ui.atlas");
         }
@@ -75,10 +106,10 @@ public class OptionsScreen implements Screen {
 //        optionsTable.center();
 
         //Create buttons
-        TextButton backButton = new TextButton("Back", skin);
-        if (glassy == true){
-            backButton = new TextButton("Back", skin, "small");
-            optionsTable.defaults().pad(5.0f);
+        TextButton backButton = new TextButton("Save and go back", skin);
+        if (neon == false){
+            backButton = new TextButton("Save and go back", skin, "small");
+//            optionsTable.defaults().pad(5.0f);
         }
 
         //Add listeners to buttons
@@ -98,6 +129,11 @@ public class OptionsScreen implements Screen {
         title.setAlignment(Align.top);
         optionsTable.row();
 
+        //Create label
+        BitmapFont myFont = new BitmapFont();
+        myFont.getData().setScale(1, 1);
+        notice = new Label(null, new Label.LabelStyle(myFont, Color.YELLOW));
+
         //Add heading
         Label ui = new Label("UI Style:",skin);
         title.setFontScale(1f,1f);
@@ -110,6 +146,7 @@ public class OptionsScreen implements Screen {
         buttonGroup.add(uiCheck);
         optionsTable.add(uiCheck);
         uiCheck = new CheckBox("Glassy", skin, "radio");
+        uiCheck.setChecked(!neon);
         buttonGroup.add(uiCheck);
         optionsTable.add(uiCheck);
         optionsTable.row();
@@ -126,7 +163,7 @@ public class OptionsScreen implements Screen {
         buttonGroup2.add(fsCheck);
         optionsTable.add(fsCheck);
         fsCheck = new CheckBox("Off", skin, "radio");
-        fsCheck.setChecked(true);
+        fsCheck.setChecked(!fs);
         buttonGroup2.add(fsCheck);
         optionsTable.add(fsCheck);
         optionsTable.row();
@@ -134,35 +171,77 @@ public class OptionsScreen implements Screen {
         //Add listeners
         uiCheck.addListener(new ChangeListener() {
             @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                if(glassy){
-                    glassy = false;
-                    System.out.println(glassy);
+            public void changed(ChangeEvent event, Actor actor) {
+                System.out.println("ui radio clicked");
+                if(neon) {
+                    neon = false;
                 } else {
-                    glassy = true;
-                    System.out.println(glassy);
+                    neon = true;
                 }
+                for(int i = 0; i<mass.getSettings().size(); i++){
+                    if (mass.getSettings().get(i).getName().equals("neon")) {
+                            mass.getSettings().get(i).setSetting(String.valueOf(neon));
+                            mass.writeSettings();
+                            break;
+                        }
+                    }
+
+//                ArrayList<Properties> temp = mass.getSettings();
+//                if (temp.contains(uitrue)){
+//                    temp.remove(uitrue);
+//                    temp.add(uifalse);
+//                    mass.writeSettings(temp);
+//                } else {
+//                    temp.add(uitrue);
+//                    temp.remove(uifalse);
+//                    mass.writeSettings(temp);
+//                }
             }
         });
         fsCheck.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                if(fs){
+                System.out.println("fs radio clicked");
+                if(fs) {
                     fs = false;
-                    System.out.println(fs);
                 } else {
                     fs = true;
-                    System.out.println(fs);
                 }
+                notice.setText("Restart required for fullscreen");
+                for(int i = 0; i<mass.getSettings().size(); i++){
+                        if (mass.getSettings().get(i).getName().equals("fs")) {
+                            mass.getSettings().get(i).setSetting(String.valueOf(fs));
+                            mass.writeSettings();
+                            break;
+                        }
+                    }
+//                ArrayList<Properties> temp2 = mass.getSettings();
+//                if (temp2.contains(fstrue)){
+//                    temp2.remove(fstrue);
+//                    temp2.add(fsfalse);
+//                    mass.writeSettings(temp2);
+//                } else {
+//                    temp2.remove(fsfalse);
+//                    temp2.add(fstrue);
+//                    System.out.println("temp2 size: " + temp2.size());
+//
+//                    mass.writeSettings(temp2);
+//                }
+
+//                System.out.println(mass.getSettingStrings().toString());
             }
         });
 
-        //Add back button
-        optionsTable.add(backButton);
+        //Add back button and label
+        optionsTable.add(backButton).colspan(3).center();
+        optionsTable.row();
+        optionsTable.add(notice).colspan(3).center();
 
         //Add table to stage
         stage.addActor(optionsTable);
     }
+
+
 
     @Override
     public void render(float delta) {

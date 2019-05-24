@@ -38,12 +38,22 @@ public class MainMenuScreen implements Screen {
     public MainMenuScreen(MASS mass) {
         this.mass = mass;
 
+        for(int i = 0; i<mass.getSettings().size(); i++){
+            if (mass.getSettings().get(i).getName().equals("neon") && mass.getSettings().get(i).getSetting().equals("true")) {
+                glassy = false;
+                break;
+            } else {
+                glassy = true;
+            }
+        }
+
         //Chooses ui skin
-        skin = new Skin(Gdx.files.internal("neon/skin/neon-ui.json"));
-        atlas = new TextureAtlas("neon/skin/neon-ui.atlas");
         if (glassy == true) {
             skin = new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json"));
             atlas = new TextureAtlas("glassy/glassyui/glassy-ui.atlas");
+        } else {
+            skin = new Skin(Gdx.files.internal("neon/skin/neon-ui.json"));
+            atlas = new TextureAtlas("neon/skin/neon-ui.atlas");
         }
 
         batch = mass.batch;
@@ -81,11 +91,17 @@ public class MainMenuScreen implements Screen {
 
 
         //Create buttons
-        TextButton simulateButton = new TextButton("Simulation", skin);
-        TextButton builderButton = new TextButton("Map builder", skin);
-        TextButton optionsButton = new TextButton("Options", skin);
-        TextButton exitButton = new TextButton("Exit", skin);
-        if (glassy == true){
+        TextButton simulateButton;
+        TextButton builderButton;
+        TextButton optionsButton;
+        TextButton exitButton;
+
+        if(glassy == false) {
+            simulateButton = new TextButton("Simulation", skin);
+            builderButton = new TextButton("Map builder", skin);
+            optionsButton = new TextButton("Options", skin);
+            exitButton = new TextButton("Exit", skin);
+        } else {
             simulateButton = new TextButton("Simulation", skin, "small");
             builderButton = new TextButton("Map builder", skin, "small");
             optionsButton = new TextButton("Options", skin, "small");

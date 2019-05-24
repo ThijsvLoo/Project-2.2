@@ -81,6 +81,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WALL);
                 System.out.println("Current action: Create wall");
+                mapBuilderScreen.getInfo().updateBuildTool("Wall");
             }
         });
         building = createButton("Textures/Buttons/Building2.png");
@@ -88,6 +89,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.BUILDING);
                 System.out.println("Current action: Create building");
+                mapBuilderScreen.getInfo().updateBuildTool("Building");
             }
         });
         door = createButton("Textures/Buttons/Door2.png");
@@ -95,6 +97,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DOOR);
                 System.out.println("Current action: Create door");
+                mapBuilderScreen.getInfo().updateBuildTool("Door");
             }
         });
         window = createButton("Textures/Buttons/Window.png");
@@ -102,6 +105,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WINDOW);
                 System.out.println("Current action: Create window");
+                mapBuilderScreen.getInfo().updateBuildTool("Window");
             }
         });
         sentryTower = createButton("Textures/Buttons/Tower.png");
@@ -109,6 +113,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.SENTRY_TOWER);
                 System.out.println("Current action: Create sentry tower");
+                mapBuilderScreen.getInfo().updateBuildTool("Sentry tower");
             }
         });
         hidingArea = createButton("Textures/Buttons/Hiding2.png");
@@ -116,6 +121,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.HIDING_AREA);
                 System.out.println("Current action: Create hiding area");
+                mapBuilderScreen.getInfo().updateBuildTool("Hiding area");
             }
         });
         targetArea = createButton("Textures/Buttons/Target.png");
@@ -123,6 +129,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.TARGET_AREA);
                 System.out.println("Current action: Create target area");
+                mapBuilderScreen.getInfo().updateBuildTool("Target area");
             }
         });
         guard = createButton("Textures/Buttons/Guard.png");
@@ -130,6 +137,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.GUARD);
                 System.out.println("Current action: Create guard");
+                mapBuilderScreen.getInfo().updateBuildTool("Guard");
             }
         });
         intruder = createButton("Textures/Buttons/Intruder2.png");
@@ -137,6 +145,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.INTRUDER);
                 System.out.println("Current action: Create intruder");
+                mapBuilderScreen.getInfo().updateBuildTool("Intruder");
             }
         });
 
@@ -144,7 +153,6 @@ public class MapBuilderHUD implements Disposable {
         load.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
 				System.out.println("Current action: Load map");
-				mass.getMap().clearMap();
 				MapFileReader.loadMapFromFile(mass);
 //                mass = mapBuilderScreen.mass;
 //				//mapBuilderScreen.mass.loadMap();
@@ -184,6 +192,7 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DELETION);
                 System.out.println("Current action: Delete");
+                mapBuilderScreen.getInfo().updateBuildTool("Delete");
             }
         });
         clear = createButton("Textures/Buttons/Clear.png");
@@ -273,6 +282,7 @@ public class MapBuilderHUD implements Disposable {
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Simulate");
+                mapBuilderScreen.getInfo().updateBuildTool(null);
                 mapBuilderScreen.mass.setScreen(mapBuilderScreen.mass.mapSimulatorScreen);
             }
         });
