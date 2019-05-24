@@ -61,6 +61,7 @@ public class MASS extends Game{
 
 	@Override
 	public void create(){
+		readSettings();
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
 		PPM = MINIMAL_ZOOM;
@@ -89,7 +90,6 @@ public class MASS extends Game{
 		mapBuilderScreen = new MapBuilderScreen(this);
 		mapSimulatorScreen = new MapSimulatorScreen(this);
         setScreen(mainMenuScreen);
-		readSettings();
 	}
 
 	@Override
