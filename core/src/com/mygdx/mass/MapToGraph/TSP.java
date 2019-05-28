@@ -2,34 +2,32 @@ package com.mygdx.mass.MapToGraph;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 public class TSP {
-    private Graph graph;
-    private ArrayList<Vertex> vertices;
 
-    private ArrayList<Edge> edges;
+    private ArrayList<Vector2> toVisit;
 
-    private Vertex start;
+
+
+    private Vector2 start;
     public TSP(Vector2 start, ArrayList<Vector2> toVisit){
-        this.start = new Vertex(start.x, start.y);
-        this.vertices = new ArrayList<Vertex>();
-        this.edges = new ArrayList<Edge>();
+        this.start = start;
+        this.toVisit = toVisit;
 
-        for(Vector2 v: toVisit){
-            vertices.add(new Vertex(v.x, v.y));
-        }
-        graph = new Graph(vertices, edges);
+
+
     }
 
     public ArrayList<Vector2> computePath(){
 
         ArrayList<Vector2> path = new ArrayList<Vector2>();
-        while(vertices.size()>0){
-            Vertex nextVertex = getClosest(start, vertices).getVertex2();
-            start = nextVertex;
-            path.add(nextVertex.getCoordinates());
-            vertices.remove(nextVertex);
+        while(toVisit.size()>0){
+            Vector2 nextVector = getClosest(start, toVisit);
+            start = nextVector;
+            path.add(nextVector);
+            toVisit.remove(nextVector);
 
         }
 
@@ -37,17 +35,24 @@ public class TSP {
 
     }
 
-    public Edge getClosest(Vertex start, ArrayList<Vertex> unvisited){
-        Edge closest=null;
-        for(Vertex v: unvisited){
-            Edge edge = new Edge(start, v);
-            edges.add(edge);
-            if(closest==null) closest= edge;
-            else if(edge.getWeight()<closest.getWeight()) closest = edge;
+    public Vector2 getClosest(Vector2 start, ArrayList<Vector2> unvisited){
+        double closestDist=-1;
+        Vector2 closestVector=null;
+        for(Vector2 v: unvisited){
+            double dist = Point2D.distance(start.x, start.y, v.x, v.y);
+
+            if(closestDist==-1) {
+                closestDist= dist;
+                closestVector = v;
+            }
+            else if(dist<closestDist) {
+                closestDist = dist;
+                closestVector = v;
+            }
 
 
         }
-        return closest;
+        return closestVector;
     }
 
 }
