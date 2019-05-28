@@ -34,8 +34,8 @@ public class Map implements Serializable {
     public Stack<BoxObject> undo = new Stack();
     public Stack<BoxObject> redo = new Stack();
 
-    private ArrayList<Guard> guards;
-    private ArrayList<Intruder> intruders;
+    public ArrayList<Guard> guards;
+    public ArrayList<Intruder> intruders;
 
     public Map(MASS mass) {
         this.mass = mass;

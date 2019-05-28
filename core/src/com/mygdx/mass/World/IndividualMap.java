@@ -2,6 +2,8 @@ package com.mygdx.mass.World;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.mass.Agents.Guard;
+import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.Building;
 import com.mygdx.mass.BoxObject.HidingArea;
 import com.mygdx.mass.BoxObject.SentryTower;
@@ -17,12 +19,15 @@ public class IndividualMap extends Map {
 
     public IndividualMap(MASS mass) {
         super(mass);
-        this.walls = mass.getMap().walls;
     }
 
     public IndividualMap(MASS mass, float width, float height) {
         super(mass, width, height);
     }
+
+    public void addGuard(Guard guard) { guards.add(guard); }
+
+    public void addIntruder(Intruder intruder) { intruders.add(intruder); }
 
     public void addBuilding(Building building) {
         buildings.add(building);

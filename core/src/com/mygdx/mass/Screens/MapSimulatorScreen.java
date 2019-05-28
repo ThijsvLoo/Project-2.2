@@ -15,12 +15,14 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
+import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.Algorithms.Explore;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Scenes.MapSimulatorHUD;
 import com.mygdx.mass.Scenes.MapSimulatorInfo;
+import com.mygdx.mass.World.IndividualMap;
 import com.mygdx.mass.World.Map;
 
 import java.util.ArrayList;
@@ -312,6 +314,8 @@ public class MapSimulatorScreen implements Screen {
                 }
             } else if (keycode == Input.Keys.T) {
                 setMap(mass.getMap().getAgents().get(0).getIndividualMap());
+                map.setWalls(mass.getMap().getWalls());
+                ((IndividualMap) map).addGuard((Guard) mass.getMap().getAgents().get(0));
             } else if (keycode == Input.Keys.B) {
                 setMap(mass.getMap());
             }
