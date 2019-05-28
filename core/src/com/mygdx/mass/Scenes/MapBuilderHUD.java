@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.Agents.Guard;
+import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MainMenuScreen;
@@ -283,6 +285,17 @@ public class MapBuilderHUD implements Disposable {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Simulate");
                 mapBuilderScreen.getInfo().updateBuildTool(null);
+
+//                initiating the individual map of all agents, giving it the starting information
+                for (Guard guard : mass.getMap().getGuards()) {
+                    guard.getIndividualMap().setWalls(mass.getMap().getWalls());
+                    guard.getIndividualMap().setGuards(mass.getMap().getGuards());
+                }
+                for (Intruder intruder : mass.getMap().getIntruders()) {
+                    intruder.getIndividualMap().setWalls(mass.getMap().getWalls());
+                    intruder.getIndividualMap().setIntruders(mass.getMap().getIntruders());
+                }
+
                 mapBuilderScreen.mass.setScreen(mapBuilderScreen.mass.mapSimulatorScreen);
             }
         });

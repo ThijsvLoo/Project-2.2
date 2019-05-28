@@ -121,7 +121,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             } else {
                 destination = null;
                 body.setLinearVelocity(0.0f,0.0f);
-
+                noiseField.update();
             }
         }
         if (destination == null && !route.isEmpty()) {
@@ -132,6 +132,10 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             updateAngle();
             updateVelocity();
         }
+    }
+
+    public boolean isMoving() {
+        return body.getLinearVelocity().x != 0.0f || body.getLinearVelocity().y != 0.0f;
     }
 
     public void goTo(Vector2 destination) {
@@ -171,8 +175,10 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             velocity.x = (float) Math.cos(body.getAngle())*moveSpeed;
             velocity.y = (float) Math.sin(body.getAngle())*moveSpeed;
             body.setLinearVelocity(velocity.x, velocity.y);
+            noiseField.update(); //need to change this later, atm it always get call, which is unneccesary
         } else {
             body.setLinearVelocity(0, 0);
+            noiseField.update();
         }
     }
 
@@ -217,10 +223,10 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         if (moveSpeed >= 0.0f && moveSpeed <= Intruder.SPRINT_SPEED) {
             if (moveSpeed <= BASE_SPEED) {
                 this.moveSpeed = moveSpeed;
-                setMaxTurnSpeed(DEFAULT_MAX_TURN_SPEED);
+//                setMaxTurnSpeed(DEFAULT_MAX_TURN_SPEED);
             } else if (moveSpeed >= BASE_SPEED && this instanceof Intruder && ((Intruder) this).sprintDuration > 0.0f) {
                 this.moveSpeed = moveSpeed;
-                setMaxTurnSpeed(SPRINT_MAX_TURN_SPEED);
+//                setMaxTurnSpeed(SPRINT_MAX_TURN_SPEED);
             }
             noiseField.update();
         } else {

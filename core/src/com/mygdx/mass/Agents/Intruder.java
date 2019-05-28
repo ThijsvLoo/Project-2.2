@@ -61,7 +61,7 @@ public class Intruder extends Agent {
     }
 
     public void update(float delta) {
-        if (moveSpeed > 1.4f) {
+        if (moveSpeed > 1.4f && isMoving()) {
             if (sprintDuration > 0.0f) {
                 sprintDuration -= delta;
                 if (sprintDuration < 0.0f) {
@@ -72,12 +72,13 @@ public class Intruder extends Agent {
                 setMoveSpeed(1.4f);
             }
         }
-        if (moveSpeed == 0.0f && sprintDuration < SPRINT_MAX_DURATION) {
+        if (!isMoving() && sprintDuration < SPRINT_MAX_DURATION) {
             sprintDuration += delta * SPRINT_MAX_DURATION / SPRINT_REST_TIME;
             if (sprintDuration > SPRINT_MAX_DURATION) {
                 sprintDuration = SPRINT_MAX_DURATION;
             }
         }
+        System.out.println(moveSpeed + "      " + sprintDuration);
         super.update(delta);
         if (door != null) {
             unlockDoorSlow(delta);

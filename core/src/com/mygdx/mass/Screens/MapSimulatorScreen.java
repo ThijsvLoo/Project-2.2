@@ -90,8 +90,11 @@ public class MapSimulatorScreen implements Screen {
         accumulator += timePassed;
         while (accumulator >= MASS.FIXED_TIME_STEP) {
             for (int i = 0; i < worldSpeedFactor; i++) {
-                for (Agent agent : map.getAgents()) {
-                    agent.update(MASS.FIXED_TIME_STEP*unitSpeedFactor);
+                for (Guard guard : map.getGuards()) {
+                    guard.update(MASS.FIXED_TIME_STEP*unitSpeedFactor);
+                }
+                for (Intruder intruder : map.getIntruders()) {
+                    intruder.update(MASS.FIXED_TIME_STEP*unitSpeedFactor);
                 }
                 world.step(MASS.FIXED_TIME_STEP*unitSpeedFactor, 6, 2);
             }
@@ -138,11 +141,11 @@ public class MapSimulatorScreen implements Screen {
                 float y = (float) Math.sin(body.getAngle()) * Agent.BASE_SPEED*2;
                 body.setLinearVelocity(x, y);
             }
-        } else {
+        } else { //this block of code will always get call, messing with the general agent control, which is why i disable it
             ArrayList<Intruder> intuders = map.getIntruders();
             if(!intuders.isEmpty()) {
                 Body body = intuders.get(0).getBody();
-                body.setLinearVelocity(0, 0);
+//                body.setLinearVelocity(0, 0);
             }
         }
 
@@ -313,11 +316,15 @@ public class MapSimulatorScreen implements Screen {
                     explore.start(agent);
                 }
             } else if (keycode == Input.Keys.T) {
-                setMap(mass.getMap().getAgents().get(0).getIndividualMap());
-                map.setWalls(mass.getMap().getWalls());
-                ((IndividualMap) map).addGuard((Guard) mass.getMap().getAgents().get(0));
+                if (!mass.getMap().getAgents().isEmpty()) {
+                    setMap(mass.getMap().getAgents().get(0).getIndividualMap());
+                }
             } else if (keycode == Input.Keys.B) {
                 setMap(mass.getMap());
+            } else if (keycode == Input.Keys.M) {
+                for (Intruder intruder : map.getIntruders()) {
+                    intruder.setMoveSpeed(3.0f);
+                }
             }
             return true;
         }

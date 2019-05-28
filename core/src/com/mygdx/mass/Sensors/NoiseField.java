@@ -33,14 +33,18 @@ public class NoiseField {
     }
 
     public void update() {
-        if (agent.getMoveSpeed() < 0.5) {
-            fixture.getShape().setRadius(1);
-        } else if (agent.getMoveSpeed() >= 0.5 && agent.getMoveSpeed() < 1) {
-            fixture.getShape().setRadius(3);
-        } else if (agent.getMoveSpeed() >= 1 && agent.getMoveSpeed() < 2) {
-            fixture.getShape().setRadius(5);
+        if (agent.isMoving()) {
+            if (agent.getMoveSpeed() < 0.5) {
+                fixture.getShape().setRadius(1);
+            } else if (agent.getMoveSpeed() >= 0.5 && agent.getMoveSpeed() < 1) {
+                fixture.getShape().setRadius(3);
+            } else if (agent.getMoveSpeed() >= 1 && agent.getMoveSpeed() < 2) {
+                fixture.getShape().setRadius(5);
+            } else {
+                fixture.getShape().setRadius(10);
+            }
         } else {
-            fixture.getShape().setRadius(10);
+            fixture.getShape().setRadius(1);
         }
     }
 
