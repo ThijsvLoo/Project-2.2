@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -14,17 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.mass.Agents.Guard;
-import com.mygdx.mass.Agents.Intruder;
-import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.*;
-import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
-import com.mygdx.mass.World.AgentsMap;
-
-import java.util.ArrayList;
 
 public class MapSimulatorHUD implements Disposable {
 

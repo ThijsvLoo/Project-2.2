@@ -58,7 +58,7 @@ public class MapSimulatorScreen implements Screen {
         this.batch = mass.batch;
         this.world = mass.world;
         this.debugRenderer = mass.debugRenderer;
-        this.map = mass.map;
+        this.map = mass.getMap();
         this.rayHandler = mass.rayHandler;
         this.shapeRenderer = mass.shapeRenderer;
 
@@ -305,7 +305,17 @@ public class MapSimulatorScreen implements Screen {
 
         @Override
         public boolean keyDown(int keycode) {
-            return false;
+            if (keycode == Input.Keys.SPACE) { //for test
+//                for (Agent agent : MASS.map.getAgents()) {
+//                agent.goTo(toWorldCoordinate(screenX, screenY));
+//            }
+//                for testing
+                Explore explore = new Explore();
+                for (Agent agent : MASS.map.getAgents()) {
+                    explore.start(agent);
+                }
+            }
+            return true;
         }
 
         @Override
@@ -316,13 +326,12 @@ public class MapSimulatorScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-//            for (Agent agent : MASS.map.getAgents()) {
-//                agent.goTo(toWorldCoordinate(screenX, screenY));
-//            }
-            //for testing
-            Explore explore = new Explore();
-            for (Agent agent : MASS.map.getAgents()) {
-                explore.start(agent);
+            map = mass.getMap();
+            for (Agent agent : mass.getMap().getAgents()) {
+                if (agent.getBody().getPosition().dst(toWorldCoordinate(screenX, screenY)) <= 0.25f) {
+                    map = agent.getIndividualMap();
+                    break;
+                }
             }
             return true;
         }

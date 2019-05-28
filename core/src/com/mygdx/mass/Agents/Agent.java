@@ -14,6 +14,7 @@ import com.mygdx.mass.MapToGraph.Graph;
 import com.mygdx.mass.MapToGraph.Vertex;
 import com.mygdx.mass.Sensors.NoiseField;
 import com.mygdx.mass.Sensors.VisualField;
+import com.mygdx.mass.World.IndividualMap;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldObject;
 
@@ -36,6 +37,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     private boolean stealth;
 
     public Map map = new Map(mass);
+    public IndividualMap individualMap;
 
     public enum AgentType {GUARD, INTRUDER};
     protected AgentType agentType;
@@ -71,6 +73,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public Agent(MASS mass, Vector2 position) {
         super(mass);
+        individualMap = new IndividualMap(mass, Map.DEFAULT_WIDTH, Map.DEFAULT_HEIGHT);
         maxTurnSpeed = DEFAULT_MAX_TURN_SPEED;
         objectsInSight = new ArrayList<WorldObject>();
         route = new LinkedBlockingQueue<Vector2>();
@@ -206,6 +209,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public LinkedBlockingQueue<Vector2> getRoute() { return route; }
     public Vector2 getDirection() { return direction; }
     public Vector2 getVelocity() { return velocity; }
+    public IndividualMap getIndividualMap() { return individualMap; }
 //    public ArrayList<Object> getCollisions() { return collisions; }
 
     public void setMoveSpeed(float moveSpeed) {
