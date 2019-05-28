@@ -10,7 +10,6 @@ public class Edge {
         vertex1 = start;
         vertex2 = end;
         weight = Point2D.distance(start.getCoordinates().x, start.getCoordinates().y, end.getCoordinates().x, end.getCoordinates().y);
-
     }
 
     public double getWeight() {
