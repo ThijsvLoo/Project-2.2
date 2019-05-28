@@ -131,7 +131,7 @@ public class MASS extends Game{
 				// read next line
 				line = br.readLine();
 			}
-			System.out.println("File was read. The size was " + settings.size());
+//			System.out.println("File was read. The size was " + settings.size());
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -168,7 +168,7 @@ public class MASS extends Game{
 			}
 			listy.clear();
 
-			System.out.println("File was written. The size was " + settings.size() + ". The contents was: ");
+//			System.out.println("File was written. The size was " + settings.size() + ". The contents was: ");
 			System.out.println(getSettingStrings()[0]);
 			System.out.println(getSettingStrings()[1]);
 
