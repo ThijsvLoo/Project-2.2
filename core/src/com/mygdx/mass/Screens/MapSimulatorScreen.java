@@ -326,12 +326,8 @@ public class MapSimulatorScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            map = mass.getMap();
-            for (Agent agent : mass.getMap().getAgents()) {
-                if (agent.getBody().getPosition().dst(toWorldCoordinate(screenX, screenY)) <= 0.25f) {
-                    map = agent.getIndividualMap();
-                    break;
-                }
+            for (Agent agent : map.getAgents()) {
+                agent.goTo(toWorldCoordinate(screenX, screenY));
             }
             return true;
         }
