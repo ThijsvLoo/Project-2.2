@@ -11,8 +11,8 @@ public class Explore {
     public Explore() {}
 
     public void start(Agent agent) {
-        TSP tsp = new TSP(agent.getBody().getPosition(), getExplorePoints());
-        ArrayList<Vector2> route = tsp.computePath();
+        TSP tsp = new TSP();
+        ArrayList<Vector2> route = tsp.computePath(agent, getExplorePoints());
         agent.getRoute().clear();
         for (Vector2 waypoint : route) {
             agent.addWaypoint(waypoint);
