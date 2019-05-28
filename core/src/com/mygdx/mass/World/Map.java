@@ -172,6 +172,20 @@ public class Map implements Serializable {
         return agents;
     }
 
+    // Remove certain world obj from the reference arraylist, doesn't destroy the box2d body associated
+    public void remove(WorldObject worldObject) {
+//        for now only guard and intruder, since boxObjects are static
+        if (worldObject instanceof Guard) {
+            guards.remove(worldObject);
+        } else if (worldObject instanceof Intruder) {
+            intruders.remove(worldObject);
+        }
+    }
+
+    public void destroy(WorldObject worldObject) {
+        mass.world.destroyBody(worldObject.getBody());
+    }
+
     public void clearMap(){
         mass.rayHandler.removeAll();
         for(BoxObject box: walls){

@@ -157,7 +157,10 @@ public class WorldContactListener implements ContactListener {
                 Agent agent1 = visualField.getAgent();
                 Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
                 if (agent1.getAgentType() != agent2.getAgentType()) {
-                    agent1.getObjectsInSight().remove(agent2);
+                    if (agent2 instanceof Guard) {
+                        agent1.getIndividualMap().getIntruders().remove(agent2);
+                    }
+
                 }
                 break;
             }
