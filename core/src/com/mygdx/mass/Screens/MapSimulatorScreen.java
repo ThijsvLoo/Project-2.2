@@ -305,15 +305,15 @@ public class MapSimulatorScreen implements Screen {
 
         @Override
         public boolean keyDown(int keycode) {
-            if (keycode == Input.Keys.SPACE) { //for test
-//                for (Agent agent : MASS.map.getAgents()) {
-//                agent.goTo(toWorldCoordinate(screenX, screenY));
-//            }
-//                for testing
+            if (keycode == Input.Keys.SPACE) {
                 Explore explore = new Explore();
                 for (Agent agent : MASS.map.getAgents()) {
                     explore.start(agent);
                 }
+            } else if (keycode == Input.Keys.T) {
+                setMap(mass.getMap().getAgents().get(0).getIndividualMap());
+            } else if (keycode == Input.Keys.B) {
+                setMap(mass.getMap());
             }
             return true;
         }
