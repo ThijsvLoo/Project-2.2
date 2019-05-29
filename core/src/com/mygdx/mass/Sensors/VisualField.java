@@ -8,7 +8,7 @@ import com.mygdx.mass.World.WorldObject;
 public class VisualField {
 
     public enum VisualFieldType {AGENT, BUILDING, TOWER};
-    protected VisualFieldType visualFieldType;
+    public VisualFieldType visualFieldType;
 
     protected Agent agent;
 
@@ -23,29 +23,46 @@ public class VisualField {
     }
 
     public void define() {
+        PolygonShape polygonShape = new PolygonShape();
+        FixtureDef fixtureDef = new FixtureDef();
         switch (visualFieldType) {
             case AGENT: {
-                ChainShape chainShape = new ChainShape();
                 vertices = new Vector2[3];
                 vertices[0] = new Vector2(0, 0);
                 vertices[1] = new Vector2((float) Math.cos(Math.toRadians(agent.getViewAngle()/2))*agent.getVisualRange(), (float) Math.sin(Math.toRadians(agent.getViewAngle()/2))*agent.getVisualRange());
                 vertices[2] = new Vector2((float) Math.cos(Math.toRadians(-agent.getViewAngle()/2))*agent.getVisualRange(), (float) Math.sin(Math.toRadians(-agent.getViewAngle()/2))*agent.getVisualRange());
-                chainShape.createLoop(vertices);
-
-                FixtureDef fixtureDef = new FixtureDef();
-                fixtureDef.shape = chainShape;
-                fixtureDef.isSensor = true;
                 fixtureDef.filter.categoryBits = WorldObject.VISUAL_FIELD_BIT;
-                fixtureDef.filter.maskBits = WorldObject.GUARD_BIT | WorldObject.INTRUDER_BIT;
-
-                fixture = agent.getBody().createFixture(fixtureDef);
-                fixture.setUserData(this);
-
-                chainShape.dispose();
+                fixtureDef.filter.maskBits = WorldObject.GUARD_BIT | WorldObject.INTRUDER_BIT | WorldObject.WALL_BIT | WorldObject.HIDING_AREA_BIT |WorldObject.TARGET_AREA_BIT;
+                break;
+            }
+            case BUILDING: {
+                vertices = new Vector2[3];
+                vertices[0] = new Vector2(0, 0);
+                vertices[1] = new Vector2((float) Math.cos(Math.toRadians(agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_BUILDING, (float) Math.sin(Math.toRadians(agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_BUILDING);
+                vertices[2] = new Vector2((float) Math.cos(Math.toRadians(-agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_BUILDING, (float) Math.sin(Math.toRadians(-agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_BUILDING);
+                fixtureDef.filter.categoryBits = WorldObject.VISUAL_FIELD_BIT;
+                fixtureDef.filter.maskBits = WorldObject.BUILDING_BIT;
+                break;
+            }
+            case TOWER: {
+                vertices = new Vector2[3];
+                vertices[0] = new Vector2(0, 0);
+                vertices[1] = new Vector2((float) Math.cos(Math.toRadians(agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_TOWER, (float) Math.sin(Math.toRadians(agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_TOWER);
+                vertices[2] = new Vector2((float) Math.cos(Math.toRadians(-agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_TOWER, (float) Math.sin(Math.toRadians(-agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_TOWER);
+                fixtureDef.filter.categoryBits = WorldObject.VISUAL_FIELD_BIT;
+                fixtureDef.filter.maskBits = WorldObject.SENTRY_TOWER_BIT;
+                break;
             }
         }
+        polygonShape.set(vertices);
+        fixtureDef.shape = polygonShape;
+        fixtureDef.isSensor = true;
+        fixture = agent.getBody().createFixture(fixtureDef);
+        fixture.setUserData(this);
+        polygonShape.dispose();
     }
 
     public Agent getAgent() { return agent; }
+    public VisualFieldType getVisualFieldType() { return visualFieldType; }
 
 }

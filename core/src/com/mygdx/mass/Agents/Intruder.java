@@ -78,7 +78,6 @@ public class Intruder extends Agent {
                 sprintDuration = SPRINT_MAX_DURATION;
             }
         }
-        System.out.println(moveSpeed + "      " + sprintDuration);
         super.update(delta);
         if (door != null) {
             unlockDoorSlow(delta);

@@ -16,7 +16,7 @@ public class TargetArea extends BoxObject {
         super(mass, rectangle);
         Filter filter = new Filter();
         filter.categoryBits = TARGET_AREA_BIT;
-        filter.maskBits = INTRUDER_BIT;
+        filter.maskBits = INTRUDER_BIT | VISUAL_FIELD_BIT;
         fixture.setFilterData(filter);
         fixture.setSensor(true);
         objectType = TARGET_AREA;

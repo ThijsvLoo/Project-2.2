@@ -66,51 +66,76 @@ public class WorldContactListener implements ContactListener {
             }
 
             // When an agent sees a boxObject like building, sentry tower, hiding area, target area
-            case VISUAL_FIELD_BIT | BUILDING_BIT :
-            case VISUAL_FIELD_BIT | SENTRY_TOWER_BIT :
-            case VISUAL_FIELD_BIT | HIDING_AREA_BIT :
-            case VISUAL_FIELD_BIT | TARGET_AREA_BIT : {
+            case VISUAL_FIELD_BIT | BUILDING_BIT : {
                 VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
-                BoxObject boxObject = fixtureA.getUserData() instanceof BoxObject ? (BoxObject) fixtureA.getUserData() : (BoxObject) fixtureB.getUserData();
-                Agent agent = visualField.getAgent();
-                if (agent instanceof Guard) {
-                    for (Guard guard : mass.getMap().getGuards()) { //Global communication
-                        if (boxObject instanceof Building) {
-                            if (!guard.getIndividualMap().getBuildings().contains(boxObject)) {
-                                guard.getIndividualMap().addBuilding((Building) boxObject);
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.BUILDING) {
+                    Building building = fixtureA.getUserData() instanceof Building ? (Building) fixtureA.getUserData() : (Building) fixtureB.getUserData();
+                    Agent agent = visualField.getAgent();
+                    if (agent instanceof Guard) {
+                        for (Guard guard : mass.getMap().getGuards()) { //Global communication, share with all other agent
+                            if (!guard.getIndividualMap().getBuildings().contains(building)) {
+                                guard.getIndividualMap().addBuilding(building);
                             }
-                        } else if (boxObject instanceof SentryTower) {
-                            if (!guard.getIndividualMap().getSentryTowers().contains(boxObject)) {
-                                guard.getIndividualMap().addSentryTower((SentryTower) boxObject);
-                            }
-                        } else if (boxObject instanceof HidingArea) {
-                            if (!guard.getIndividualMap().getHidingAreas().contains(boxObject)) {
-                                guard.getIndividualMap().addHidingArea((HidingArea) boxObject);
-                            }
-                        } else if (boxObject instanceof TargetArea) {
-                            if (!guard.getIndividualMap().getTargetAreas().contains(boxObject)) {
-                                guard.getIndividualMap().addTargetArea((TargetArea) boxObject);
+                        }
+                    } else {
+                        for (Intruder intruder : mass.getMap().getIntruders()) {
+                            if (!intruder.getIndividualMap().getBuildings().contains(building)) {
+                                intruder.getIndividualMap().addBuilding(building);
                             }
                         }
                     }
-                } else {
+                }
+                break;
+            }
+            case VISUAL_FIELD_BIT | SENTRY_TOWER_BIT : {
+                VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.TOWER) {
+                    SentryTower sentryTower = fixtureA.getUserData() instanceof SentryTower ? (SentryTower) fixtureA.getUserData() : (SentryTower) fixtureB.getUserData();
+                    Agent agent = visualField.getAgent();
+                    if (agent instanceof Guard) {
+                        for (Guard guard : mass.getMap().getGuards()) { //Global communication, share with all other agent
+                            if (!guard.getIndividualMap().getSentryTowers().contains(sentryTower)) {
+                                guard.getIndividualMap().addSentryTower(sentryTower);
+                            }
+                        }
+                    } else {
+                        for (Intruder intruder : mass.getMap().getIntruders()) {
+                            if (!intruder.getIndividualMap().getSentryTowers().contains(sentryTower)) {
+                                intruder.getIndividualMap().addSentryTower(sentryTower);
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case VISUAL_FIELD_BIT | HIDING_AREA_BIT : {
+                VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.AGENT) {
+                    HidingArea hidingArea = fixtureA.getUserData() instanceof HidingArea ? (HidingArea) fixtureA.getUserData() : (HidingArea) fixtureB.getUserData();
+                    Agent agent = visualField.getAgent();
+                    if (agent instanceof Guard) {
+                        for (Guard guard : mass.getMap().getGuards()) { //Global communication, share with all other agent
+                            if (!guard.getIndividualMap().getHidingAreas().contains(hidingArea)) {
+                                guard.getIndividualMap().addHidingArea(hidingArea);
+                            }
+                        }
+                    } else {
+                        for (Intruder intruder : mass.getMap().getIntruders()) {
+                            if (!intruder.getIndividualMap().getHidingAreas().contains(hidingArea)) {
+                                intruder.getIndividualMap().addHidingArea(hidingArea);
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case VISUAL_FIELD_BIT | TARGET_AREA_BIT : {
+                VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.AGENT && visualField.getAgent() instanceof Intruder) {
+                    TargetArea targetArea = fixtureA.getUserData() instanceof TargetArea ? (TargetArea) fixtureA.getUserData() : (TargetArea) fixtureB.getUserData();
                     for (Intruder intruder : mass.getMap().getIntruders()) {
-                        if (boxObject instanceof Building) {
-                            if (!intruder.getIndividualMap().getBuildings().contains(boxObject)) {
-                                intruder.getIndividualMap().addBuilding((Building) boxObject);
-                            }
-                        } else if (boxObject instanceof SentryTower) {
-                            if (!intruder.getIndividualMap().getSentryTowers().contains(boxObject)) {
-                                intruder.getIndividualMap().addSentryTower((SentryTower) boxObject);
-                            }
-                        } else if (boxObject instanceof HidingArea) {
-                            if (!intruder.getIndividualMap().getHidingAreas().contains(boxObject)) {
-                                intruder.getIndividualMap().addHidingArea((HidingArea) boxObject);
-                            }
-                        } else if (boxObject instanceof TargetArea){
-                            if (!intruder.getIndividualMap().getTargetAreas().contains(boxObject)) {
-                                intruder.getIndividualMap().addTargetArea((TargetArea) boxObject);
-                            }
+                        if (!intruder.getIndividualMap().getTargetAreas().contains(targetArea)) {
+                            intruder.getIndividualMap().addTargetArea(targetArea);
                         }
                     }
                 }

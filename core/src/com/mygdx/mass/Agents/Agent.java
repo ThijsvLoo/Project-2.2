@@ -31,6 +31,9 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public static final float DEFAULT_MAX_TURN_SPEED = 180.0f;
     public static final float BASE_SPEED = 1.4f;
 
+    public static final float VISIBLE_DISTANCE_BUILDING = 10.0f;
+    public static final float VISIBLE_DISTANCE_TOWER = 18.0f;
+
     private float blindDuration;
     private float immobilityDuration;
 
@@ -56,7 +59,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     protected VisualField agentDetection;
     protected VisualField buildingDetection;
-    protected VisualField TowerDetection;
+    protected VisualField sentryTowerDetection;
 
     protected NoiseField noiseField;
 
@@ -73,7 +76,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public Agent(MASS mass, Vector2 position) {
         super(mass);
-        individualMap = new IndividualMap(mass, Map.DEFAULT_WIDTH, Map.DEFAULT_HEIGHT);
+        individualMap = new IndividualMap(mass, Map.DEFAULT_WIDTH, Map.DEFAULT_HEIGHT, this);
         maxTurnSpeed = DEFAULT_MAX_TURN_SPEED;
         objectsInSight = new ArrayList<WorldObject>();
         route = new LinkedBlockingQueue<Vector2>();
@@ -100,6 +103,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         fixture.setUserData(this);
 
         agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
+        buildingDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
+        sentryTowerDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
 
         noiseField = new NoiseField(this);
     }

@@ -32,7 +32,7 @@ public class Wall extends BoxObject {
         fixtureDef.shape = polygonShape;
         fixtureDef.density = 1.0f;
         fixtureDef.filter.categoryBits = WALL_BIT;
-        fixtureDef.filter.maskBits = GUARD_BIT | INTRUDER_BIT | LIGHT_BIT;
+        fixtureDef.filter.maskBits = GUARD_BIT | INTRUDER_BIT | LIGHT_BIT | VISUAL_FIELD_BIT;
 
         body = world.createBody(bodyDef);
         fixture = body.createFixture(fixtureDef);

@@ -16,7 +16,7 @@ public class SentryTower extends BoxObject {
         super(mass, rectangle);
         Filter filter = new Filter();
         filter.categoryBits = SENTRY_TOWER_BIT;
-        filter.maskBits = GUARD_BIT | INTRUDER_BIT | LIGHT_BIT;
+        filter.maskBits = GUARD_BIT | INTRUDER_BIT | LIGHT_BIT | VISUAL_FIELD_BIT;
         fixture.setFilterData(filter);
         objectType = SENTRY_TOWER;
     }

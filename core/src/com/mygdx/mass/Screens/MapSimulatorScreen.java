@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
+import com.mygdx.mass.Algorithms.CapturePoint;
 import com.mygdx.mass.Algorithms.Explore;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
@@ -190,6 +191,7 @@ public class MapSimulatorScreen implements Screen {
         drawAgentPaths();
         drawBoxObjects();
         drawAgents();
+        drawCapturePoints();
 
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
@@ -281,6 +283,18 @@ public class MapSimulatorScreen implements Screen {
             shapeRenderer.circle(agent.getBody().getPosition().x, agent.getBody().getPosition().y, Agent.SIZE/2);
         }
         shapeRenderer.end();
+    }
+
+    public void drawCapturePoints() {
+//        if (map instanceof IndividualMap &&) {
+//            Gdx.gl.glLineWidth(4);
+//            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//            for (CapturePoint capturePoint : map.getCapturePoint()) {
+//                shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f)
+//                shapeRenderer.circle(, Agent.SIZE / 2);
+//            }
+//            shapeRenderer.end();
+//        }
     }
 
     @Override
