@@ -70,7 +70,7 @@ public class RayCastField { // each agent has a RayCastField
                         closestCollision = new RayCollision(rayCollision.getFraction(),rayCollision.getFixture(),rayCollision.getPoint());
                         fract = rayCollision.getFraction();
 
-                        System.out.println(fract);
+                        //System.out.println(fract);
                         saveCount = counFor;
                     }
                     counFor++;
@@ -78,7 +78,7 @@ public class RayCastField { // each agent has a RayCastField
 
                 if (closestCollision != null) { // do something with the closest object
                     drawRay = new Vector2(closestCollision.getPoint()) ;
-                    System.out.println("Collision detected with fixture of BitMaskType: "+Integer.toString(closestCollision.getFixture().getFilterData().categoryBits,2));
+                    //System.out.println("Collision detected with fixture of BitMaskType: "+Integer.toString(closestCollision.getFixture().getFilterData().categoryBits,2));
                 }
                 else {
                     System.out.println("ERROR IN CLOSEST COLLISION!");
@@ -148,7 +148,7 @@ public class RayCastField { // each agent has a RayCastField
 
         //rays.add(new RayCast(getLocationAgent(),getTarget(getRadiusAgent(),getRange(),getRotation())));
         //rayCount++;
-        System.out.println("Number of rays: "+rayCount);
+        //System.out.println("Number of rays: "+rayCount);
     }
 
     public Vector2[] beginPointRay() {
