@@ -24,6 +24,11 @@ public abstract class WorldObject implements Serializable {
     public static final short VISUAL_FIELD_BIT = 512;
     public static final short NOISE_FIELD_BIT = 1024;
     public static final short LIGHT_BIT = 2048;
+    public static final short TOP = 4096;
+    public static final short LEFT = 8192;
+    public static final short RIGHT = 16384;
+    public static final short BOTTOM = -32768;
+
 
     protected MASS mass;
 

@@ -23,6 +23,7 @@ import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Scenes.MapSimulatorHUD;
 import com.mygdx.mass.Scenes.MapSimulatorInfo;
+import com.mygdx.mass.Sensors.RayCastField;
 import com.mygdx.mass.World.IndividualMap;
 import com.mygdx.mass.World.Map;
 
@@ -83,7 +84,7 @@ public class MapSimulatorScreen implements Screen {
     }
 
     private float accumulator = 0;
-    private int worldSpeedFactor = 10; //how fast the world update per time unit, more steps etc
+    private int worldSpeedFactor = 1; //how fast the world update per time unit, more steps etc
     private int unitSpeedFactor = 1; //how fast the agents update per world step, should pretty much always be 1
 
     public void update(float delta) {
@@ -193,6 +194,7 @@ public class MapSimulatorScreen implements Screen {
         drawAgentPaths();
         drawBoxObjects();
         drawAgents();
+        drawRays();
         drawCapturePoints();
 
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -299,6 +301,24 @@ public class MapSimulatorScreen implements Screen {
             }
             shapeRenderer.end();
         }
+    }
+
+    private void drawRays() {
+        Gdx.gl.glLineWidth(0.05f);
+        mass.shapeRenderer.setColor(1.0f,1.0f,1.0f,1.0f);
+        mass.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (Agent agent:map.getAgents()) {
+            RayCastField rayCastField = agent.getRayCastField();
+            if (rayCastField != null) {
+                Vector2[] beginPointRays = rayCastField.beginPointRay();
+                Vector2[] endPointRays = rayCastField.endPointRay();
+                for (int i = 0; i < beginPointRays.length; i++) {
+                    mass.shapeRenderer.line(beginPointRays[i], endPointRays[i]);
+                }
+            }
+        }
+        mass.shapeRenderer.end();
+
     }
 
     @Override

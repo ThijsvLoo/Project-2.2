@@ -15,6 +15,7 @@ import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Scenes.MapBuilderInfo;
+import com.mygdx.mass.Sensors.RayCastField;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.MapBuilderHUD;
 
@@ -47,6 +48,9 @@ public class MapBuilderScreen implements Screen {
     private InputMultiplexer inputMultiplexer;
     private InputHandler inputHandler;
 
+    private Vector2 p1, p2, collision;
+    private RayCastCallback callback;
+
     public MapBuilderScreen(MASS mass) {
         this.mass = mass;
         this.camera = mass.camera;
@@ -68,6 +72,26 @@ public class MapBuilderScreen implements Screen {
         inputMultiplexer.addProcessor(hud.stage);
         inputHandler = new InputHandler();
         inputMultiplexer.addProcessor(inputHandler);
+
+        /*p1 = new Vector2();
+        p2 = new Vector2();
+        collision = new Vector2();
+
+        p1.x = 99;
+        p1.y = 99;
+        p2.x = 199;
+        p2.y = 199;
+
+        callback = new RayCastCallback() {
+            @Override
+            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                // 'normal' = a point. To get line, start at 'point' to 'normal'
+                // 'fraction' = fraction of line length between 'point' and the collision between 0-1
+                System.out.println("Collision on ray at "+fraction*100+"% of the ray with fixture: "+fixture.getFilterData().categoryBits+" from body: "+fixture.getFilterData().maskBits);
+                collision.set(point);
+                return 1;
+            }
+        };*/
     }
 
     @Override
@@ -75,6 +99,8 @@ public class MapBuilderScreen implements Screen {
         Gdx.input.setInputProcessor(inputMultiplexer);
         currentState = State.NONE;
         mass.map.addOuterWalls();
+
+
     }
 
     private void update(float delta) {
@@ -126,6 +152,15 @@ public class MapBuilderScreen implements Screen {
         drawBoxObjects();
         drawAgents();
         drawPreviewActionResult();
+        //drawRays();
+
+
+        /*world.rayCast(callback, p1, p2);
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.line(p1, p2);
+        shapeRenderer.line(collision,new Vector2(100,220));
+        shapeRenderer.end();*/
 
         //draw the hud
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
@@ -143,6 +178,8 @@ public class MapBuilderScreen implements Screen {
 
         batch.end();
     }
+
+
 
     private void drawBoxObjects() {
         Gdx.gl.glLineWidth(4);

@@ -13,6 +13,7 @@ import com.mygdx.mass.MapToGraph.Edge;
 import com.mygdx.mass.MapToGraph.Graph;
 import com.mygdx.mass.MapToGraph.Vertex;
 import com.mygdx.mass.Sensors.NoiseField;
+import com.mygdx.mass.Sensors.RayCastField;
 import com.mygdx.mass.Sensors.VisualField;
 import com.mygdx.mass.World.IndividualMap;
 import com.mygdx.mass.World.Map;
@@ -30,6 +31,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public static final float DECREASE_VISION_FACTOR = 0.5f;
     public static final float DEFAULT_MAX_TURN_SPEED = 180.0f;
     public static final float BASE_SPEED = 1.4f;
+    public static final boolean CONE_ENABLED = false;
 
     public static final float VISIBLE_DISTANCE_BUILDING = 10.0f;
     public static final float VISIBLE_DISTANCE_TOWER = 18.0f;
@@ -60,6 +62,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected VisualField agentDetection;
     protected VisualField buildingDetection;
     protected VisualField sentryTowerDetection;
+
+    protected RayCastField rayCastField;
 
     protected NoiseField noiseField;
 
@@ -102,9 +106,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
 
-        agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
-        buildingDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
-        sentryTowerDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
+        if(CONE_ENABLED == true) {agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);}
 
         noiseField = new NoiseField(this);
     }
@@ -112,6 +114,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void update(float delta) {
 //        algorithm.act();
         followRoute();
+        doRayCasting();
     }
 
     public void addWaypoint(Vector2 waypoint) {
@@ -194,6 +197,20 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         return body.getPosition().dst(vector2) < 0.25;
     }
 
+    private void doRayCasting(){
+        rayCastField = new RayCastField(mass);
+        rayCastField.setLocationAgent(this.getBody().getPosition());
+        rayCastField.setRadiusAgent(SIZE);
+        rayCastField.setRange(getVisualRange());
+        rayCastField.setViewingAngle(getViewAngle());
+        rayCastField.setRotation(this.getBody().getAngle()); // in radian
+
+        rayCastField.createRays();
+
+
+        //return rayCastField;
+    }
+
     //get the unit vector with length 1
 //    private Vector2 normalise(Vector2 vector2) {
 //        float magnitude = magnitude(vector2);
@@ -224,6 +241,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public Vector2 getDirection() { return direction; }
     public Vector2 getVelocity() { return velocity; }
     public IndividualMap getIndividualMap() { return individualMap; }
+    public RayCastField getRayCastField() { return rayCastField; }
 //    public ArrayList<Object> getCollisions() { return collisions; }
 
     public void setMoveSpeed(float moveSpeed) {
