@@ -111,5 +111,4 @@ public class Intruder extends Agent {
     public void setWindow(Window window) { this.window = window; }
     public void setDoorUnlockTime(float doorUnlockTime) { this.doorUnlockTime = doorUnlockTime; }
     public void setBreakThroughProgress(float breakThroughProgress) { this.breakThroughProgress = breakThroughProgress; }
-
 }

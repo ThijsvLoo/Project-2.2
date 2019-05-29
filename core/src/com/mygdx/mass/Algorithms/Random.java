@@ -13,8 +13,8 @@ import java.util.ArrayList;
 public class Random extends Algorithm {
 
     private Agent agent;
-
     private float count;
+    private ArrayList<Intruder> intruders = new ArrayList<Intruder>();
 
     public Random(Agent agent) {
         this.agent = agent;
@@ -28,20 +28,31 @@ public class Random extends Algorithm {
         agent.setMoveSpeed(3.0f);
         if (agent.getAgentType() == Agent.AgentType.GUARD) {
             ArrayList<WorldObject> objectsInSight = agent.getObjectsInSight();
-            ArrayList<Intruder> intruders = new ArrayList<Intruder>();
+
+            //intruders.clear();
             if (!objectsInSight.isEmpty()) {
                 for (WorldObject worldObject : objectsInSight) {
                     if (worldObject instanceof Intruder) {
-                        intruders.add((Intruder) worldObject);
+                        if (!intruders.contains(worldObject)){
+                            intruders.add((Intruder) worldObject);
+                        }
                     }
                 }
             }
             if (!intruders.isEmpty()) {
                 agent.getRoute().clear();
-                agent.setDestination(intruders.get(0).getBody().getPosition());
-                agent.updateDirection();
-                agent.updateAngle();
-                agent.updateVelocity();
+                if(!objectsInSight.contains(intruders.get(0))){
+                    agent.setDestination(new Vector2((float) Math.random() * MASS.map.getWidth(), (float) Math.random() * MASS.map.getHeight()));
+                    agent.updateDirection();
+                    agent.updateAngle();
+                    agent.updateVelocity();
+                    intruders.remove(intruders.get(0));
+                }else{
+                    agent.setDestination(intruders.get(0).getBody().getPosition());
+                    agent.updateDirection();
+                    agent.updateAngle();
+                    agent.updateVelocity();
+                }
             } else {
                 if (agent.getRoute().isEmpty()) {
                     agent.addWaypoint(new Vector2((float) Math.random() * MASS.map.getWidth(), (float) Math.random() * MASS.map.getHeight()));

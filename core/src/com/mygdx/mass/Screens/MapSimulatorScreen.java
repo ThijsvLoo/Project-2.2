@@ -109,6 +109,7 @@ public class MapSimulatorScreen implements Screen {
     }
 
     public void handleInput(float delta) {
+        //move camera
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camera.position.x -= MASS.CAMERA_SPEED * delta;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
@@ -120,13 +121,13 @@ public class MapSimulatorScreen implements Screen {
             camera.position.y -= MASS.CAMERA_SPEED * delta;
         }
 
+        //zoom in/out
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             ArrayList<Intruder> intuders = map.getIntruders();
             if(!intuders.isEmpty()){
                 Body body = intuders.get(0).getBody();
                 body.setTransform(body.getWorldCenter(), (float)((body.getAngle()-(Math.PI)*delta)));
             }
-
         } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             ArrayList<Intruder> intuders = map.getIntruders();
             if(!intuders.isEmpty()){
@@ -134,21 +135,22 @@ public class MapSimulatorScreen implements Screen {
                 body.setTransform(body.getWorldCenter(), (float)(body.getAngle()+(Math.PI)*delta));
             }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            ArrayList<Intruder> intuders = map.getIntruders();
-            if(!intuders.isEmpty()) {
-                Body body = intuders.get(0).getBody();
-                float x = (float) Math.cos(body.getAngle()) * Agent.BASE_SPEED*2;
-                float y = (float) Math.sin(body.getAngle()) * Agent.BASE_SPEED*2;
-                body.setLinearVelocity(x, y);
-            }
-        } else { //this block of code will always get call, messing with the general agent control, which is why i disable it
-            ArrayList<Intruder> intuders = map.getIntruders();
-            if(!intuders.isEmpty()) {
-                Body body = intuders.get(0).getBody();
+        //add keyboard controls to the first intruder
+//        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+//            ArrayList<Intruder> intruders = map.getIntruders();
+//            if(!intruders.isEmpty()) {
+//                Body body = intruders.get(0).getBody();
+//                float x = (float) Math.cos(body.getAngle()) * Agent.BASE_SPEED*2;
+//                float y = (float) Math.sin(body.getAngle()) * Agent.BASE_SPEED*2;
+//                body.setLinearVelocity(x, y);
+//            }
+//        } else {
+//            ArrayList<Intruder> intruders = map.getIntruders();
+//            if(!intruders.isEmpty()) {
+//                Body body = intruders.get(0).getBody();
 //                body.setLinearVelocity(0, 0);
-            }
-        }
+//            }
+//        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.I) && mass.PPM < MASS.MAXIMAL_ZOOM) {
             mass.PPM *= 1.01;
@@ -160,7 +162,7 @@ public class MapSimulatorScreen implements Screen {
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         }
 
-//        for test purpose
+        //for test purpose
 //        if (Gdx.input.justTouched()) {
 //            for (Agent agent : map.getAgents()) {
 //                agent.getRoute().clear();
