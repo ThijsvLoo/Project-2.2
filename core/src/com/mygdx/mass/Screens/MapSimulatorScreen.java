@@ -83,7 +83,7 @@ public class MapSimulatorScreen implements Screen {
     }
 
     private float accumulator = 0;
-    private int worldSpeedFactor = 20; //how fast the world update per time unit, more steps etc
+    private int worldSpeedFactor = 10; //how fast the world update per time unit, more steps etc
     private int unitSpeedFactor = 1; //how fast the agents update per world step, should pretty much always be 1
 
     public void update(float delta) {
@@ -280,21 +280,23 @@ public class MapSimulatorScreen implements Screen {
                     shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
                     break;
             }
-            shapeRenderer.circle(agent.getBody().getPosition().x, agent.getBody().getPosition().y, Agent.SIZE/2);
+            shapeRenderer.circle(agent.getBody().getPosition().x, agent.getBody().getPosition().y, 1.0f);
         }
         shapeRenderer.end();
     }
 
     public void drawCapturePoints() {
-//        if (map instanceof IndividualMap &&) {
-//            Gdx.gl.glLineWidth(4);
-//            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-//            for (CapturePoint capturePoint : map.getCapturePoint()) {
-//                shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f)
-//                shapeRenderer.circle(, Agent.SIZE / 2);
-//            }
-//            shapeRenderer.end();
-//        }
+        if (map instanceof IndividualMap && ((IndividualMap) map).getAgent() instanceof Guard) {
+            Gdx.gl.glLineWidth(4);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+            if (((Guard) ((IndividualMap) map).getAgent()).getCapture() != null) {
+                for (CapturePoint capturePoint : ((Guard) ((IndividualMap) map).getAgent()).getCapture().getCapturePoints()) {
+                    shapeRenderer.circle(capturePoint.getPosition().x, capturePoint.getPosition().y, 1);
+                }
+            }
+            shapeRenderer.end();
+        }
     }
 
     @Override
@@ -338,6 +340,10 @@ public class MapSimulatorScreen implements Screen {
             } else if (keycode == Input.Keys.M) {
                 for (Intruder intruder : map.getIntruders()) {
                     intruder.setMoveSpeed(3.0f);
+                }
+            } else if (keycode == Input.Keys.C) {
+                if (map instanceof IndividualMap && ((IndividualMap) map).getAgent() instanceof Guard) {
+                    ((Guard) ((IndividualMap) map).getAgent()).getCapture().run = true;
                 }
             }
             return true;
