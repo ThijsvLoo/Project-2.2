@@ -141,8 +141,9 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void goTo(Vector2 destination) {
         Vertex start = new Vertex(body.getPosition().x, body.getPosition().y);
         Vertex end = new Vertex(destination.x, destination.y);
-        Graph graph = new Graph(new ArrayList<Vertex>(), new ArrayList<Edge>());
+        Graph graph = new Graph(new ArrayList<Vertex>(), new ArrayList<Edge>(), this);
         graph.getPathVertices(start, end);
+
         Dijkstra dijkstra = new Dijkstra(graph);
         ArrayList<Vector2> bestPath = dijkstra.computePath();
         route.clear();

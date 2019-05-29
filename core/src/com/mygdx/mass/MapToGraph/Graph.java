@@ -1,6 +1,7 @@
 package com.mygdx.mass.MapToGraph;
 
 import com.badlogic.gdx.math.Intersector;
+import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.BoxObject.Building;
 import com.mygdx.mass.BoxObject.SentryTower;
@@ -16,9 +17,11 @@ public class Graph {
     private Vertex start;
     private Vertex destination;
     private ArrayList<BoxObject> exploredBuilding;
-    public Graph(ArrayList<Vertex> vertices, ArrayList<Edge> edges){
+    private Agent agent;
+    public Graph(ArrayList<Vertex> vertices, ArrayList<Edge> edges, Agent agent){
         this.vertices = vertices;
         this.edges = edges;
+        this.agent = agent;
 
     }
     public boolean adjacent(Vertex vertex1, Vertex vertex2){
@@ -91,17 +94,17 @@ public class Graph {
 
     }
     private BoxObject connectVertices(Vertex v1, Vertex v2){
-        for(Building building: MASS.map.getBuildings()){
+        for(Building building: agent.getIndividualMap().getBuildings()){
             if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(), building.getRectangle())){
                     return building;
             }
         }
-        for(SentryTower sentryTower: MASS.map.getSentryTowers()){
+        for(SentryTower sentryTower: agent.getIndividualMap().getSentryTowers()){
             if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(),sentryTower.getRectangle())){
                     return sentryTower;
             }
         }
-        for(Wall wall: MASS.map.getWalls()){
+        for(Wall wall: agent.getIndividualMap().getWalls()){
             if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(),wall.getRectangle())){
                 return wall;
             }
@@ -117,20 +120,20 @@ public class Graph {
         vertices.add(start);
         vertices.add(destination);
 
-        for (Building building : MASS.map.getBuildings()) {
+        for (Building building : agent.getIndividualMap().getBuildings()) {
             if (Intersector.intersectSegmentRectangle(start.getCoordinates(), destination.getCoordinates(),building.getRectangle())) {
                 exploredBuilding.add(building);
                 add4Corners(building);
             }
         }
 
-        for (SentryTower sentryTower : MASS.map.getSentryTowers()) {
+        for (SentryTower sentryTower : agent.getIndividualMap().getSentryTowers()) {
             if (Intersector.intersectSegmentRectangle(start.getCoordinates(), destination.getCoordinates(),sentryTower.getRectangle())) {
                 exploredBuilding.add(sentryTower);
                 add4Corners(sentryTower);
             }
         }
-        for (Wall wall: MASS.map.getWalls()){
+        for (Wall wall: agent.getIndividualMap().getWalls()){
             if (Intersector.intersectSegmentRectangle(start.getCoordinates(), destination.getCoordinates(), wall.getRectangle())) {
                 exploredBuilding.add(wall);
                 add4Corners(wall);
