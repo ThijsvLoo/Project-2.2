@@ -11,11 +11,8 @@ import com.mygdx.mass.Data.MASS;
 public class Guard extends Agent {
 
     public enum State {EXPLORE, PATROL, CHASE, HUNT};
-
     public static final float BASE_SPEED = 1.4f;
-
     public static final float TOWER_VIEW_ANGLE = 30.0f;
-
     public static final float DEFAULT_VISUAL_RANGE = 6.0f;
     public static final float TOWER_MIN_VISUAL_RANGE = 2.0f;
     public static final float TOWER_MAX_VISUAL_RANGE = 15.0f;

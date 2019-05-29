@@ -153,6 +153,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         ArrayList<Vector2> bestPath = dijkstra.computePath();
         route.clear();
         setDestination(null);
+
         for (Vector2 waypoint : bestPath) {
             addWaypoint(waypoint);
         }
