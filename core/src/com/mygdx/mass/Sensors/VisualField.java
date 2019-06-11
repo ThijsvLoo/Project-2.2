@@ -64,5 +64,6 @@ public class VisualField {
 
     public Agent getAgent() { return agent; }
     public VisualFieldType getVisualFieldType() { return visualFieldType; }
+    public Fixture getFixture() { return fixture; }
 
 }

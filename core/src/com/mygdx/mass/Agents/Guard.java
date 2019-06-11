@@ -2,15 +2,18 @@ package com.mygdx.mass.Agents;
 
 import box2dLight.ConeLight;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
-import com.mygdx.mass.Algorithms.Capture;
-import com.mygdx.mass.Algorithms.Random;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.mygdx.mass.Algorithms.CapturePoint;
+import com.mygdx.mass.Algorithms.PredictionModel;
 import com.mygdx.mass.Data.MASS;
 
 public class Guard extends Agent {
 
-    public enum State {EXPLORE, PATROL, CHASE, HUNT};
+    public enum State {EXPLORE, PATROL, CHASE, SEARCH, COMMUNICATE, ALARM};
+    public State currentState;
     public static final float BASE_SPEED = 1.4f;
     public static final float TOWER_VIEW_ANGLE = 30.0f;
     public static final float DEFAULT_VISUAL_RANGE = 6.0f;
@@ -21,7 +24,7 @@ public class Guard extends Agent {
 
     private boolean onTower;
 
-    private Capture capture;
+    private PredictionModel capture;
 
     public Guard(MASS mass, Vector2 position) {
         super(mass, position);
@@ -39,20 +42,26 @@ public class Guard extends Agent {
         fixture.setFilterData(filter);
 
 //        pointLight = new PointLight(mass.rayHandler, 360, new Color(0,0,1,1), 10, body.getPosition().x, body.getPosition().y);
-        if(CONE_ENABLED == true) coneLight = new ConeLight(mass.rayHandler, 45, new Color(0,0,1,1), visualRange*5, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
-        if(CONE_ENABLED == true) coneLight.attachToBody(body);
-        if(CONE_ENABLED == true) coneLight.setContactFilter(LIGHT_BIT, (short) 0, (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT));
+//        if(CONE_ENABLED == true) coneLight = new ConeLight(mass.rayHandler, 45, new Color(0,0,1,1), visualRange*5, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
+//        if(CONE_ENABLED == true) coneLight.attachToBody(body);
+//        if(CONE_ENABLED == true) coneLight.setContactFilter(LIGHT_BIT, (short) 0, (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT));
 //        algorithm = new Random(this);
-        capture = new Capture();
+//        capture = new PredictionModel();
     }
 
     public void update(float delta) {
         super.update(delta);
-        if (capture != null) {
-            capture.increaseCounter(delta);
-        }
+//        if (capture != null) {
+//            capture.increaseCounter(delta);
+//        }
+//        for (CapturePoint capturePoint : capture.getCapturePoints()) {
+//            if (body.getPosition().dst(capturePoint.getPosition()) < 5.0f) {
+//                capture.removePoint(capturePoint);
+//                break;
+//            }
+//        }
     }
 
-    public Capture getCapture() { return capture; }
+    public PredictionModel getCapture() { return capture; }
 
 }

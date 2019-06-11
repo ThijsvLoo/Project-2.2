@@ -1,5 +1,6 @@
 package com.mygdx.mass.World;
 
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Guard;

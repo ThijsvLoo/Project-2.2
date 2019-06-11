@@ -84,7 +84,7 @@ public class MapSimulatorScreen implements Screen {
     }
 
     private float accumulator = 0;
-    private int worldSpeedFactor = 1; //how fast the world update per time unit, more steps etc
+    private int worldSpeedFactor = 20; //how fast the world update per time unit, more steps etc
     private int unitSpeedFactor = 1; //how fast the agents update per world step, should pretty much always be 1
 
     public void update(float delta) {

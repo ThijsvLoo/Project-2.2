@@ -106,7 +106,11 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
 
-        if(CONE_ENABLED == true) {agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);}
+        agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
+        agentDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
+        agentDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
+
+//        if(CONE_ENABLED == true) {agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);}
 
         noiseField = new NoiseField(this);
     }
@@ -114,7 +118,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void update(float delta) {
 //        algorithm.act();
         followRoute();
-        doRayCasting();
+//        doRayCasting();
     }
 
     public void addWaypoint(Vector2 waypoint) {

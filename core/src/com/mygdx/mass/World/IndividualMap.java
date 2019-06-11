@@ -35,6 +35,11 @@ public class IndividualMap extends Map {
 
     public void addBuilding(Building building) {
         buildings.add(building);
+//        Vector2 destination = agent.getBody().getPosition();
+//        while (!agent.getRoute().isEmpty()) {
+//            destination = agent.getRoute().poll();
+//        }
+//        agent.goTo(destination);
     }
 
     public void addSentryTower(SentryTower sentryTower) {

@@ -14,6 +14,9 @@ import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 public class Intruder extends Agent {
 
+    public enum State {SEARCH, ESCAPE, HIDE, COMMUNICATE, REST};
+    public State currentState;
+
     public static final float SPRINT_SPEED = 3.0f;
 
     public static final float DEFAULT_VISUAL_RANGE = 7.5f;
@@ -36,6 +39,9 @@ public class Intruder extends Agent {
     protected float doorUnlockTime;
     protected float breakThroughProgress;
 
+    private boolean detected;
+    private Vector2 entryPoint;
+
     public Intruder(MASS mass, Vector2 position) {
         super(mass, position);
 
@@ -46,6 +52,7 @@ public class Intruder extends Agent {
         viewAngle = 45.0f;
         restTime = 0;
         sprintDuration = 5.0f;
+        detected = false;
 
         define(position);
         Filter filter = new Filter();
@@ -54,9 +61,9 @@ public class Intruder extends Agent {
         fixture.setFilterData(filter);
 
 //        pointLight = new PointLight(mass.rayHandler, 360, new Color(1,0,0,1), 10, body.getPosition().x, body.getPosition().y);
-        if(CONE_ENABLED == true) coneLight = new ConeLight(mass.rayHandler, 45, new Color(1,0,0,1), visualRange*5, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
-        if(CONE_ENABLED == true) coneLight.attachToBody(body);
-        if(CONE_ENABLED == true) coneLight.setContactFilter(LIGHT_BIT, (short) 0, (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT));
+//        if(CONE_ENABLED == true) coneLight = new ConeLight(mass.rayHandler, 45, new Color(1,0,0,1), visualRange*5, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
+//        if(CONE_ENABLED == true) coneLight.attachToBody(body);
+//        if(CONE_ENABLED == true) coneLight.setContactFilter(LIGHT_BIT, (short) 0, (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT));
         algorithm = new Random(this);
     }
 
@@ -87,6 +94,39 @@ public class Intruder extends Agent {
         }
     }
 
+    public void act() {
+        updateState();
+        switch (currentState) {
+            case SEARCH: {
+                //if
+            }
+            case ESCAPE: {
+                if (atPosition(entryPoint)) {
+                    //wait 3 sec
+                } else {
+                    goTo(entryPoint);
+                }
+                break;
+            }
+        }
+    }
+
+    public void updateState() {
+        if (!detected) { //hasn't been detected yet
+            if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
+                currentState = State.SEARCH;
+            } else {
+                currentState = State.ESCAPE;
+            }
+        } else {
+            if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
+                currentState = State.HIDE;
+            } else {
+                currentState = State.ESCAPE;
+            }
+        }
+    }
+
     private void unlockDoorSlow(float delta) {
         if (door != null && door.getCurrentState() == CLOSED) {
             breakThroughProgress += delta*100/doorUnlockTime;
@@ -106,9 +146,12 @@ public class Intruder extends Agent {
     public Window getWindow() { return window; }
     public float getDoorUnlockTime() { return doorUnlockTime; }
     public float getBreakThroughProgress() { return breakThroughProgress; }
+    public boolean getDetected() { return detected; }
 
     public void setDoor(Door door) { this.door = door; }
     public void setWindow(Window window) { this.window = window; }
     public void setDoorUnlockTime(float doorUnlockTime) { this.doorUnlockTime = doorUnlockTime; }
     public void setBreakThroughProgress(float breakThroughProgress) { this.breakThroughProgress = breakThroughProgress; }
+    public void setDetected(boolean detected) { this.detected = detected; }
+
 }

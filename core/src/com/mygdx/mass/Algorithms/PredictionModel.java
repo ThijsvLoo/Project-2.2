@@ -10,7 +10,7 @@ import com.sun.corba.se.impl.logging.InterceptorsSystemException;
 
 import java.util.ArrayList;
 
-public class Capture {
+public class PredictionModel {
 
     public boolean run = false; //for testing
 
@@ -20,7 +20,7 @@ public class Capture {
 
     public float counter;
 
-    public Capture() {
+    public PredictionModel() {
         capturePoints = new ArrayList<CapturePoint>();
         latestPoints = new ArrayList<CapturePoint>();
         tempPoints = new ArrayList<CapturePoint>();
@@ -37,12 +37,14 @@ public class Capture {
             return;
         }
         for (CapturePoint capturePoint : capturePoints) {
-            if (position.dst(capturePoint.getPosition()) < 3.0f) {
+            if (position.dst(capturePoint.getPosition()) < 6.0f) {
                 return;
             }
         }
-        for (CapturePoint capturePoint : latestPoints) {
-
+        for (CapturePoint capturePoint : tempPoints) {
+            if (position.dst(capturePoint.getPosition()) < 6.0f) {
+                return;
+            }
         }
         tempPoints.add(new CapturePoint(position, direction));
     }
@@ -115,8 +117,8 @@ public class Capture {
     public void increaseCounter(float delta) {
         if (run) {
             counter += delta;
-            if (counter >= 3.0f) {
-                expand(3.0f);
+            if (counter >= 6.0f) {
+                expand(6.0f);
                 counter = 0.0f;
             }
         }
