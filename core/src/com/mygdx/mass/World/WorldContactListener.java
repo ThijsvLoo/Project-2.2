@@ -13,7 +13,7 @@ import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 import static com.mygdx.mass.BoxObject.Door.State.OPEN;
 import static com.mygdx.mass.World.WorldObject.*;
 
-//This class is where all collissions are handled
+//This class is where all collisions are handled
 public class WorldContactListener implements ContactListener {
 
     MASS mass;

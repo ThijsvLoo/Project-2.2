@@ -35,23 +35,32 @@ public class IndividualMap extends Map {
 
     public void addBuilding(Building building) {
         buildings.add(building);
-//        Vector2 destination = agent.getBody().getPosition();
-//        while (!agent.getRoute().isEmpty()) {
-//            destination = agent.getRoute().poll();
-//        }
-//        agent.goTo(destination);
+        updatePath();
     }
 
     public void addSentryTower(SentryTower sentryTower) {
         sentryTowers.add(sentryTower);
+        updatePath();
     }
 
     public void addHidingArea(HidingArea hidingArea) {
         hidingAreas.add(hidingArea);
+        updatePath();
     }
 
     public void addTargetArea(TargetArea targetArea) {
         targetAreas.add(targetArea);
+        updatePath();
+    }
+
+    private void updatePath(){
+        Vector2 destination = agent.getDestination();
+        while (!agent.getRoute().isEmpty()) {
+
+            destination = agent.getRoute().poll();
+            System.out.println(agent.getRoute().size());
+        }
+        agent.goTo(destination);
     }
 
     public Agent getAgent() { return agent; }
