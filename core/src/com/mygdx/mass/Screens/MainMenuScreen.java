@@ -113,7 +113,8 @@ public class MainMenuScreen implements Screen {
         builderButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MapBuilderScreen(mass));
+                mass.mapBuilderScreen = new MapBuilderScreen(mass);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mass.mapBuilderScreen);
             }
         });
         exitButton.addListener(new ClickListener(){
@@ -125,14 +126,17 @@ public class MainMenuScreen implements Screen {
         simulateButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MapBuilderScreen(mass));
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MapSimulatorScreen(mass));
+                mass.mapSimulatorScreen = new MapSimulatorScreen(mass);
+                mass.mapBuilderScreen = new MapBuilderScreen(mass);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mass.mapBuilderScreen);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mass.mapSimulatorScreen);
             }
         });
         optionsButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new OptionsScreen(mass));
+                mass.optionsScreen = new OptionsScreen(mass);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mass.optionsScreen);
             }
         });
 

@@ -19,33 +19,35 @@ public class DesktopLauncher {
 		config.height = MASS.WINDOW_HEIGHT;
 		config.samples = MASS.ANTI_ALIASING; //anti aliasing
 
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(
-					"config.properties"));
-			String line = reader.readLine();
-
-			ArrayList<Properties> settings = new ArrayList<Properties>();
-
-			settings.add(new Properties(line.split(": ")));
-
-			while (line != null) {
-//				System.out.println(line);
-				settings.add(new Properties(line.split(": ")));
-				// read next line
-				line = reader.readLine();
-			}
-
-			for(int i = 0; i<settings.size(); i++){
-				if (settings.get(i).getName().equals("fs") && settings.get(i).getSetting().equals("true")) {
-					config.fullscreen = true;
-				}
-			}
-
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		THIS BUFFERED READER IS NO LONGER NEEDED
+//
+//		BufferedReader reader;
+//		try {
+//			reader = new BufferedReader(new FileReader(
+//					"config.properties"));
+//			String line = reader.readLine();
+//
+//			ArrayList<Properties> settings = new ArrayList<Properties>();
+//
+//			settings.add(new Properties(line.split(": ")));
+//
+//			while (line != null) {
+////				System.out.println(line);
+//				settings.add(new Properties(line.split(": ")));
+//				// read next line
+//				line = reader.readLine();
+//			}
+//
+//			for(int i = 0; i<settings.size(); i++){
+//				if (settings.get(i).getName().equals("fs") && settings.get(i).getSetting().equals("true")) {
+//					config.fullscreen = true;
+//				}
+//			}
+//
+//			reader.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		new LwjglApplication(new MASS(), config);
 	}

@@ -303,7 +303,10 @@ public class MapBuilderHUD implements Disposable {
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit");
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen(mapBuilderScreen.mass));
+                mass.PPM = mass.MINIMAL_ZOOM;
+                mass.viewport.setUnitsPerPixel(1/mass.PPM);
+                mass.viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mapBuilderScreen.mass.mainMenuScreen);
 
 //                Gdx.app.getApplicationListener().dispose();
             }

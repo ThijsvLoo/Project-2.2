@@ -31,7 +31,7 @@ public class MapBuilderInfo implements Disposable {
 
     private Label currentLabel;
     private Label builderLabel;
-    private String currentBuildTool;
+    private String currentBuildTool = "None";
 
     public MapBuilderInfo(MASS mass) {
         this.mass = mass;
@@ -53,17 +53,17 @@ public class MapBuilderInfo implements Disposable {
         simstepNameLabel = new Label("Simulation step:", labelstyle);
         simstepLabel = new Label(String.format("%06d", simStep), labelstyle);
 
-        currentLabel = new Label(null, labelstyle);
+        currentLabel = new Label("Selected Tool: ", labelstyle);
         builderLabel = new Label(currentBuildTool, labelstyle);
 
         table.add(fpsNameLabel).padTop(10).expandX();
-        //table.add(currentLabel).padTop(10).expandX();
+        table.add(currentLabel).padTop(10).expandX();
         //table.add(simstepNameLabel).padTop(10).expandX();
 
         table.row();
 
         table.add(fpsLabel).padTop(5).expandX();
-        //table.add(builderLabel).padTop(5).expandX();
+        table.add(builderLabel).padTop(5).expandX();
         //table.add(simstepLabel).padTop(5).expandX();
 
         stage.addActor(table);
@@ -80,7 +80,7 @@ public class MapBuilderInfo implements Disposable {
     }
 
     public void updateBuildTool(String tool){
-        currentLabel.setText("Selected: ");
+//        currentLabel.setText("Selected: ");
         builderLabel.setText(tool);
     }
 

@@ -182,6 +182,12 @@ public class MapSimulatorScreen implements Screen {
             mass.PPM /= 1.01;
             viewport.setUnitsPerPixel(1/mass.PPM);
             viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        } else if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
+            System.out.println("Escaping to Main Menu");
+            mass.PPM = mass.MINIMAL_ZOOM;
+            mass.viewport.setUnitsPerPixel(1/mass.PPM);
+            mass.viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+            ((Game) Gdx.app.getApplicationListener()).setScreen(mass.mainMenuScreen);
         }
 
         //for test purpose

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 public class OptionsScreen implements Screen {
 
     public MASS mass;
+    public MainMenuScreen mainMenuScreen;
 
     private Skin skin;
 
@@ -116,7 +117,8 @@ public class OptionsScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen(mass));
+                mass.mainMenuScreen = new MainMenuScreen(mass);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mass.mainMenuScreen);
             }
         });
 
@@ -185,6 +187,8 @@ public class OptionsScreen implements Screen {
                             break;
                         }
                     }
+                mass.optionsScreen = new OptionsScreen(mass);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mass.optionsScreen);
 
 //                ArrayList<Properties> temp = mass.getSettings();
 //                if (temp.contains(uitrue)){
@@ -207,7 +211,7 @@ public class OptionsScreen implements Screen {
                 } else {
                     fs = true;
                 }
-                notice.setText("Restart required for fullscreen");
+//                notice.setText("Restart required for fullscreen");
                 for(int i = 0; i<mass.getSettings().size(); i++){
                         if (mass.getSettings().get(i).getName().equals("fs")) {
                             mass.getSettings().get(i).setSetting(String.valueOf(fs));
@@ -235,7 +239,7 @@ public class OptionsScreen implements Screen {
         //Add back button and label
         optionsTable.add(backButton).colspan(3).center();
         optionsTable.row();
-        optionsTable.add(notice).colspan(3).center();
+//        optionsTable.add(notice).colspan(3).center();
 
         //Add table to stage
         stage.addActor(optionsTable);

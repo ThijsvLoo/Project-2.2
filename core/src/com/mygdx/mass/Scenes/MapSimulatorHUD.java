@@ -134,17 +134,20 @@ public class MapSimulatorHUD implements Disposable {
                 System.out.println("Simulation step counter: "+mapSimulatorScreen.getSimulationStep());
                 System.out.println("Simulation time: "+mapSimulatorScreen.getSimulationTime());
                 for(int i = 0; i < mass.map.getAgents().size(); i++) {
-                    mass.map.getAgents().get(i).route.clear();
-                    mass.map.getAgents().get(i).setDestination(null);
+//                    mass.map.getAgents().get(i).route.clear();
+//                    mass.map.getAgents().get(i).setDestination(null);
                 }
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MapBuilderScreen(mapSimulatorScreen.mass));
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mapSimulatorScreen.mass.mapBuilderScreen);
             }
         });
         exit = createButton("Textures/Buttons/Exit.png");
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit Simulation");
-                ((Game) Gdx.app.getApplicationListener()).setScreen(new MainMenuScreen(mapSimulatorScreen.mass));
+                mass.PPM = mass.MINIMAL_ZOOM;
+                mass.viewport.setUnitsPerPixel(1/mass.PPM);
+                mass.viewport.update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+                ((Game) Gdx.app.getApplicationListener()).setScreen(mapSimulatorScreen.mass.mainMenuScreen);
             }
         });
 
@@ -159,24 +162,17 @@ public class MapSimulatorHUD implements Disposable {
         });
         float sliderWidth = 500.f;
         int colSpan = (int) Math.ceil(sliderWidth/BUTTON_SIZE);
-
-          table.defaults().pad(2.0f);
-          table.add(speed).size(sliderWidth,BUTTON_SIZE).colspan(colSpan);
-//        table.add(wall).size(BUTTON_SIZE);
-//        table.add(building).size(BUTTON_SIZE);
-//        table.add(door).size(BUTTON_SIZE);
-//        table.add(window).size(BUTTON_SIZE);
-//        table.add(sentryTower).size(BUTTON_SIZE);
-//
-//        //start second row
+        table.defaults().pad(2.0f);
+        table.setSize(sliderWidth, 1.0f);
+        table.add(speed).size(sliderWidth,BUTTON_SIZE).expandX();
+        //start second row
         table.row();
-//
-//        table.add(load).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-//        table.add(save).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-//        table.add(move).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(clear).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(pause).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(exit).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        Table miniTable = new Table();
+        miniTable.defaults().pad(2.0f);
+        miniTable.add(clear).size(BUTTON_SIZE);
+        miniTable.add(pause).size(BUTTON_SIZE);
+        miniTable.add(exit).size(BUTTON_SIZE);
+        table.add(miniTable).padBottom(PAD_BOTTOM).expandX();
 
         stage.addActor(table);
     }

@@ -2,6 +2,7 @@ package com.mygdx.mass.Data;
 
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Screens.MapSimulatorScreen;
+import com.mygdx.mass.Screens.OptionsScreen;
 import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.Data.Properties;
 import com.mygdx.mass.World.Map;
@@ -58,6 +60,7 @@ public class MASS extends Game{
 	public MainMenuScreen mainMenuScreen;
 	public MapBuilderScreen mapBuilderScreen;
 	public MapSimulatorScreen mapSimulatorScreen;
+	public OptionsScreen optionsScreen;
 
 	private Properties properties;
 	private ArrayList<Properties> settings = new ArrayList<Properties>();
@@ -137,6 +140,13 @@ public class MASS extends Game{
 				settings.add(toAdd);
 				// read next line
 				line = br.readLine();
+
+				if (toAdd.getName().equals("fs") && toAdd.getSetting().equals("true")){
+					Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+				}
+				if (toAdd.getName().equals("fs") && toAdd.getSetting().equals("false")){
+					Gdx.graphics.setWindowedMode(WINDOW_WIDTH,WINDOW_HEIGHT);
+				}
 			}
 //			System.out.println("File was read. The size was " + settings.size());
 			br.close();
