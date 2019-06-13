@@ -18,7 +18,10 @@ import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldContactListener;
 
 import java.io.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MASS extends Game{
 
@@ -58,6 +61,10 @@ public class MASS extends Game{
 
 	private Properties properties;
 	private ArrayList<Properties> settings = new ArrayList<Properties>();
+
+	private static DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.ENGLISH);
+	public static DecimalFormat largeIntegerFormat = new DecimalFormat("###,###,###", symbols);
+	public static DecimalFormat largeDoubleFormat = new DecimalFormat("###,###.00", symbols);
 
 	@Override
 	public void create(){

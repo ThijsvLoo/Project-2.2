@@ -15,24 +15,30 @@ import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MapSimulatorScreen;
 
 public class MapSimulatorInfo implements Disposable {
+    private MapSimulatorScreen mapSimulatorScreen;
+
     public Stage stage;
     private Viewport viewport;
 
     private int fpsCount;
-    private int simStep;
 
     private Label fpsNameLabel;
     private Label fpsLabel;
+    private Label worldSpeedFactorNameLabel;
+    private Label worldSpeedFactorLabel;
     private Label simstepNameLabel;
     private Label simstepLabel;
+    private Label simTimeNameLabel;
+    private Label simTimeLabel;
 
     private Label currentLabel;
     private Label builderLabel;
     private String currentBuildTool;
 
     public MapSimulatorInfo(MapSimulatorScreen mapSimulatorScreen, SpriteBatch spritebatch) {
+        this.mapSimulatorScreen = mapSimulatorScreen;
+
         fpsCount = 0;
-        simStep = 0;
 
         viewport = new FitViewport(MASS.WINDOW_WIDTH,MASS.WINDOW_HEIGHT, new OrthographicCamera());
         stage = new Stage(viewport, spritebatch);
@@ -41,30 +47,44 @@ public class MapSimulatorInfo implements Disposable {
         table.top();
         table.setFillParent(true);
 
-        Label.LabelStyle labelstyle = new Label.LabelStyle(new BitmapFont(), Color.YELLOW);
+        BitmapFont font = new BitmapFont();
+        font.setFixedWidthGlyphs("0123456789");
+
+        Label.LabelStyle labelstyle = new Label.LabelStyle(font, Color.YELLOW);
 
         fpsNameLabel = new Label("FPS:", labelstyle);
         fpsLabel = new Label(String.format("%03d", fpsCount), labelstyle);
+        worldSpeedFactorNameLabel = new Label("Simulation speed factor:", labelstyle);
+        worldSpeedFactorLabel = new Label(String.format("%02d", 1), labelstyle);
         simstepNameLabel = new Label("Simulation step:", labelstyle);
-        simstepLabel = new Label(String.format("%06d", simStep), labelstyle);
+        simstepLabel = new Label(String.format("%09d", 0), labelstyle);
+        simTimeNameLabel = new Label("Simulation time:", labelstyle);
+        simTimeLabel = new Label(MASS.largeDoubleFormat.format(0), labelstyle);
 
         currentLabel = new Label("Current:", labelstyle);
         builderLabel = new Label(currentBuildTool, labelstyle);
 
         table.add(fpsNameLabel).padTop(10).expandX();
+        table.add(worldSpeedFactorNameLabel).padTop(10).expandX();
         table.add(simstepNameLabel).padTop(10).expandX();
+        table.add(simTimeNameLabel).padTop(10).expandX();
 
         table.row();
 
         table.add(fpsLabel).padTop(5).expandX();
+        table.add(worldSpeedFactorLabel).padTop(5).expandX();
         table.add(simstepLabel).padTop(5).expandX();
+        table.add(simTimeLabel).padTop(5).expandX();
 
         stage.addActor(table);
     }
 
     public void update(float dt){
         fpsCount = Gdx.graphics.getFramesPerSecond();
-        fpsLabel.setText(String.format("%03d", fpsCount));
+        fpsLabel.setText(MASS.largeIntegerFormat.format(fpsCount) + " Hz");
+        simstepLabel.setText(MASS.largeIntegerFormat.format(mapSimulatorScreen.getSimulationStep()));
+        simTimeLabel.setText(MASS.largeDoubleFormat.format(mapSimulatorScreen.getSimulationTime()) + " s");
+        worldSpeedFactorLabel.setText(String.format("%03d",mapSimulatorScreen.getWorldSpeedFactor()) + " X");
     }
 
     @Override

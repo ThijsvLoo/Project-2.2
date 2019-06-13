@@ -57,21 +57,21 @@ public class MapBuilderInfo implements Disposable {
         builderLabel = new Label(currentBuildTool, labelstyle);
 
         table.add(fpsNameLabel).padTop(10).expandX();
-        table.add(currentLabel).padTop(10).expandX();
-        table.add(simstepNameLabel).padTop(10).expandX();
+        //table.add(currentLabel).padTop(10).expandX();
+        //table.add(simstepNameLabel).padTop(10).expandX();
 
         table.row();
 
         table.add(fpsLabel).padTop(5).expandX();
-        table.add(builderLabel).padTop(5).expandX();
-        table.add(simstepLabel).padTop(5).expandX();
+        //table.add(builderLabel).padTop(5).expandX();
+        //table.add(simstepLabel).padTop(5).expandX();
 
         stage.addActor(table);
     }
 
     public void update(float dt){
         fpsCount = Gdx.graphics.getFramesPerSecond();
-        fpsLabel.setText(String.format("%03d", fpsCount));
+        fpsLabel.setText(String.format("%03d", fpsCount) + " Hz");
     }
 
     @Override

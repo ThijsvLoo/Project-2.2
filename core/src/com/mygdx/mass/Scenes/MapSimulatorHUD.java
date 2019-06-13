@@ -5,10 +5,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
@@ -24,6 +28,7 @@ public class MapSimulatorHUD implements Disposable {
     public static final float PAD_BOTTOM = 10;
 
     private MASS mass;
+    private MapSimulatorScreen mapSimulatorScreen;
 
     private OrthographicCamera camera;
     private ScreenViewport viewport;
@@ -43,8 +48,12 @@ public class MapSimulatorHUD implements Disposable {
     private ImageButton move;
     private ImageButton pause;
     private ImageButton exit;
+    private ImageButton clear;
+
+    private Slider speed;
 
     public MapSimulatorHUD(final MapSimulatorScreen mapSimulatorScreen){
+        this.mapSimulatorScreen = mapSimulatorScreen;
         this.mass = mapSimulatorScreen.mass;
 
         camera = new OrthographicCamera();
@@ -107,10 +116,23 @@ public class MapSimulatorHUD implements Disposable {
 //                System.out.println("Current action: Move");
 //            }
 //        });
+        clear = createButton("Textures/Buttons/Clear.png");
+        clear.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                System.out.println("Current action: Clear timers");
+                mapSimulatorScreen.resetSimulationTimers();
+
+            }
+        });
+
+
         pause = createButton("Textures/Buttons/Pause.png");
         pause.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Pause");
+                System.out.println("Simulation speed was set to: "+mapSimulatorScreen.getWorldSpeedFactor());
+                System.out.println("Simulation step counter: "+mapSimulatorScreen.getSimulationStep());
+                System.out.println("Simulation time: "+mapSimulatorScreen.getSimulationTime());
                 for(int i = 0; i < mass.map.getAgents().size(); i++) {
                     mass.map.getAgents().get(i).route.clear();
                     mass.map.getAgents().get(i).setDestination(null);
@@ -126,8 +148,20 @@ public class MapSimulatorHUD implements Disposable {
             }
         });
 
+        speed = new Slider(1, 500, 1, false, new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json")));
+        speed.setValue(mapSimulatorScreen.getWorldSpeedFactor());
+        speed.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                mapSimulatorScreen.setWorldSpeedFactor((int)(speed.getValue()));
+                System.out.println("Current action: Changed World Speed To " +mapSimulatorScreen.getWorldSpeedFactor());
+            }
+        });
+        float sliderWidth = 500.f;
+        int colSpan = (int) Math.ceil(sliderWidth/BUTTON_SIZE);
 
           table.defaults().pad(2.0f);
+          table.add(speed).size(sliderWidth,BUTTON_SIZE).colspan(colSpan);
 //        table.add(wall).size(BUTTON_SIZE);
 //        table.add(building).size(BUTTON_SIZE);
 //        table.add(door).size(BUTTON_SIZE);
@@ -135,11 +169,12 @@ public class MapSimulatorHUD implements Disposable {
 //        table.add(sentryTower).size(BUTTON_SIZE);
 //
 //        //start second row
-//        table.row();
+        table.row();
 //
 //        table.add(load).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
 //        table.add(save).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
 //        table.add(move).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(clear).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(pause).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(exit).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
 
@@ -154,7 +189,10 @@ public class MapSimulatorHUD implements Disposable {
         return imageButton;
     }
 
+
+
     public void update(float dt){
+        if(!speed.isDragging()) speed.setValue(mapSimulatorScreen.getWorldSpeedFactor());
     }
 
     public void resize(int width, int height) {

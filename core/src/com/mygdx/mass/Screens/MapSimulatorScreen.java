@@ -55,6 +55,9 @@ public class MapSimulatorScreen implements Screen {
     private InputMultiplexer inputMultiplexer;
     private InputHandler inputHandler;
 
+    private long simulationStep = 0;
+    private double simulationTime = 0;
+
     public MapSimulatorScreen(MASS mass) {
         this.mass = mass;
         this.camera = mass.camera;
@@ -85,20 +88,38 @@ public class MapSimulatorScreen implements Screen {
 
     private float accumulator = 0;
     private int worldSpeedFactor = 20; //how fast the world update per time unit, more steps etc
-    private int unitSpeedFactor = 1; //how fast the agents update per world step, should pretty much always be 1
+    //private int unitSpeedFactor = 1; //how fast the agents update per world step, should pretty much always be 1
+
 
     public void update(float delta) {
-        float timePassed = Math.min(delta, 0.20f);
+        float worldSpeedCap = 0.20f; // Prevents spiral of death slowdown
+        boolean worldSpeedCapReached;
+        float timePassed = Math.min(delta, worldSpeedCap);
+
+        // Logic to automatically lower the world speed when heavy lag happens
+        worldSpeedCapReached = (delta >= worldSpeedCap ? true : false); // check if the speed cap is reached
+        if (worldSpeedCapReached && worldSpeedFactor > 1) {
+            int oldSpeedFactor = worldSpeedFactor;
+            int newSpeedFactor = (int) Math.ceil(worldSpeedFactor *0.6);
+            if (newSpeedFactor == worldSpeedFactor) {
+                worldSpeedFactor--;
+            }
+            else { worldSpeedFactor = newSpeedFactor; }
+            System.out.println("World speed cap reached! Lowering the world speed factor by 40% from "+oldSpeedFactor+" to "+worldSpeedFactor);
+        }
+
         accumulator += timePassed;
         while (accumulator >= MASS.FIXED_TIME_STEP) {
             for (int i = 0; i < worldSpeedFactor; i++) {
                 for (Guard guard : map.getGuards()) {
-                    guard.update(MASS.FIXED_TIME_STEP*unitSpeedFactor);
+                    guard.update(MASS.FIXED_TIME_STEP);
                 }
                 for (Intruder intruder : map.getIntruders()) {
-                    intruder.update(MASS.FIXED_TIME_STEP*unitSpeedFactor);
+                    intruder.update(MASS.FIXED_TIME_STEP);
                 }
-                world.step(MASS.FIXED_TIME_STEP*unitSpeedFactor, 6, 2);
+                world.step(MASS.FIXED_TIME_STEP, 6, 2);
+                simulationStep++;
+                simulationTime = simulationTime + MASS.FIXED_TIME_STEP;
             }
             accumulator -= MASS.FIXED_TIME_STEP;
         }
@@ -421,4 +442,24 @@ public class MapSimulatorScreen implements Screen {
         this.map = map;
     }
 
+    public int getWorldSpeedFactor() {
+        return worldSpeedFactor;
+    }
+
+    public void setWorldSpeedFactor(int worldSpeedFactor) {
+        this.worldSpeedFactor = worldSpeedFactor;
+    }
+
+    public void resetSimulationTimers() {
+        simulationTime = 0;
+        simulationStep = 0;
+    }
+
+    public long getSimulationStep() {
+        return simulationStep;
+    }
+
+    public double getSimulationTime() {
+        return simulationTime;
+    }
 }
