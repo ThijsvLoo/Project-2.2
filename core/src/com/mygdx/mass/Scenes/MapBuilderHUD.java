@@ -284,7 +284,7 @@ public class MapBuilderHUD implements Disposable {
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Simulate");
-                mapBuilderScreen.getInfo().updateBuildTool(null);
+                mapBuilderScreen.getInfo().updateBuildTool("None");
 
 //                initiating the individual map of all agents, giving it the starting information
                 for (Guard guard : mass.getMap().getGuards()) {
