@@ -27,7 +27,7 @@ public class Random extends Algorithm {
 //            agent.setMoveSpeed((float) Math.random()*3);
         agent.setMoveSpeed(3.0f);
         if (agent.getAgentType() == Agent.AgentType.GUARD) {
-            ArrayList<WorldObject> objectsInSight = agent.getObjectsInSight();
+            ArrayList<Agent> objectsInSight = agent.getEnemyInSight();
 
             //intruders.clear();
             if (!objectsInSight.isEmpty()) {

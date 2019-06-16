@@ -124,4 +124,16 @@ public class PredictionModel {
         }
     }
 
+    public void update() {
+//        if (predictionModel != null) {
+//            predictionModel.increaseCounter(delta);
+//        }
+//        for (CapturePoint capturePoint : predictionModel.getCapturePoints()) {
+//            if (body.getPosition().dst(capturePoint.getPosition()) < 5.0f) {
+//                predictionModel.removePoint(capturePoint);
+//                break;
+//            }
+//        }
+    }
+
 }

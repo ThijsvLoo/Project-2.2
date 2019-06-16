@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -222,7 +221,19 @@ public class MapSimulatorScreen implements Screen {
         drawBoxObjects();
         drawAgents();
         drawRays();
-        drawCapturePoints();
+        drawCapturePoints(); //for testing
+
+        //for testing, draw the unexplored places
+        if (map.getAgents().get(0).getIndividualMap().getUnexploredPlaces().isEmpty()) {
+            System.out.println("empty");
+        }
+            Gdx.gl.glLineWidth(4);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+            for (Vector2 vector2 : map.getAgents().get(0).getIndividualMap().getUnexploredPlaces()) {
+                shapeRenderer.circle(vector2.x, vector2.y, 1);
+            }
+            shapeRenderer.end();
 
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
@@ -321,8 +332,8 @@ public class MapSimulatorScreen implements Screen {
             Gdx.gl.glLineWidth(4);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
-            if (((Guard) ((IndividualMap) map).getAgent()).getCapture() != null) {
-                for (CapturePoint capturePoint : ((Guard) ((IndividualMap) map).getAgent()).getCapture().getCapturePoints()) {
+            if (((Guard) ((IndividualMap) map).getAgent()).getPredictionModel() != null) {
+                for (CapturePoint capturePoint : ((Guard) ((IndividualMap) map).getAgent()).getPredictionModel().getCapturePoints()) {
                     shapeRenderer.circle(capturePoint.getPosition().x, capturePoint.getPosition().y, 1);
                 }
             }
@@ -392,7 +403,7 @@ public class MapSimulatorScreen implements Screen {
                 }
             } else if (keycode == Input.Keys.C) {
                 if (map instanceof IndividualMap && ((IndividualMap) map).getAgent() instanceof Guard) {
-                    ((Guard) ((IndividualMap) map).getAgent()).getCapture().run = true;
+                    ((Guard) ((IndividualMap) map).getAgent()).getPredictionModel().run = true;
                 }
             }
             return true;

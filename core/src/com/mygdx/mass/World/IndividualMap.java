@@ -5,10 +5,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
-import com.mygdx.mass.BoxObject.Building;
-import com.mygdx.mass.BoxObject.HidingArea;
-import com.mygdx.mass.BoxObject.SentryTower;
-import com.mygdx.mass.BoxObject.TargetArea;
+import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 
 import java.lang.annotation.Target;
@@ -24,45 +21,54 @@ public class IndividualMap extends Map {
         super(mass);
     }
 
+    public ArrayList<Vector2> unexploredPlaces;
+
     public IndividualMap(MASS mass, float width, float height, Agent agent) {
         super(mass, width, height);
         this.agent = agent;
+        unexploredPlaces = new ArrayList<Vector2>();
+        for (int i = 1; i < 20; i++) {
+            for (int j = 1; j < 20; j++) {
+                unexploredPlaces.add(new Vector2(i*10,j*10));
+            }
+        }
     }
 
     public void addGuard(Guard guard) { guards.add(guard); }
 
     public void addIntruder(Intruder intruder) { intruders.add(intruder); }
 
-    public void addBuilding(Building building) {
-        buildings.add(building);
-        updatePath();
-    }
-
-    public void addSentryTower(SentryTower sentryTower) {
-        sentryTowers.add(sentryTower);
-        updatePath();
-    }
-
-    public void addHidingArea(HidingArea hidingArea) {
-        hidingAreas.add(hidingArea);
-        updatePath();
-    }
-
-    public void addTargetArea(TargetArea targetArea) {
-        targetAreas.add(targetArea);
-        updatePath();
-    }
-
-    private void updatePath(){
-        Vector2 destination = agent.getDestination();
-        while (!agent.getRoute().isEmpty()) {
-
-            destination = agent.getRoute().poll();
-            System.out.println(agent.getRoute().size());
+    public void add(BoxObject boxObject) {
+        if (boxObject instanceof Building) {
+            buildings.add((Building) boxObject);
+        } else if (boxObject instanceof SentryTower) {
+            sentryTowers.add((SentryTower) boxObject);
+        } else if (boxObject instanceof HidingArea) {
+            hidingAreas.add((HidingArea) boxObject);
+        } else if (boxObject instanceof TargetArea) {
+            targetAreas.add((TargetArea) boxObject);
         }
-        agent.goTo(destination);
+
+        //update the unexplored places, remove all vector2 inside the building
+        ArrayList<Vector2> temp = new ArrayList<Vector2>();
+        for (Vector2 place : unexploredPlaces) {
+            if (boxObject.getRectangle().contains(place)) {
+                temp.add(place);
+            }
+        }
+        if (!temp.isEmpty()) {
+            unexploredPlaces.removeAll(temp);
+        }
+
+        //reset the current state
+        if (agent instanceof Guard) {
+            ((Guard) agent).setCurrentState(Guard.State.NONE);
+            ((Guard) agent).setPreviousState(Guard.State.NONE);
+        }
+
     }
 
     public Agent getAgent() { return agent; }
+    public ArrayList<Vector2> getUnexploredPlaces() { return unexploredPlaces; }
 
 }

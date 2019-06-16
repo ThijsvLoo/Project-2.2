@@ -57,7 +57,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected PointLight pointLight;
     protected ConeLight coneLight;
 
-    protected ArrayList<WorldObject> objectsInSight;
+    protected ArrayList<BoxObject> boxObjectsInSight;
+    protected ArrayList<Agent> enemyInSight;
 
     protected VisualField agentDetection;
     protected VisualField buildingDetection;
@@ -82,7 +83,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         super(mass);
         individualMap = new IndividualMap(mass, Map.DEFAULT_WIDTH, Map.DEFAULT_HEIGHT, this);
         maxTurnSpeed = DEFAULT_MAX_TURN_SPEED;
-        objectsInSight = new ArrayList<WorldObject>();
+        boxObjectsInSight = new ArrayList<BoxObject>();
+        enemyInSight = new ArrayList<Agent>();
         route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
         velocity = new Vector2();
@@ -128,6 +130,12 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     //Need to recheck this part
     public void followRoute() {
         if (destination != null && atPosition(destination)) {
+            for (Vector2 vector2 : individualMap.getUnexploredPlaces()) { //has to handle this way because not sure if TSP returns the same object
+                if (vector2.x == destination.x && vector2.y == destination.y) {
+                    individualMap.getUnexploredPlaces().remove(vector2);
+                    break;
+                }
+            }
             if (!route.isEmpty()) {
                 destination = route.poll();
             } else {
@@ -239,7 +247,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public float getTurnSpeed() { return turnSpeed; }
     public float getVisualRange() { return visualRange; }
     public float getViewAngle() { return viewAngle; }
-    public ArrayList<WorldObject> getObjectsInSight() { return objectsInSight; }
+    public ArrayList<BoxObject> getBoxObjectsInSight() { return boxObjectsInSight; }
+    public ArrayList<Agent> getEnemyInSight() { return enemyInSight; }
     public Vector2 getDestination() { return destination; }
     public LinkedBlockingQueue<Vector2> getRoute() { return route; }
     public Vector2 getDirection() { return direction; }
@@ -279,7 +288,6 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     }
     public void setVisualRange(float visualRange) { this.visualRange = visualRange; }
     public void setViewAngle(float viewAngle) { this.viewAngle = viewAngle; }
-    public void setObjectsInSight(ArrayList<WorldObject> objectsInSight) { this.objectsInSight = objectsInSight; }
     public void setDestination(Vector2 destination) { this.destination = destination; }
     public void setRoute(LinkedBlockingQueue<Vector2> route) { this.route = route; }
     public void setDirection(Vector2 direction) { this.direction = direction; }
