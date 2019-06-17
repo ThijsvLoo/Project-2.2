@@ -1,6 +1,7 @@
 package com.mygdx.mass.MapToGraph;
 
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.Building;
@@ -21,19 +22,31 @@ public class TSP {
 
     }
 
-    public ArrayList<Vector2> computePath(Agent agent, ArrayList<Vector2> toVisit){
-        Vector2 start = agent.getBody().getPosition();
+    public ArrayList<Vector2> computePath(Agent agent, ArrayList<Vector2> list){
+        ArrayList<Vertex> toVisit = new ArrayList<Vertex>();
+        for(Vector2 vector: list){
+            toVisit.add(new Vertex(vector.x,vector.y));
+        }
+        Vertex start = new Vertex(agent.getBody().getPosition().x, agent.getBody().getPosition().y);
         ArrayList<Vector2> path = new ArrayList<Vector2>();
         while(toVisit.size()>0){
-            Vector2 nextVector = getClosest(start, toVisit);
-            while (intersected(agent, start, nextVector)){
-                toVisit.remove(nextVector);
-                nextVector = getClosest(start, toVisit);
+            Vertex nextVertex = getClosest(start, toVisit);
+            while (containsPoint(agent, nextVertex)){
+                toVisit.remove(nextVertex);
+                nextVertex = getClosest(start, toVisit);
             }
-            start = nextVector;
-            path.add(nextVector);
-            toVisit.remove(nextVector);
 
+            if(nextVertex != null) { // added this to solve the nullpointerexception error
+                Graph graph = new Graph(new ArrayList<Vertex>(), new ArrayList<Edge>(), agent);
+                graph.getPathVertices(start, nextVertex);
+
+                Dijkstra dijkstra = new Dijkstra(graph);
+
+                ArrayList<Vector2> bestPath = dijkstra.computePath();
+                start = nextVertex;
+                path.addAll(bestPath);
+                toVisit.remove(nextVertex);
+            }
         }
 
         return path;
@@ -41,38 +54,59 @@ public class TSP {
     }
 
 
-    public Vector2 getClosest(Vector2 start, ArrayList<Vector2> unvisited){
+    public Vertex getClosest(Vertex start, ArrayList<Vertex> unvisited){
         double closestDist=-1;
-        Vector2 closestVector=null;
-        for(Vector2 v: unvisited){
-            double dist = Point2D.distance(start.x, start.y, v.x, v.y);
+        Vertex closestVertex=null;
+        for(Vertex v: unvisited){
+            Edge edge = new Edge(start, v);
+            double dist = edge.getWeight();
 
             if(closestDist==-1) {
                 closestDist= dist;
-                closestVector = v;
+                closestVertex = v;
             }
             else if(dist<closestDist) {
                 closestDist = dist;
-                closestVector = v;
+                closestVertex= v;
             }
 
-
         }
-        return closestVector;
+        return closestVertex;
     }
-    public boolean intersected(Agent agent, Vector2 start, Vector2 end){
+    public boolean intersected(Agent agent, Vertex start, Vertex end){
         for (Building building : agent.getIndividualMap().getBuildings()) {
-            if (Intersector.intersectSegmentRectangle(start, end, building.getRectangle())) {
+            if (Intersector.intersectSegmentRectangle(start.getCoordinates(), end.getCoordinates(), building.getRectangle())) {
                 return true;
             }
         }
         for (SentryTower sentryTower : agent.getIndividualMap().getSentryTowers()) {
-            if (Intersector.intersectSegmentRectangle(start, end, sentryTower.getRectangle())) {
+            if (Intersector.intersectSegmentRectangle(start.getCoordinates(), end.getCoordinates(), sentryTower.getRectangle())) {
                 return true;
             }
         }
         for (Wall wall : agent.getIndividualMap().getWalls()) {
-            if (Intersector.intersectSegmentRectangle(start, end, wall.getRectangle())) {
+            if (Intersector.intersectSegmentRectangle(start.getCoordinates(), end.getCoordinates(), wall.getRectangle())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean containsPoint(Agent agent, Vertex vertex){
+        for (Building building : agent.getIndividualMap().getBuildings()) {
+            if (building.getRectangle().contains(vertex.getCoordinates())) {
+
+                return true;
+            }
+        }
+        for (SentryTower sentryTower : agent.getIndividualMap().getSentryTowers()) {
+            if (sentryTower.getRectangle().contains(vertex.getCoordinates())) {
+
+                return true;
+            }
+        }
+        for (Wall wall : agent.getIndividualMap().getWalls()) {
+            if (wall.getRectangle().contains(vertex.getCoordinates())) {
+
                 return true;
             }
         }
