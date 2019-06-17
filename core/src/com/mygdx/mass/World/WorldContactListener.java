@@ -54,14 +54,27 @@ public class WorldContactListener implements ContactListener {
                 break;
             }
 
+            case VISUAL_FIELD_BIT | DOOR_BIT :
+            case VISUAL_FIELD_BIT | WINDOW_BIT : {
+                VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.AGENT) {
+                    BoxObject boxObject = fixtureA.getUserData() instanceof BoxObject ? (BoxObject) fixtureA.getUserData() : (BoxObject) fixtureB.getUserData();
+                    Agent agent = visualField.getAgent();
+                    agent.getBoxObjectsInSight().add(boxObject);
+                }
+                break;
+            }
+
             // When an agent sees an enemy, register it to the enemy in sight arraylist
             case VISUAL_FIELD_BIT | GUARD_BIT :
             case VISUAL_FIELD_BIT | INTRUDER_BIT : {
                 VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
-                Agent agent1 = visualField.getAgent();
-                Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
-                if (agent1.getAgentType() != agent2.getAgentType()) {
-                    //agent1.getEnemyInSight().add(agent2);
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.AGENT) {
+                    Agent agent1 = visualField.getAgent();
+                    Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
+                    if (agent1.getAgentType() != agent2.getAgentType()) {
+                        agent1.getEnemyInSight().add(agent2);
+                    }
                 }
                 break;
             }
@@ -178,27 +191,49 @@ public class WorldContactListener implements ContactListener {
                 break;
             }
 
+            case VISUAL_FIELD_BIT | DOOR_BIT :
+            case VISUAL_FIELD_BIT | WINDOW_BIT : {
+                VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.AGENT) {
+                    BoxObject boxObject = fixtureA.getUserData() instanceof BoxObject ? (BoxObject) fixtureA.getUserData() : (BoxObject) fixtureB.getUserData();
+                    Agent agent = visualField.getAgent();
+                    agent.getBoxObjectsInSight().remove(boxObject);
+                }
+                break;
+            }
+
             // When an enemy get out of sight of another agent, remove it from the enemy in sight arraylist
             case VISUAL_FIELD_BIT | GUARD_BIT :
             case VISUAL_FIELD_BIT | INTRUDER_BIT : {
                 VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
-                Agent agent1 = visualField.getAgent();
-                Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
-                if (agent1.getAgentType() != agent2.getAgentType()) {
-                    if (agent2 instanceof Guard) {
-                        agent1.getEnemyInSight().remove(agent2);
-                    }
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.AGENT) {
+                    Agent agent1 = visualField.getAgent();
+                    Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
+                    if (agent1.getAgentType() != agent2.getAgentType()) {
+                        if (agent2 instanceof Guard) {
+                            agent1.getEnemyInSight().remove(agent2);
+                        }
 
+                    }
                 }
                 break;
             }
 
             //remove a boxObject from the box object in sight list when its out of vision
-            case VISUAL_FIELD_BIT | BUILDING_BIT :
+            case VISUAL_FIELD_BIT | BUILDING_BIT : {
+                VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
+                Building building = fixtureA.getUserData() instanceof Building ? (Building) fixtureA.getUserData() : (Building) fixtureB.getUserData();
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.BUILDING) {
+                    visualField.getAgent().getBoxObjectsInSight().remove(building);
+                }
+                break;
+            }
             case VISUAL_FIELD_BIT | SENTRY_TOWER_BIT : {
                 VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
-                BoxObject boxObject = fixtureA.getUserData() instanceof BoxObject ? (BoxObject) fixtureA.getUserData() : (BoxObject) fixtureB.getUserData();
-                visualField.getAgent().getBoxObjectsInSight().remove(boxObject);
+                SentryTower sentryTower = fixtureA.getUserData() instanceof SentryTower ? (SentryTower) fixtureA.getUserData() : (SentryTower) fixtureB.getUserData();
+                if (visualField.getVisualFieldType() == VisualField.VisualFieldType.TOWER) {
+                    visualField.getAgent().getBoxObjectsInSight().remove(sentryTower);
+                }
                 break;
             }
         }
@@ -222,7 +257,14 @@ public class WorldContactListener implements ContactListener {
                 Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
                 if (!agent1.getBoxObjectsInSight().isEmpty()) {
                     for (BoxObject boxObject : agent1.getBoxObjectsInSight()) {
-                        if (boxObject instanceof Building || boxObject instanceof SentryTower) {
+                        if (boxObject instanceof Building) {
+                            if (Intersector.intersectSegmentRectangle(agent1.getBody().getPosition(), agent2.getBody().getPosition(), boxObject.getRectangle())) {
+//                                for (BoxObject boxObject1 : agent1.getBoxObjectsInSight()) {
+//                                    if (boxObject instanceof Door)
+//                                }
+                                contact.setEnabled(false);
+                            }
+                        } else if (boxObject instanceof SentryTower) {
                             if (Intersector.intersectSegmentRectangle(agent1.getBody().getPosition(), agent2.getBody().getPosition(), boxObject.getRectangle())) {
                                 contact.setEnabled(false);
                             }

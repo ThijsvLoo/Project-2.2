@@ -62,6 +62,7 @@ public class TSP {
     }
     public boolean intersected(Agent agent, Vector2 start, Vector2 end){
         for (Building building : agent.getIndividualMap().getBuildings()) {
+            //occassionally error because start or end is null, need to fix this
             if (Intersector.intersectSegmentRectangle(start, end, building.getRectangle())) {
                 return true;
             }

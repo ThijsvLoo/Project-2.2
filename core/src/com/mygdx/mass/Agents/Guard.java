@@ -65,10 +65,10 @@ public class Guard extends Agent {
             currentState = State.CHASE;
         } else if (!predictionModel.getCapturePoints().isEmpty()){
             currentState = State.SEARCH;
-        } else if (individualMap.getUnexploredPlaces().isEmpty()) {
-            currentState = State.PATROL;
+        } else if (!individualMap.getUnexploredPlaces().isEmpty()) {
+            currentState = State.EXPLORE;
         } else {
-            currentState = State.NONE;
+            currentState = State.PATROL;
         }
 
         if (!super.blind) {
@@ -121,9 +121,17 @@ public class Guard extends Agent {
                 break;
             }
             case SEARCH: {
+                if (previousState != State.SEARCH) {
+                    search();
+                    previousState = State.SEARCH;
+                }
                 break;
             }
             case PATROL: {
+                if (previousState != State.PATROL) {
+                    patrol();
+                    previousState = State.PATROL;
+                }
                 break;
             }
             case EXPLORE: {
@@ -138,6 +146,7 @@ public class Guard extends Agent {
 
     //adapt the walk route to explore unexplored locations
     public void explore() {
+        destination = null;
         route.clear();
         TSP tsp = new TSP();
         ArrayList<Vector2> toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces()); //need to adapt this to work with multiple agent
@@ -147,9 +156,24 @@ public class Guard extends Agent {
         }
     }
 
+    public void patrol() {
+        destination = null;
+        route.clear();
+        goTo(new Vector2((float) Math.random()*(mass.getMap().width-10) + 5, (float) Math.random()*(mass.getMap().height-10) + 5));
+    }
+
+    public void search() {
+
+    }
+
     public PredictionModel getPredictionModel() { return predictionModel; }
 
     public void setCurrentState(State state) { this.currentState = state; }
     public void setPreviousState(State state) { this.previousState = state; }
+
+    public void resetState() {
+        currentState = State.NONE;
+        previousState = State.NONE;
+    }
 
 }
