@@ -225,21 +225,11 @@ public class MapSimulatorScreen implements Screen {
         drawRays();
         drawCapturePoints(); //for testing
 
-        //for testing, draw the unexplored places
-
+        //draw an agent's unexplored location on its local map
         if (!map.getAgents().isEmpty()) {
-            if (map.getAgents().get(0).getIndividualMap().getUnexploredPlaces().isEmpty()) {
-                System.out.println("empty");
-            }
-            Gdx.gl.glLineWidth(4);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
-            for (Vector2 vector2 : map.getAgents().get(0).getIndividualMap().getUnexploredPlaces()) {
-                //shapeRenderer.circle(vector2.x, vector2.y, 1);
-            }
-            shapeRenderer.end();
-
+            drawUnexploredPoints(map.getAgents().get(0));
         }
+
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
 
@@ -247,6 +237,16 @@ public class MapSimulatorScreen implements Screen {
         info.stage.draw();
 
         update(delta);
+    }
+
+    public void drawUnexploredPoints(Agent agent) {
+        Gdx.gl.glLineWidth(4);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+        for (Vector2 vector2 : agent.getIndividualMap().getUnexploredPlaces()) {
+            shapeRenderer.circle(vector2.x, vector2.y, 1);
+        }
+        shapeRenderer.end();
     }
 
     private void drawSprites() {
@@ -259,8 +259,34 @@ public class MapSimulatorScreen implements Screen {
     private void drawAgentPaths() {
         Gdx.gl.glLineWidth(1);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.PURPLE);
         for (Agent agent : map.getAgents()) {
+            if (agent instanceof Guard) {
+                switch (((Guard) agent).currentState) {
+                    case EXPLORE: {
+                        shapeRenderer.setColor(Color.PURPLE);
+                        break;
+                    }
+                    case PATROL: {
+                        shapeRenderer.setColor(Color.GREEN);
+                        break;
+                    }
+                    case SEARCH: {
+                        shapeRenderer.setColor(Color.YELLOW);
+                        break;
+                    }
+                    case CHASE: {
+                        shapeRenderer.setColor(Color.RED);
+                        break;
+                    }
+                }
+            } else if (agent instanceof Intruder) {
+                switch (((Intruder) agent).currentState) {
+                    case SEARCH: {
+                        shapeRenderer.setColor(Color.PURPLE);
+                        break;
+                    }
+                }
+            }
             Vector2 start = agent.getBody().getPosition();
             Vector2 end = agent.getDestination();
             if (end != null) {
