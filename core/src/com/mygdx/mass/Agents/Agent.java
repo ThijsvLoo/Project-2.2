@@ -12,6 +12,7 @@ import com.mygdx.mass.MapToGraph.Dijkstra;
 import com.mygdx.mass.MapToGraph.Edge;
 import com.mygdx.mass.MapToGraph.Graph;
 import com.mygdx.mass.MapToGraph.Vertex;
+import com.mygdx.mass.Scenes.MapSimulatorInfo;
 import com.mygdx.mass.Sensors.NoiseField;
 import com.mygdx.mass.Sensors.RayCastField;
 import com.mygdx.mass.Sensors.VisualField;
@@ -20,6 +21,8 @@ import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.mygdx.mass.Agents.Intruder.SPRINT_MAX_TURN_SPEED;
@@ -39,7 +42,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     private float blindDuration;
     private float immobilityDuration;
 
-    private boolean stealth;
+    protected boolean stealth = false, deaf = false, blind = false;
 
     public Map map = new Map(mass);
     public IndividualMap individualMap;
@@ -57,6 +60,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected PointLight pointLight;
     protected ConeLight coneLight;
 
+    protected ArrayList<WorldObject> objectsInSight;
     protected ArrayList<BoxObject> boxObjectsInSight;
     protected ArrayList<Agent> enemyInSight;
 
@@ -64,7 +68,10 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected VisualField buildingDetection;
     protected VisualField sentryTowerDetection;
 
-    protected RayCastField rayCastField;
+    protected RayCastField rayCastFieldBuildings, rayCastFieldTowers, rayCastFieldAgents;
+    protected ArrayList<RayCastField> allRayCastFields;
+    protected short objectsToCheck = 0, objectsTransparent = 0, objectsWanted = 0;
+
 
     protected NoiseField noiseField;
 
@@ -83,11 +90,14 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         super(mass);
         individualMap = new IndividualMap(mass, Map.DEFAULT_WIDTH, Map.DEFAULT_HEIGHT, this);
         maxTurnSpeed = DEFAULT_MAX_TURN_SPEED;
+        objectsInSight = new ArrayList<WorldObject>();
         boxObjectsInSight = new ArrayList<BoxObject>();
         enemyInSight = new ArrayList<Agent>();
         route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
         velocity = new Vector2();
+        allRayCastFields = new ArrayList<RayCastField>();
+
 //        collisions = new ArrayList<Object>();
         count++;
     }
@@ -108,9 +118,9 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
 
-        agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
-        agentDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
-        agentDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
+        //agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
+        //agentDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
+        //agentDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
 
 //        if(CONE_ENABLED == true) {agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);}
 
@@ -118,9 +128,13 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     }
 
     public void update(float delta) {
+
 //        algorithm.act();
         followRoute();
-//        doRayCasting();
+
+        /*rayCastFieldTowers = new RayCastField(mass);
+        rayCastFieldBuildings = new RayCastField(mass);
+        rayCastFieldAgents = new RayCastField(mass);*/
     }
 
     public void addWaypoint(Vector2 waypoint) {
@@ -209,18 +223,61 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         return body.getPosition().dst(vector2) < 0.25;
     }
 
-    private void doRayCasting(){
-        rayCastField = new RayCastField(mass);
+    protected void doRayCasting(RayCastField rayCastField, float startRange, float range, float angle, String typeOfField){
         rayCastField.setLocationAgent(this.getBody().getPosition());
-        rayCastField.setRadiusAgent(SIZE);
-        rayCastField.setRange(getVisualRange());
-        rayCastField.setViewingAngle(getViewAngle());
-        rayCastField.setRotation(this.getBody().getAngle()); // in radian
+        rayCastField.setStartRange(startRange);
+        rayCastField.setRange(range);
+        rayCastField.setViewingAngle(angle);
+        rayCastField.setFieldScanTypeMask(objectsToCheck);
+        rayCastField.setFieldReturnTypeMask(objectsWanted);
+        rayCastField.setFieldTransparentTypeMask(objectsTransparent);
+        rayCastField.setTypeOfField(typeOfField);
+        rayCastField.setRotationRad(this.getBody().getAngle()); // in radian
 
         rayCastField.createRays();
+    }
+
+    protected void processResultsFromRayCastFields () {
+        allRayCastFields.clear();
+        if (rayCastFieldTowers != null) allRayCastFields.add(rayCastFieldTowers);
+        if (rayCastFieldBuildings != null) allRayCastFields.add(rayCastFieldBuildings);
+        if (rayCastFieldAgents != null) allRayCastFields.add(rayCastFieldAgents);
 
 
-        //return rayCastField;
+        // HashSet is used because it will never add a duplicate object reference
+        HashSet<Object> tempSet = new HashSet<Object>();
+        for (RayCastField r : allRayCastFields) {
+            tempSet.addAll(r.getCollisionObjects());
+        }
+
+        objectsInSight.clear();
+        boxObjectsInSight.clear();
+        enemyInSight.clear();
+
+        for (Object o : tempSet) {
+            objectsInSight.add((WorldObject)o);
+            // System.out.println("- "+o.getClass() + " at "+o);
+        }
+
+        for (WorldObject o : objectsInSight) {
+            if (o instanceof Building) {
+                boxObjectsInSight.add((Building) o);
+            }
+            else if (o instanceof  SentryTower) {
+                boxObjectsInSight.add((SentryTower) o);
+            }
+            else if (this instanceof Guard && o instanceof Intruder) {
+                enemyInSight.add((Intruder) o);
+            }
+            else if (this instanceof Intruder && o instanceof Guard) {
+                enemyInSight.add((Guard) o);
+            }
+            //System.out.println(this + " can see "+o.getClass() + " at "+o);
+        }
+
+        //System.out.println(objectsInSight.size()+ " -> total objects of which: "+boxObjectsInSight.size()+" are box objects and "+enemyInSight.size()+" are enemies");
+
+
     }
 
     //get the unit vector with length 1
@@ -254,7 +311,9 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public Vector2 getDirection() { return direction; }
     public Vector2 getVelocity() { return velocity; }
     public IndividualMap getIndividualMap() { return individualMap; }
-    public RayCastField getRayCastField() { return rayCastField; }
+    public ArrayList<RayCastField> getAllRayCastFields() {
+        return allRayCastFields;
+    }
 //    public ArrayList<Object> getCollisions() { return collisions; }
 
     public void setMoveSpeed(float moveSpeed) {

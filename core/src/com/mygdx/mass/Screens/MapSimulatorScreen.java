@@ -110,12 +110,14 @@ public class MapSimulatorScreen implements Screen {
         accumulator += timePassed;
         while (accumulator >= MASS.FIXED_TIME_STEP) {
             for (int i = 0; i < worldSpeedFactor; i++) {
+                MapSimulatorInfo.resetRayCounters();
                 for (Guard guard : map.getGuards()) {
                     guard.update(MASS.FIXED_TIME_STEP);
                 }
                 for (Intruder intruder : map.getIntruders()) {
                     intruder.update(MASS.FIXED_TIME_STEP);
                 }
+
                 world.step(MASS.FIXED_TIME_STEP, 6, 2);
                 simulationStep++;
                 simulationTime = simulationTime + MASS.FIXED_TIME_STEP;
@@ -224,17 +226,20 @@ public class MapSimulatorScreen implements Screen {
         drawCapturePoints(); //for testing
 
         //for testing, draw the unexplored places
-        if (map.getAgents().get(0).getIndividualMap().getUnexploredPlaces().isEmpty()) {
-            System.out.println("empty");
-        }
+
+        if (!map.getAgents().isEmpty()) {
+            if (map.getAgents().get(0).getIndividualMap().getUnexploredPlaces().isEmpty()) {
+                System.out.println("empty");
+            }
             Gdx.gl.glLineWidth(4);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
             for (Vector2 vector2 : map.getAgents().get(0).getIndividualMap().getUnexploredPlaces()) {
-                shapeRenderer.circle(vector2.x, vector2.y, 1);
+                //shapeRenderer.circle(vector2.x, vector2.y, 1);
             }
             shapeRenderer.end();
 
+        }
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
 
@@ -343,19 +348,38 @@ public class MapSimulatorScreen implements Screen {
 
     private void drawRays() {
         Gdx.gl.glLineWidth(0.05f);
-        mass.shapeRenderer.setColor(1.0f,1.0f,1.0f,1.0f);
-        mass.shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
         for (Agent agent:map.getAgents()) {
-            RayCastField rayCastField = agent.getRayCastField();
-            if (rayCastField != null) {
-                Vector2[] beginPointRays = rayCastField.beginPointRay();
-                Vector2[] endPointRays = rayCastField.endPointRay();
-                for (int i = 0; i < beginPointRays.length; i++) {
-                    mass.shapeRenderer.line(beginPointRays[i], endPointRays[i]);
+            if(agent.getAllRayCastFields() != null) {
+                for (RayCastField rayCastField : agent.getAllRayCastFields()) {
+                    if (rayCastField != null) {
+                        shapeRenderer.end();
+                        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+
+                        if(rayCastField.getTypeOfField().equalsIgnoreCase("TOWER")) {
+                            shapeRenderer.setColor(1.00f, 0.81f, 0.00f, 1.0f);
+                        }
+                        else if (rayCastField.getTypeOfField().equalsIgnoreCase("BUILDING")) {
+                            shapeRenderer.setColor(1.0f,1.0f,1.0f,1.0f);
+                        }
+                        else if (rayCastField.getTypeOfField().equalsIgnoreCase("AGENT") && agent instanceof Guard) {
+                            shapeRenderer.setColor(0.0f, 0.0f, 1.0f, 1.0f);
+                        }
+                        else if (rayCastField.getTypeOfField().equalsIgnoreCase("AGENT") && agent instanceof Intruder) {
+                            shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+                        }
+
+                        Vector2[] beginPointRays = rayCastField.beginPointRay();
+                        Vector2[] endPointRays = rayCastField.endPointRay();
+                        for (int i = 0; i < beginPointRays.length; i++) {
+                            shapeRenderer.line(beginPointRays[i], endPointRays[i]);
+                        }
+                        shapeRenderer.end();
+                    }
                 }
             }
         }
-        mass.shapeRenderer.end();
+        shapeRenderer.end();
 
     }
 

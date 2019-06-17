@@ -187,7 +187,7 @@ public class MapSimulatorHUD implements Disposable {
                 }
                 if(!paused && mapSimulatorScreen.getWorldSpeedFactor() == 0){
                     if(prevSpeed == 0){
-                        prevSpeed = 12;
+                        prevSpeed = 1;
                     }
                     setTable();
                 }

@@ -1,14 +1,15 @@
 package com.mygdx.mass.Agents;
 
+
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
-import com.mygdx.mass.Algorithms.CapturePoint;
-import com.mygdx.mass.Algorithms.Explore;
 import com.mygdx.mass.Algorithms.PredictionModel;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.MapToGraph.TSP;
 
 import java.util.ArrayList;
+import com.mygdx.mass.Sensors.RayCastField;
+
 
 public class Guard extends Agent {
 
@@ -67,14 +68,56 @@ public class Guard extends Agent {
         } else if (individualMap.getUnexploredPlaces().isEmpty()) {
             currentState = State.PATROL;
         } else {
-            currentState = State.EXPLORE;
+            currentState = State.NONE;
         }
+
+        if (!super.blind) {
+            if (!onTower) {
+                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+                objectsTransparent = (short) (WINDOW_BIT);
+                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+                rayCastFieldBuildings = new RayCastField(mass);
+                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
+
+                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
+                objectsTransparent = (short) (SENTRY_TOWER_BIT);
+                objectsWanted = (short) (SENTRY_TOWER_BIT);
+                rayCastFieldTowers = new RayCastField(mass);
+                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
+
+                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
+                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
+                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
+                rayCastFieldAgents = new RayCastField(mass);
+                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
+            }
+            else {
+                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+                rayCastFieldAgents = new RayCastField(mass);
+                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
+            }
+        }
+
+        processResultsFromRayCastFields();
+
+
+//        if (capture != null) {
+//            capture.increaseCounter(delta);
+//        }
+//        for (CapturePoint capturePoint : capture.getCapturePoints()) {
+//            if (body.getPosition().dst(capturePoint.getPosition()) < 5.0f) {
+//                capture.removePoint(capturePoint);
+//                break;
+//            }
+//        }
     }
 
     private void updateAction() {
         switch (currentState) {
             case CHASE: {
-                destination = individualMap.getIntruders().get(0).getBody().getPosition();
+                //destination = individualMap.getIntruders().get(0).getBody().getPosition();
                 break;
             }
             case SEARCH: {

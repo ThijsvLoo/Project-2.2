@@ -21,15 +21,15 @@ public class MapSimulatorInfo implements Disposable {
     private Viewport viewport;
 
     private int fpsCount;
+    private static long rayCount = 0, rayCollisionCount = 0;
 
-    private Label fpsNameLabel;
-    private Label fpsLabel;
-    private Label worldSpeedFactorNameLabel;
-    private Label worldSpeedFactorLabel;
-    private Label simstepNameLabel;
-    private Label simstepLabel;
-    private Label simTimeNameLabel;
-    private Label simTimeLabel;
+    private Label fpsNameLabel, fpsLabel;
+    private Label worldSpeedFactorNameLabel, worldSpeedFactorLabel;
+    private Label simstepNameLabel, simstepLabel;
+    private Label simTimeNameLabel, simTimeLabel;
+    private Label rayCountNameLabel, rayCountLabel;
+    private Label rayCollisionCountNameLabel, rayCollisionCountLabel;
+
 
     private Label currentLabel;
     private Label builderLabel;
@@ -60,6 +60,11 @@ public class MapSimulatorInfo implements Disposable {
         simstepLabel = new Label(String.format("%09d", 0), labelstyle);
         simTimeNameLabel = new Label("Simulation time:", labelstyle);
         simTimeLabel = new Label(MASS.largeDoubleFormat.format(0), labelstyle);
+        rayCountNameLabel = new Label("# Rays:", labelstyle);
+        rayCountLabel = new Label(String.format("%09d", 0), labelstyle);
+        rayCollisionCountNameLabel = new Label("# Ray collisions:", labelstyle);
+        rayCollisionCountLabel = new Label(String.format("%09d", 0), labelstyle);
+
 
         currentLabel = new Label("Current:", labelstyle);
         builderLabel = new Label(currentBuildTool, labelstyle);
@@ -68,6 +73,8 @@ public class MapSimulatorInfo implements Disposable {
         table.add(worldSpeedFactorNameLabel).padTop(10).expandX();
         table.add(simstepNameLabel).padTop(10).expandX();
         table.add(simTimeNameLabel).padTop(10).expandX();
+        table.add(rayCountNameLabel).padTop(10).expandX();
+        table.add(rayCollisionCountNameLabel).padTop(10).expandX();
 
         table.row();
 
@@ -75,6 +82,8 @@ public class MapSimulatorInfo implements Disposable {
         table.add(worldSpeedFactorLabel).padTop(5).expandX();
         table.add(simstepLabel).padTop(5).expandX();
         table.add(simTimeLabel).padTop(5).expandX();
+        table.add(rayCountLabel).padTop(5).expandX();
+        table.add(rayCollisionCountLabel).padTop(5).expandX();
 
         stage.addActor(table);
     }
@@ -85,6 +94,8 @@ public class MapSimulatorInfo implements Disposable {
         simstepLabel.setText(MASS.largeIntegerFormat.format(mapSimulatorScreen.getSimulationStep()));
         simTimeLabel.setText(MASS.largeDoubleFormat.format(mapSimulatorScreen.getSimulationTime()) + " s");
         worldSpeedFactorLabel.setText(String.format("%03d",mapSimulatorScreen.getWorldSpeedFactor()) + " X");
+        rayCountLabel.setText(MASS.largeIntegerFormat.format(rayCount));
+        rayCollisionCountLabel.setText(MASS.largeIntegerFormat.format(rayCollisionCount));
     }
 
     @Override
@@ -94,6 +105,19 @@ public class MapSimulatorInfo implements Disposable {
 
     public void updateBuildTool(String tool){
         builderLabel.setText(tool);
+    }
+
+    public static void addRayCount() {
+        rayCount++;
+    }
+
+    public static void addRayCollisionCount() {
+        rayCollisionCount++;
+    }
+
+    public static void resetRayCounters() {
+        rayCount = 0;
+        rayCollisionCount = 0;
     }
 
 }
