@@ -4,11 +4,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import com.mygdx.mass.Agents.Agent;
+import com.mygdx.mass.Scenes.MapSimulatorInfo;
+import com.mygdx.mass.Screens.MapSimulatorScreen;
 import com.mygdx.mass.World.WorldObject;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.mass.Data.MASS;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class RayCastField { // each agent has a RayCastField
 
@@ -17,16 +21,22 @@ public class RayCastField { // each agent has a RayCastField
 
     private ArrayList<RayCast> rays = new ArrayList<RayCast>();
 
-    public static final int MAX_RAYS = 50;
+    public static final int MAX_RAYS = 10000;
 
     private int rayCount;
-    private float radiusAgent, viewingAngle, range;
-    private double rotation; // radian
+    private float viewingAngle, startRange, range;
+    private double rotationRad, viewingAngleRad; // radian
     private Vector2 locationAgent;
+    private short fieldScanTypeMask; // this defines the type of field to scan for(building, agent, etc.)
+    private short fieldReturnTypeMask; // what objects should we return (e.g. only towers for tower ray field)
+    private short fieldTransparentTypeMask; // these objects should still be detected but are transparent
+    private HashSet<Object> collisionObjects; // holds list with all objects this ray field sees
+    private String typeOfField;
 
     public RayCastField (MASS mass){
         this.mass = mass;
         this.world = mass.world;
+        collisionObjects = new HashSet<Object>();
 
     }
 
@@ -35,7 +45,8 @@ public class RayCastField { // each agent has a RayCastField
         private ArrayList<RayCollision> rayCollisions;
 
 
-        public RayCast(Vector2 start, Vector2 end) {
+
+        public RayCast(Vector2 start, Vector2 end) { // running one ray
             //System.out.println("closesCollision: "+closestCollision);
             RayCollision closestCollision = null;
             drawRay = new Vector2();
@@ -50,6 +61,9 @@ public class RayCastField { // each agent has a RayCastField
                     // 'fraction' = fraction of line length between 'point' and the collision between 0-1
                     //System.out.println("2Collision on ray at "+fraction*100+"% of the ray with fixture: "+fixture.getFilterData().categoryBits+" from body: "+fixture.getFilterData().maskBits+" @: "+point);
                     //if(fixture != null) {
+                    MapSimulatorInfo.addRayCollisionCount();
+                    short fixtureTypeObjectBit = fixture.getFilterData().categoryBits;
+                    if ((fixtureTypeObjectBit & fieldScanTypeMask) == 0) { return 1; } // skip this collision as it's not in the type mask (e.g. collision is with an agent but we only want buildings)
                     rayCollisions.add(new RayCollision(fraction,fixture,new Vector2(point)));
                     //collision.set(point);
                     return 1;
@@ -57,37 +71,44 @@ public class RayCastField { // each agent has a RayCastField
             };
 
             world.rayCast(callback,startRay,endRay); // callback is called multiple times until it's done. No call is also possible
-            if (rayCollisions.isEmpty()) {
-                drawRay = endRay; // nothing is detected, but we still want to draw
-            }
-            else {
-                // search for the closest collision
-                float fract = 1.1f;
-                int counFor = 0;
-                int saveCount = 0;
-                for(RayCollision rayCollision : rayCollisions) {
-                    if (rayCollision.getFraction() < fract) {
-                        closestCollision = new RayCollision(rayCollision.getFraction(),rayCollision.getFixture(),rayCollision.getPoint());
-                        fract = rayCollision.getFraction();
 
-                        //System.out.println(fract);
-                        saveCount = counFor;
+            boolean isClosestCollisionTransparent = true;
+            while (isClosestCollisionTransparent) { // check if the closest collision is transparent, if so, save it to objectsInSight but remove if from the collision array and run again until either there are no more collisions in the array or we find a collision which is not transparent
+                if (rayCollisions.isEmpty()) {
+                    drawRay = endRay; // nothing is detected, but we still want to draw
+                    isClosestCollisionTransparent = false;
+                } else {
+                    // search for the closest collision
+                    float fract = 1.1f;
+                    for (RayCollision rayCollision : rayCollisions) {
+                        if (rayCollision.getFraction() < fract) {
+                            //closestCollision = new RayCollision(rayCollision.getFraction(), rayCollision.getFixture(), rayCollision.getPoint());
+                            closestCollision = rayCollision;
+                            fract = rayCollision.getFraction();
+                        }
+                    } // found the closest collision
+
+                    if (closestCollision != null) { // do something with the closest collision
+                        if ((closestCollision.fixture.getFilterData().categoryBits & fieldTransparentTypeMask) != 0) { // we found a transparent object
+                            if ((closestCollision.fixture.getFilterData().categoryBits & fieldReturnTypeMask) != 0) {
+                                collisionObjects.add(closestCollision.fixture.getUserData());
+                            }
+                            rayCollisions.remove(closestCollision);
+                        }
+                        else { // closest object is not transparent
+                            drawRay = new Vector2(closestCollision.getPoint());
+                            if ((closestCollision.fixture.getFilterData().categoryBits & fieldReturnTypeMask) != 0)
+                                collisionObjects.add(closestCollision.fixture.getUserData());
+                            isClosestCollisionTransparent = false;
+                        }
+                    } else {
+                        System.out.println("ERROR IN CLOSEST COLLISION!");
+                        drawRay = endRay;
+                        isClosestCollisionTransparent = false;
                     }
-                    counFor++;
-                }
-
-                if (closestCollision != null) { // do something with the closest object
-                    drawRay = new Vector2(closestCollision.getPoint()) ;
-                    //System.out.println("Collision detected with fixture of BitMaskType: "+Integer.toString(closestCollision.getFixture().getFilterData().categoryBits,2));
-                }
-                else {
-                    System.out.println("ERROR IN CLOSEST COLLISION!");
-                    drawRay = endRay;
                 }
             }
             rayCollisions.clear();
-
-
         }
 
 
@@ -130,21 +151,54 @@ public class RayCastField { // each agent has a RayCastField
     }
 
     public void createRays() {
-        // smarty pants distribution of rays, for now a single ray
-        rayCount = MAX_RAYS;
-        double angle = Math.toRadians(getViewingAngle());
-        double anglePartition = angle / (rayCount-1);
-        double rotation = getRotation();
-        double startRotation = rotation - (angle / 2);
-        double currentRotation = startRotation;
+        // calculation maximum allowable angle between rays in order to detect the smallest objects: agents
+        if (viewingAngle > 360.0f) viewingAngle = 360.0f;
+        viewingAngleRad = Math.toRadians(viewingAngle);
+        double maxDegreeRad;
+        double halfAgentSize = 0.5 * Agent.SIZE;
+        maxDegreeRad = 2 * Math.asin(halfAgentSize/range);
+
+        //          .|
+        //         . |
+        //   RAY  .  |
+        //       .   | <- SIZE
+        //      .   _|
+        //     .  ,  |
+        //    .  ,   | W
+        //   .  ,    | A      LENGTH
+        //  .  ,     | L
+        // . ,    90*| L
+        // ._________|
+        //  .5 SIZE
+
+        if(typeOfField.equalsIgnoreCase("GAP SENSOR")) { // logic to calculate maximum ray angle for gap sensor
+            double completeAngleRad = Math.acos(halfAgentSize / range);
+            double length = Math.tan(completeAngleRad) * halfAgentSize;
+            double bottomAngleRad = Math.atan((length - Agent.SIZE) / halfAgentSize);
+            maxDegreeRad = completeAngleRad - bottomAngleRad;
+            //System.out.println(completeAngleRad+"|"+length+"|"+bottomAngleRad+"|"+maxDegreeRad);
+        }
+        rayCount = (int) Math.ceil(viewingAngleRad/maxDegreeRad);
+        if (rayCount > MAX_RAYS) { System.out.println("Capping maximum rays for this field! "+this); rayCount = MAX_RAYS; }
+        double fieldAnglePartitionRad = viewingAngleRad / rayCount;
+        double startRotationRad = rotationRad - (viewingAngleRad / 2);
+        double currentRotationRad = startRotationRad;
+        rayCount++; // add last ray
+        if (viewingAngle == 360.0f) rayCount = rayCount-1;  // remove last ray if it's 360 degrees
 
         for (int i = 0 ; i < rayCount ; i++) {
             rays.add(new RayCast(
-                    getTarget(getRadiusAgent(),0.000001f,currentRotation),
-                    getTarget(getRadiusAgent(),getRange(),currentRotation)
+                    getTarget(startRange,currentRotationRad),
+                    getTarget(range,currentRotationRad)
             ));
-            currentRotation += anglePartition;
+            currentRotationRad += fieldAnglePartitionRad;
+            MapSimulatorInfo.addRayCount();
         }
+
+
+        // after all the rays are calculated, we can do some stuff
+
+
 
         //rays.add(new RayCast(getLocationAgent(),getTarget(getRadiusAgent(),getRange(),getRotation())));
         //rayCount++;
@@ -167,12 +221,11 @@ public class RayCastField { // each agent has a RayCastField
         return endPoints;
     }
 
-    public Vector2 getTarget(float radius, float range, double rotation) {
+    public Vector2 getTarget(float range, double rotation) {
         float x = (float)Math.cos(rotation);
         float y = (float)Math.sin(rotation);
-        float multiplier = radius + range;
-        x = x * multiplier;
-        y = y * multiplier;
+        x = x * range;
+        y = y * range;
 
         Vector2 target = new Vector2(getLocationAgent());
         target.add(x,y);
@@ -181,9 +234,6 @@ public class RayCastField { // each agent has a RayCastField
     }
 
 
-    public void setRadiusAgent(float radiusAgent) {
-        this.radiusAgent = radiusAgent;
-    }
 
     public void setViewingAngle(float viewingAngle) {
         this.viewingAngle = viewingAngle;
@@ -197,31 +247,39 @@ public class RayCastField { // each agent has a RayCastField
         this.locationAgent = locationAgent;
     }
 
-    public void setRotation(double rotation) {
-        this.rotation = rotation;
-    }
-
-    public float getRadiusAgent() {
-        return radiusAgent;
-    }
-
-    public float getViewingAngle() {
-        return viewingAngle;
-    }
-
-    public float getRange() {
-        return range;
-    }
-
-    public double getRotation() {
-        return rotation;
+    public void setRotationRad(double rotation) {
+        this.rotationRad = rotation;
     }
 
     public Vector2 getLocationAgent() {
         return locationAgent;
     }
 
-    public ArrayList<RayCast> getRays() {
-        return rays;
+    public void setFieldScanTypeMask(short fieldScanTypeMask) {
+        this.fieldScanTypeMask = fieldScanTypeMask;
+    }
+
+    public void setFieldReturnTypeMask(short fieldReturnTypeMask) {
+        this.fieldReturnTypeMask = fieldReturnTypeMask;
+    }
+
+    public void setStartRange(float startRange) {
+        this.startRange = startRange;
+    }
+
+    public HashSet<Object> getCollisionObjects() {
+        return collisionObjects;
+    }
+
+    public String getTypeOfField() {
+        return typeOfField;
+    }
+
+    public void setTypeOfField(String typeOfField) {
+        this.typeOfField = typeOfField;
+    }
+
+    public void setFieldTransparentTypeMask(short fieldTransparentTypeMask) {
+        this.fieldTransparentTypeMask = fieldTransparentTypeMask;
     }
 }

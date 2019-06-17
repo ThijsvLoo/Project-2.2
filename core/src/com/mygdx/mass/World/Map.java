@@ -91,6 +91,12 @@ public class Map implements Serializable {
         Door door = new Door(mass, rectangle);
         doors.add(door);
         undo.add(door);
+        for (int i = 0; i < buildings.size(); i++){
+            if (buildings.get(i).getRectangle().overlaps(rectangle)){
+                buildings.get(i).addDoor(door);
+//                System.out.println("Door Added");
+            }
+        }
         return door;
     }
 
@@ -98,6 +104,12 @@ public class Map implements Serializable {
         Window window = new Window(mass, rectangle);
         windows.add(window);
         undo.add(window);
+        for (Building building : buildings){
+            if (building.getRectangle().overlaps(rectangle)){
+                building.addWindow(window);
+//                System.out.println("Window Added");
+            }
+        }
         return window;
     }
 

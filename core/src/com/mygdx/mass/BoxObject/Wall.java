@@ -62,14 +62,14 @@ public class Wall extends BoxObject {
         FixtureDef Ftl = new FixtureDef(), Ftop = new FixtureDef(), Ftr = new FixtureDef(), Fleft = new FixtureDef(),
                 Fright = new FixtureDef(), Fbl = new FixtureDef(), Fbottom = new FixtureDef(), Fbr = new FixtureDef();
 
-        createFixture(Ftl, tl, density, (short) (WALL_BIT | TOP | LEFT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
-        createFixture(Ftop, top, density, (short) (WALL_BIT | TOP), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
-        createFixture(Ftr, tr, density, (short) (WALL_BIT | TOP | RIGHT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
-        createFixture(Fleft, left, density, (short) (WALL_BIT |  LEFT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
-        createFixture(Fright, right, density, (short) (WALL_BIT | RIGHT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
-        createFixture(Fbl, bl, density, (short) (WALL_BIT | BOTTOM | LEFT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
-        createFixture(Fbottom, bottom, density, (short) (WALL_BIT | BOTTOM), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
-        createFixture(Fbr, br, density, (short) (WALL_BIT | BOTTOM | RIGHT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
+        createFixture(Ftl, tl, density, (short) (WALL_BIT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
+        createFixture(Ftop, top, density, (short) (WALL_BIT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
+        createFixture(Ftr, tr, density, (short) (WALL_BIT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
+        createFixture(Fleft, left, density, (short) (WALL_BIT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
+        createFixture(Fright, right, density, (short) (WALL_BIT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
+        createFixture(Fbl, bl, density, (short) (WALL_BIT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
+        createFixture(Fbottom, bottom, density, (short) (WALL_BIT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
+        createFixture(Fbr, br, density, (short) (WALL_BIT), (short) (GUARD_BIT | INTRUDER_BIT | LIGHT_BIT));
 
         /*FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
@@ -81,15 +81,16 @@ public class Wall extends BoxObject {
 
         body = world.createBody(bodyDef);
         //fixture = body.createFixture(fixtureDef);
-        body.createFixture(Ftl);
-        body.createFixture(Ftop);
-        body.createFixture(Ftr);
-        body.createFixture(Fleft);
-        body.createFixture(Fright);
-        body.createFixture(Fbl);
-        body.createFixture(Fbottom);
-        body.createFixture(Fbr);
+        body.createFixture(Ftl).setUserData(this);
+        body.createFixture(Ftop).setUserData(this);
+        body.createFixture(Ftr).setUserData(this);
+        body.createFixture(Fleft).setUserData(this);
+        body.createFixture(Fright).setUserData(this);
+        body.createFixture(Fbl).setUserData(this);
+        body.createFixture(Fbottom).setUserData(this);
+        body.createFixture(Fbr).setUserData(this);
         //fixture.setUserData(this);
+
 
 
         //polygonShape.dispose();

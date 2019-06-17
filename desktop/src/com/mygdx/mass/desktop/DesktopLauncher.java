@@ -1,5 +1,6 @@
 package com.mygdx.mass.desktop;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.mass.Data.MASS;
@@ -48,6 +49,8 @@ public class DesktopLauncher {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
+
+		config.addIcon("Textures/icon.png", Files.FileType.Internal);
 
 		new LwjglApplication(new MASS(), config);
 	}
