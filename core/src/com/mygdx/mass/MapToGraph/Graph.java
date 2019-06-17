@@ -6,7 +6,6 @@ import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.BoxObject.Building;
 import com.mygdx.mass.BoxObject.SentryTower;
 import com.mygdx.mass.BoxObject.Wall;
-import com.mygdx.mass.Data.MASS;
 
 
 import java.util.ArrayList;

@@ -54,4 +54,5 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
     }
     public Vector2[] getVertices() { return vertices; }
 
+
 }
