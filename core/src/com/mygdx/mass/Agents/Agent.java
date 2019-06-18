@@ -166,19 +166,6 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             updateAngle();
             updateVelocity();
         }
-
-        if (destination == null) {
-            resetState();
-        }
-    }
-
-    //might need to recheck wether this works
-    public void resetState() {
-        if (this instanceof Guard) {
-            ((Guard) this).resetState();
-        } else if (this instanceof Intruder){
-            ((Intruder) this).resetState();
-        }
     }
 
     public boolean isMoving() {
@@ -263,9 +250,10 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             tempSet.addAll(r.getCollisionObjects());
         }
 
-        objectsInSight.clear();
-        boxObjectsInSight.clear();
-        enemyInSight.clear();
+        //clearing this will cause the agent not chasing intruder, causing an error...
+//        objectsInSight.clear();
+//        boxObjectsInSight.clear();
+//        enemyInSight.clear();
 
         for (Object o : tempSet) {
             objectsInSight.add((WorldObject)o);

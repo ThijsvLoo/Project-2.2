@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
-import com.mygdx.mass.Algorithms.CapturePoint;
 import com.mygdx.mass.Algorithms.Explore;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
@@ -208,7 +207,7 @@ public class MapSimulatorScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0)); //anti aliasing
 
         Gdx.gl.glLineWidth(1);
-        debugRenderer.render(world, camera.combined);
+//        debugRenderer.render(world, camera.combined);
 
         //draw the sprites
         drawSprites();
@@ -223,7 +222,7 @@ public class MapSimulatorScreen implements Screen {
         drawBoxObjects();
         drawAgents();
         drawRays();
-        drawCapturePoints(); //for testing
+//        drawPredictionPoints(); //for testing
 
         //draw an agent's unexplored location on its local map
         if (!map.getAgents().isEmpty()) {
@@ -280,12 +279,13 @@ public class MapSimulatorScreen implements Screen {
                     }
                 }
             } else if (agent instanceof Intruder) {
-                switch (((Intruder) agent).currentState) {
-                    case SEARCH: {
-                        shapeRenderer.setColor(Color.PURPLE);
-                        break;
-                    }
-                }
+                shapeRenderer.setColor(Color.WHITE);
+//                switch (((Intruder) agent).currentState) {
+//                    case SEARCH: {
+//                        shapeRenderer.setColor(Color.PURPLE);
+//                        break;
+//                    }
+//                }
             }
             Vector2 start = agent.getBody().getPosition();
             Vector2 end = agent.getDestination();
@@ -358,19 +358,19 @@ public class MapSimulatorScreen implements Screen {
         shapeRenderer.end();
     }
 
-    public void drawCapturePoints() {
-        if (map instanceof IndividualMap && ((IndividualMap) map).getAgent() instanceof Guard) {
-            Gdx.gl.glLineWidth(4);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
-            if (((Guard) ((IndividualMap) map).getAgent()).getPredictionModel() != null) {
-                for (CapturePoint capturePoint : ((Guard) ((IndividualMap) map).getAgent()).getPredictionModel().getCapturePoints()) {
-                    shapeRenderer.circle(capturePoint.getPosition().x, capturePoint.getPosition().y, 1);
-                }
-            }
-            shapeRenderer.end();
-        }
-    }
+//    public void drawPredictionPoints() {
+//        if (map instanceof IndividualMap && ((IndividualMap) map).getAgent() instanceof Guard) {
+//            Gdx.gl.glLineWidth(4);
+//            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//            shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+//            if (((Guard) ((IndividualMap) map).getAgent()).getPredictionModel() != null) {
+//                for (PredictionPoint predictionPoint : ((Guard) ((IndividualMap) map).getAgent()).getPredictionModel().getPredictionPoints()) {
+//                    shapeRenderer.circle(predictionPoint.getPosition().x, predictionPoint.getPosition().y, 1);
+//                }
+//            }
+//            shapeRenderer.end();
+//        }
+//    }
 
     private void drawRays() {
         Gdx.gl.glLineWidth(0.05f);
@@ -453,7 +453,7 @@ public class MapSimulatorScreen implements Screen {
                 }
             } else if (keycode == Input.Keys.C) {
                 if (map instanceof IndividualMap && ((IndividualMap) map).getAgent() instanceof Guard) {
-                    ((Guard) ((IndividualMap) map).getAgent()).getPredictionModel().run = true;
+//                    ((Guard) ((IndividualMap) map).getAgent()).getPredictionModel().run = true;
                 }
             }
             return true;

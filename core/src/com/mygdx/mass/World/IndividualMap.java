@@ -32,6 +32,11 @@ public class IndividualMap extends Map {
                 unexploredPlaces.add(new Vector2(i*10,j*10));
             }
         }
+//        for (int i = 1; i < 40; i++) {
+//            for (int j = 1; j < 40; j++) {
+//                unexploredPlaces.add(new Vector2(i*5,j*5));
+//            }
+//        }
     }
 
     public void addGuard(Guard guard) { guards.add(guard); }
@@ -60,12 +65,7 @@ public class IndividualMap extends Map {
             unexploredPlaces.removeAll(temp);
         }
 
-        //reset the current state
-        if (agent instanceof Guard) {
-            ((Guard) agent).setCurrentState(Guard.State.NONE);
-            ((Guard) agent).setPreviousState(Guard.State.NONE);
-        }
-
+        agent.setDestination(null);
     }
 
     public Agent getAgent() { return agent; }

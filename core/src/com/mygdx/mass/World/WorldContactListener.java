@@ -259,10 +259,22 @@ public class WorldContactListener implements ContactListener {
                     for (BoxObject boxObject : agent1.getBoxObjectsInSight()) {
                         if (boxObject instanceof Building) {
                             if (Intersector.intersectSegmentRectangle(agent1.getBody().getPosition(), agent2.getBody().getPosition(), boxObject.getRectangle())) {
-//                                for (BoxObject boxObject1 : agent1.getBoxObjectsInSight()) {
-//                                    if (boxObject instanceof Door)
-//                                }
                                 contact.setEnabled(false);
+                                //this essentially say if an open door or window is within the path of vision, he can see the other agent
+                                //however this might not behave correctly, since it has to first see the door and the target to register in its objects insight list
+                                //if this does indeed cause an incorrect detection, a way to fix is to check the list of all building every frame, which might lag
+                                //but i assume it wont, since the agent should register the door before it register the target as being seen
+                                for (BoxObject boxObject1 : agent1.getBoxObjectsInSight()) {
+                                    if (boxObject1 instanceof Door) {
+                                        if (((Door) boxObject1).getCurrentState() == Door.State.OPEN && Intersector.intersectSegmentRectangle(agent1.getBody().getPosition(), agent2.getBody().getPosition(), boxObject1.getRectangle())) {
+                                            contact.setEnabled(true);
+                                        }
+                                    } else if (boxObject1 instanceof Window) {
+                                        if (Intersector.intersectSegmentRectangle(agent1.getBody().getPosition(), agent2.getBody().getPosition(), boxObject1.getRectangle())) {
+                                            contact.setEnabled(true);
+                                        }
+                                    }
+                                }
                             }
                         } else if (boxObject instanceof SentryTower) {
                             if (Intersector.intersectSegmentRectangle(agent1.getBody().getPosition(), agent2.getBody().getPosition(), boxObject.getRectangle())) {

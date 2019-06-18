@@ -4,6 +4,8 @@ package com.mygdx.mass.Agents;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.mass.Algorithms.PredictionModel;
+import com.mygdx.mass.BoxObject.Building;
+import com.mygdx.mass.BoxObject.SentryTower;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.MapToGraph.TSP;
 
@@ -15,7 +17,6 @@ public class Guard extends Agent {
 
     public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH};
     public State currentState;
-    public State previousState;
     public static final float BASE_SPEED = 1.4f;
     public static final float TOWER_VIEW_ANGLE = 30.0f;
     public static final float DEFAULT_VISUAL_RANGE = 6.0f;
@@ -24,9 +25,12 @@ public class Guard extends Agent {
 
     private float deafDuration;
 
-    private boolean onTower;
+    private ArrayList<Integer> intrudersSeen; //the list of intruders which has been known so far, as unique hascode
 
-    private PredictionModel predictionModel;
+    private boolean onTower;
+    private boolean checkInsideBuilding;
+
+//    private PredictionModel predictionModel;
 
     public Guard(MASS mass, Vector2 position) {
         super(mass, position);
@@ -37,6 +41,9 @@ public class Guard extends Agent {
         visualRange = DEFAULT_VISUAL_RANGE;
         viewAngle = 45.0f;
 
+        intrudersSeen = new ArrayList<Integer>();
+        checkInsideBuilding = false;
+
         define(position);
         Filter filter = new Filter();
         filter.categoryBits = GUARD_BIT;
@@ -44,14 +51,13 @@ public class Guard extends Agent {
         fixture.setFilterData(filter);
 
         currentState = State.NONE;
-        previousState = State.NONE;
 
 //        pointLight = new PointLight(mass.rayHandler, 360, new Color(0,0,1,1), 10, body.getPosition().x, body.getPosition().y);
 //        if(CONE_ENABLED == true) coneLight = new ConeLight(mass.rayHandler, 45, new Color(0,0,1,1), visualRange*5, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
 //        if(CONE_ENABLED == true) coneLight.attachToBody(body);
 //        if(CONE_ENABLED == true) coneLight.setContactFilter(LIGHT_BIT, (short) 0, (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT));
 //        algorithm = new Random(this);
-        predictionModel = new PredictionModel();
+//        predictionModel = new PredictionModel();
     }
 
     public void update(float delta) {
@@ -62,13 +68,29 @@ public class Guard extends Agent {
 
     private void updateState() {
         if (!enemyInSight.isEmpty()) {
-            currentState = State.CHASE;
-        } else if (!predictionModel.getCapturePoints().isEmpty()){
-            currentState = State.SEARCH;
+            if (currentState != State.CHASE) {
+                currentState = State.CHASE;
+                destination = null;
+                route.clear();
+            }
+        } else if (!intrudersSeen.isEmpty()){
+            if (currentState != State.SEARCH) {
+                currentState = State.SEARCH;
+                destination = null;
+                route.clear();
+            }
         } else if (!individualMap.getUnexploredPlaces().isEmpty()) {
-            currentState = State.EXPLORE;
+            if (currentState != State.EXPLORE) {
+                currentState = State.EXPLORE;
+                destination = null;
+                route.clear();
+            }
         } else {
-            currentState = State.PATROL;
+            if (currentState != State.PATROL) {
+                currentState = State.PATROL;
+                destination = null;
+                route.clear();
+            }
         }
 
         if (!super.blind) {
@@ -102,7 +124,6 @@ public class Guard extends Agent {
 
         processResultsFromRayCastFields();
 
-
 //        if (capture != null) {
 //            capture.increaseCounter(delta);
 //        }
@@ -112,34 +133,29 @@ public class Guard extends Agent {
 //                break;
 //            }
 //        }
+
     }
 
     private void updateAction() {
-        switch (currentState) {
-            case CHASE: {
-                //destination = individualMap.getIntruders().get(0).getBody().getPosition();
-                break;
-            }
-            case SEARCH: {
-                if (previousState != State.SEARCH) {
+        if (destination == null) {
+            switch (currentState) {
+                case CHASE: {
+                    destination = getEnemyInSight().get(0).getBody().getPosition();
+                    break;
+                }
+                case SEARCH: {
                     search();
-                    previousState = State.SEARCH;
+                    break;
                 }
-                break;
-            }
-            case PATROL: {
-                if (previousState != State.PATROL) {
+                case PATROL: {
+                    System.out.println("patrol");
                     patrol();
-                    previousState = State.PATROL;
+                    break;
                 }
-                break;
-            }
-            case EXPLORE: {
-                if (previousState != State.EXPLORE) {
+                case EXPLORE: {
                     explore();
-                    previousState = State.EXPLORE;
+                    break;
                 }
-                break;
             }
         }
     }
@@ -159,21 +175,42 @@ public class Guard extends Agent {
     public void patrol() {
         destination = null;
         route.clear();
-        goTo(new Vector2((float) Math.random()*(mass.getMap().width-10) + 5, (float) Math.random()*(mass.getMap().height-10) + 5));
+        float x = (float) Math.random()*(mass.getMap().width-10) + 5;
+        float y = (float) Math.random()*(mass.getMap().height-10) + 5;
+        if (!checkInsideBuilding) { //patrol also include within buildings
+            while(insideBuilding(x,y)) {
+                x = (float) Math.random()*(mass.getMap().width-10) + 5;
+                y = (float) Math.random()*(mass.getMap().height-10) + 5;
+            }
+        }
+        goTo(new Vector2(x,y));
+    }
+
+    private boolean insideBuilding(float x, float y) {
+        for (Building building : individualMap.getBuildings()) {
+            if (building.getRectangle().contains(x,y)) {
+                return true;
+            }
+        }
+        for (SentryTower sentryTower : individualMap.getSentryTowers()) {
+            if (sentryTower.getRectangle().contains(x,y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void intercept(Agent target) {
+//        PredictionModel predictionModel = new PredictionModel();
+//        goTo(predictionModel.interceptPoint(this,target));
     }
 
     public void search() {
 
     }
 
-    public PredictionModel getPredictionModel() { return predictionModel; }
+//    public PredictionModel getPredictionModel() { return predictionModel; }
 
     public void setCurrentState(State state) { this.currentState = state; }
-    public void setPreviousState(State state) { this.previousState = state; }
-
-    public void resetState() {
-        currentState = State.NONE;
-        previousState = State.NONE;
-    }
 
 }
