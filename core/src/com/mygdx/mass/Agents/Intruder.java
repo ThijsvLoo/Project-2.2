@@ -1,7 +1,5 @@
 package com.mygdx.mass.Agents;
 
-import box2dLight.ConeLight;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.mass.Algorithms.Random;
@@ -15,8 +13,8 @@ import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 public class Intruder extends Agent {
 
-    public enum State {SEARCH, ESCAPE, HIDE, COMMUNICATE, REST};
-    public State currentState;
+    public enum State {NONE, EXPLORE, ESCAPE, HIDE, EVADE}
+    public State currentState = State.NONE;
 
     public static final float SPRINT_SPEED = 3.0f;
 
@@ -69,6 +67,11 @@ public class Intruder extends Agent {
     }
 
     public void update(float delta) {
+
+		updateAction();
+		updateState();
+		updateRayCasting();
+
         if (moveSpeed > 1.4f && isMoving()) {
             if (sprintDuration > 0.0f) {
                 sprintDuration -= delta;
@@ -80,7 +83,7 @@ public class Intruder extends Agent {
                 setMoveSpeed(1.4f);
             }
         }
-        if (!isMoving() && sprintDuration < SPRINT_MAX_DURATION) {
+        if (sprintDuration < SPRINT_MAX_DURATION) {
             sprintDuration += delta * SPRINT_MAX_DURATION / SPRINT_REST_TIME;
             if (sprintDuration > SPRINT_MAX_DURATION) {
                 sprintDuration = SPRINT_MAX_DURATION;
@@ -94,27 +97,31 @@ public class Intruder extends Agent {
             breakThroughWindow(delta);
         }
 
-        if (!super.blind) {
-            objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT | TARGET_AREA_BIT | SENTRY_TOWER_BIT);
-            objectsTransparent = (short) (WINDOW_BIT | TARGET_AREA_BIT |  SENTRY_TOWER_BIT);
-            objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT | TARGET_AREA_BIT | SENTRY_TOWER_BIT);
-            rayCastFieldBuildings = new RayCastField(mass);
-            super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
 
-            objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-            objectsTransparent = (short) (GUARD_BIT | INTRUDER_BIT);
-            objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
-            rayCastFieldAgents = new RayCastField(mass);
-            super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
-        }
-
-        processResultsFromRayCastFields();
     }
+
+    public void updateRayCasting(){
+		if (!super.blind) {
+			objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT | TARGET_AREA_BIT | SENTRY_TOWER_BIT);
+			objectsTransparent = (short) (WINDOW_BIT | TARGET_AREA_BIT |  SENTRY_TOWER_BIT);
+			objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT | TARGET_AREA_BIT | SENTRY_TOWER_BIT);
+			rayCastFieldBuildings = new RayCastField(mass);
+			super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
+
+			objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+			objectsTransparent = (short) (GUARD_BIT | INTRUDER_BIT);
+			objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
+			rayCastFieldAgents = new RayCastField(mass);
+			super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
+		}
+
+		processResultsFromRayCastFields();
+	}
 
     public void act() {
         updateState();
         switch (currentState) {
-            case SEARCH: {
+            case EXPLORE: {
                 //if
             }
             case ESCAPE: {
@@ -131,13 +138,13 @@ public class Intruder extends Agent {
     public void updateState() {
         if (!detected) { //hasn't been detected yet
             if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
-                currentState = State.SEARCH;
+                currentState = State.EXPLORE;
             } else {
                 currentState = State.ESCAPE;
             }
         } else {
             if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
-                currentState = State.HIDE;
+                currentState = State.EVADE;
             } else {
                 currentState = State.ESCAPE;
             }
@@ -152,6 +159,40 @@ public class Intruder extends Agent {
             }
         }
     }
+
+    private void updateAction() {
+        switch (currentState) {
+            case EXPLORE: {
+            	if(route.isEmpty()){
+					explore();
+				}
+                //destination = individualMap.getIntruders().get(0).getBody().getPosition();
+                break;
+            }
+            case ESCAPE: {
+				escape();
+                break;
+            }
+            case EVADE: {
+            	evade();
+                break;
+            }
+            case HIDE: {
+            	hide();
+                break;
+            }
+        }
+    }
+
+    private void escape(){
+
+	}
+	private void evade(){
+
+	}
+	private void hide(){
+
+	}
 
     private void breakThroughWindow(float delta) {
         if (window != null && breakThroughProgress < 100.0f) {

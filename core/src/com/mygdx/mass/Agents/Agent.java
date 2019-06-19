@@ -8,10 +8,7 @@ import com.mygdx.mass.Algorithms.Algorithm;
 import com.mygdx.mass.Algorithms.Explore;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
-import com.mygdx.mass.MapToGraph.Dijkstra;
-import com.mygdx.mass.MapToGraph.Edge;
-import com.mygdx.mass.MapToGraph.Graph;
-import com.mygdx.mass.MapToGraph.Vertex;
+import com.mygdx.mass.MapToGraph.*;
 import com.mygdx.mass.Scenes.MapSimulatorInfo;
 import com.mygdx.mass.Sensors.NoiseField;
 import com.mygdx.mass.Sensors.RayCastField;
@@ -187,6 +184,15 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             addWaypoint(waypoint);
         }
     }
+    public void recalculatePath(){
+        //        Vector2 destination = agent.getDestination();
+//        while (!agent.getRoute().isEmpty()) {
+//
+//            destination = agent.getRoute().poll();
+//            System.out.println(agent.getRoute().size());
+//        }
+//        agent.goTo(destination);
+    }
 
     public void updateDirection() {
         direction.x = destination.x - body.getPosition().x;
@@ -262,16 +268,24 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
         for (WorldObject o : objectsInSight) {
             if (o instanceof Building) {
-                boxObjectsInSight.add((Building) o);
+                if(!individualMap.getBoxObjects().contains(o)){
+                    boxObjectsInSight.add((Building) o);
+                }
             }
             else if (o instanceof  SentryTower) {
-                boxObjectsInSight.add((SentryTower) o);
+                if(!individualMap.getBoxObjects().contains(o)){
+                    boxObjectsInSight.add((SentryTower) o);
+                }
             }
             else if (this instanceof Guard && o instanceof Intruder) {
-                enemyInSight.add((Intruder) o);
+                if(!individualMap.getBoxObjects().contains(o)){
+                    enemyInSight.add((Intruder) o);
+                }
             }
             else if (this instanceof Intruder && o instanceof Guard) {
-                enemyInSight.add((Guard) o);
+                if(!individualMap.getBoxObjects().contains(o)){
+                    enemyInSight.add((Guard) o);
+                }
             }
             //System.out.println(this + " can see "+o.getClass() + " at "+o);
         }
@@ -299,6 +313,18 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 //    public void removeCollision(Object collision) {
 //        collisions.remove(collision);
 //    }
+
+    //adapt the walk route to explore unexplored locations
+    public void explore() {
+        destination = null;
+        route.clear();
+        TSP tsp = new TSP();
+        ArrayList<Vector2> toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces()); //need to adapt this to work with multiple agent
+        ArrayList<Vector2> path = tsp.computePath(this, toBeExploredPoints);
+        for (Vector2 wp : path) {
+            addWaypoint(wp);
+        }
+    }
 
     public AgentType getAgentType() { return agentType; }
     public float getMoveSpeed() { return moveSpeed; }

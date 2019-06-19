@@ -175,7 +175,7 @@ public class MapSimulatorHUD implements Disposable {
             }
         });
 
-        speed = new Slider(0, 500, 1, false, new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json")));
+        speed = new Slider(1, 500, 1, false, new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json")));
         speed.setValue(mapSimulatorScreen.getWorldSpeedFactor());
         speed.addListener(new ChangeListener() {
             @Override
@@ -193,7 +193,7 @@ public class MapSimulatorHUD implements Disposable {
                 }
             }
         });
-        float sliderWidth = 501.f;
+        float sliderWidth = 500.f;
         int colSpan = (int) Math.ceil(sliderWidth/BUTTON_SIZE);
         table.defaults().pad(2.0f);
         table.setSize(sliderWidth, 1.0f);

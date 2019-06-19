@@ -56,14 +56,16 @@ public class Guard extends Agent {
 //        if(CONE_ENABLED == true) coneLight = new ConeLight(mass.rayHandler, 45, new Color(0,0,1,1), visualRange*5, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
 //        if(CONE_ENABLED == true) coneLight.attachToBody(body);
 //        if(CONE_ENABLED == true) coneLight.setContactFilter(LIGHT_BIT, (short) 0, (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT));
+
 //        algorithm = new Random(this);
 //        predictionModel = new PredictionModel();
     }
 
     public void update(float delta) {
-        super.update(delta);
         updateState();
         updateAction();
+        updateRayCasting();
+        super.update(delta);
     }
 
     private void updateState() {
@@ -93,6 +95,21 @@ public class Guard extends Agent {
             }
         }
 
+
+
+//        if (capture != null) {
+//            capture.increaseCounter(delta);
+//        }
+//        for (CapturePoint capturePoint : capture.getCapturePoints()) {
+//            if (body.getPosition().dst(capturePoint.getPosition()) < 5.0f) {
+//                capture.removePoint(capturePoint);
+//                break;
+//            }
+//        }
+
+    }
+
+    private void updateRayCasting(){
         if (!super.blind) {
             if (!onTower) {
                 objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
@@ -123,17 +140,6 @@ public class Guard extends Agent {
         }
 
         processResultsFromRayCastFields();
-
-//        if (capture != null) {
-//            capture.increaseCounter(delta);
-//        }
-//        for (CapturePoint capturePoint : capture.getCapturePoints()) {
-//            if (body.getPosition().dst(capturePoint.getPosition()) < 5.0f) {
-//                capture.removePoint(capturePoint);
-//                break;
-//            }
-//        }
-
     }
 
     private void updateAction() {
@@ -157,18 +163,6 @@ public class Guard extends Agent {
                     break;
                 }
             }
-        }
-    }
-
-    //adapt the walk route to explore unexplored locations
-    public void explore() {
-        destination = null;
-        route.clear();
-        TSP tsp = new TSP();
-        ArrayList<Vector2> toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces()); //need to adapt this to work with multiple agent
-        ArrayList<Vector2> path = tsp.computePath(this, toBeExploredPoints);
-        for (Vector2 wp : path) {
-            addWaypoint(wp);
         }
     }
 
