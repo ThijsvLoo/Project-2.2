@@ -32,11 +32,6 @@ public class IndividualMap extends Map {
                 unexploredPlaces.add(new Vector2(i*10,j*10));
             }
         }
-//        for (int i = 1; i < 40; i++) {
-//            for (int j = 1; j < 40; j++) {
-//                unexploredPlaces.add(new Vector2(i*5,j*5));
-//            }
-//        }
     }
 
     public void addGuard(Guard guard) { guards.add(guard); }
@@ -66,6 +61,7 @@ public class IndividualMap extends Map {
         }
 
         agent.setDestination(null);
+        agent.getRoute().clear();
     }
 
     private void updatePath(){

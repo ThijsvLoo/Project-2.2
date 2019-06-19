@@ -11,11 +11,12 @@ import com.mygdx.mass.MapToGraph.TSP;
 
 import java.util.ArrayList;
 import com.mygdx.mass.Sensors.RayCastField;
+import com.mygdx.mass.World.Map;
 
 
 public class Guard extends Agent {
 
-    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH};
+    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH, INTERCEPT};
     public State currentState;
     public static final float BASE_SPEED = 1.4f;
     public static final float TOWER_VIEW_ANGLE = 30.0f;
@@ -30,6 +31,8 @@ public class Guard extends Agent {
     private boolean onTower;
     private boolean checkInsideBuilding;
 
+    PredictionModel predictionModel;
+
 //    private PredictionModel predictionModel;
 
     public Guard(MASS mass, Vector2 position) {
@@ -43,6 +46,8 @@ public class Guard extends Agent {
 
         intrudersSeen = new ArrayList<Integer>();
         checkInsideBuilding = false;
+
+        predictionModel = new PredictionModel(this);
 
         define(position);
         Filter filter = new Filter();
@@ -75,6 +80,12 @@ public class Guard extends Agent {
                 destination = null;
                 route.clear();
             }
+//        } else if (!MASS.map.getIntruders().isEmpty()) {
+//            if (currentState != State.INTERCEPT) {
+//                currentState = State.INTERCEPT;
+//                destination = null;
+//                route.clear();
+//            }
         } else if (!intrudersSeen.isEmpty()){
             if (currentState != State.SEARCH) {
                 currentState = State.SEARCH;
@@ -140,21 +151,81 @@ public class Guard extends Agent {
         }
 
         processResultsFromRayCastFields();
+//        if (!super.blind) {
+//            if (!onTower) {
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+//                objectsTransparent = (short) (WINDOW_BIT);
+//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+//                rayCastFieldBuildings = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
+//
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
+//                objectsTransparent = (short) (SENTRY_TOWER_BIT);
+//                objectsWanted = (short) (SENTRY_TOWER_BIT);
+//                rayCastFieldTowers = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
+//
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
+//                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
+//                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
+//                rayCastFieldAgents = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
+//            }
+//            else {
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                rayCastFieldAgents = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
+//            }
+//        }
+//
+//        processResultsFromRayCastFields();
+
+//        if (capture != null) {
+//            capture.increaseCounter(delta);
+//        }
+//        for (CapturePoint capturePoint : capture.getCapturePoints()) {
+//            if (body.getPosition().dst(capturePoint.getPosition()) < 5.0f) {
+//                capture.removePoint(capturePoint);
+//                break;
+//            }
+//        }
+
+    }
+
+    private double angleDifference(float angle1, float angle2) {
+        return Math.PI - Math.abs(Math.PI - Math.abs(angle1%(Math.PI*2) - angle2%(Math.PI*2)));
     }
 
     private void updateAction() {
-        if (destination == null) {
+        //this will update the intercept path when the intruder changed his direction by at least 10 degree
+//        if (currentState == State.INTERCEPT) {
+//            if (predictionModel.getInterceptTarget() != null
+//                    && predictionModel.getInterceptTarget().getTurnSide() == 0
+//                    && angleDifference(predictionModel.getInterceptTarget().getBody().getAngle(), predictionModel.getInterceptTargetAngle()) > Math.toRadians(10)
+//                    && angleDifference(predictionModel.getInterceptTarget().getBody().getAngle(), (float) Math.atan2(body.getPosition().y - predictionModel.getInterceptTarget().getBody().getPosition().y, body.getPosition().x - predictionModel.getInterceptTarget().getBody().getPosition().x)) < Math.PI/2) {
+//
+//                setDestination(null);
+//                route.clear();
+//            }
+//        }
+
+        if (destination == null && route.isEmpty()) {
             switch (currentState) {
                 case CHASE: {
                     destination = getEnemyInSight().get(0).getBody().getPosition();
                     break;
                 }
+//                case INTERCEPT: {
+//                    intercept(MASS.map.getIntruders().get(0));
+//                    break;
+//                }
                 case SEARCH: {
                     search();
                     break;
                 }
                 case PATROL: {
-                    System.out.println("patrol");
                     patrol();
                     break;
                 }
@@ -194,9 +265,14 @@ public class Guard extends Agent {
         return false;
     }
 
-    public void intercept(Agent target) {
-//        PredictionModel predictionModel = new PredictionModel();
-//        goTo(predictionModel.interceptPoint(this,target));
+    //if the target does change direction, calculate the intercept point and go
+    public void intercept(Intruder target) {
+        if (target.getTurnSide() == 0) {
+            Vector2 interceptPoint = predictionModel.interceptPoint(this, target);
+            if (interceptPoint != null) {
+                goTo(interceptPoint);
+            }
+        }
     }
 
     public void search() {
@@ -206,5 +282,7 @@ public class Guard extends Agent {
 //    public PredictionModel getPredictionModel() { return predictionModel; }
 
     public void setCurrentState(State state) { this.currentState = state; }
+
+    public PredictionModel getPredictionModel() { return predictionModel; }
 
 }
