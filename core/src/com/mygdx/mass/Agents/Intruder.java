@@ -70,7 +70,7 @@ public class Intruder extends Agent {
 
 		updateAction();
 		updateState();
-		updateRayCasting();
+		raycast();
 
         if (moveSpeed > 1.4f && isMoving()) {
             if (sprintDuration > 0.0f) {
@@ -96,27 +96,7 @@ public class Intruder extends Agent {
         if (window != null) {
             breakThroughWindow(delta);
         }
-
-
     }
-
-    public void updateRayCasting(){
-		if (!super.blind) {
-			objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT | TARGET_AREA_BIT | SENTRY_TOWER_BIT);
-			objectsTransparent = (short) (WINDOW_BIT | TARGET_AREA_BIT |  SENTRY_TOWER_BIT);
-			objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT | TARGET_AREA_BIT | SENTRY_TOWER_BIT);
-			rayCastFieldBuildings = new RayCastField(mass);
-			super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
-
-			objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-			objectsTransparent = (short) (GUARD_BIT | INTRUDER_BIT);
-			objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
-			rayCastFieldAgents = new RayCastField(mass);
-			super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
-		}
-
-		processResultsFromRayCastFields();
-	}
 
     public void act() {
         updateState();
@@ -198,6 +178,29 @@ public class Intruder extends Agent {
         if (window != null && breakThroughProgress < 100.0f) {
             breakThroughProgress += delta*100/WINDOW_BREAK_THROUGH_TIME;
         }
+    }
+
+    public void raycast(boolean forceRayCast) {
+        if(forceRayCast) isRayCastOff = false;
+        raycast();
+        isRayCastOff = true;
+    }
+
+    public void raycast() {
+        if (!super.blind && !isRayCastOff) {
+            objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT | TARGET_AREA_BIT | SENTRY_TOWER_BIT);
+            objectsTransparent = (short) (WINDOW_BIT | TARGET_AREA_BIT |  SENTRY_TOWER_BIT);
+            objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT | TARGET_AREA_BIT | SENTRY_TOWER_BIT);
+            rayCastFieldBuildings = new RayCastField(mass);
+            super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
+
+            objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+            objectsTransparent = (short) (GUARD_BIT | INTRUDER_BIT);
+            objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
+            rayCastFieldAgents = new RayCastField(mass);
+            super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
+        }
+        processResultsFromRayCastFields();
     }
 
     public Door getDoor() { return door; }

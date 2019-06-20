@@ -73,7 +73,7 @@ public class WorldContactListener implements ContactListener {
                     Agent agent1 = visualField.getAgent();
                     Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
                     if (agent1.getAgentType() != agent2.getAgentType()) {
-                        agent1.getEnemyInSight().add(agent2);
+                        if(agent1.isRayCastOff()) agent1.getEnemyInSight().add(agent2);
                     }
                 }
                 break;
@@ -85,7 +85,7 @@ public class WorldContactListener implements ContactListener {
                 if (visualField.getVisualFieldType() == VisualField.VisualFieldType.BUILDING) {
                     Building building = fixtureA.getUserData() instanceof Building ? (Building) fixtureA.getUserData() : (Building) fixtureB.getUserData();
                     Agent agent = visualField.getAgent();
-                    //agent.getBoxObjectsInSight().add(building);
+                    if (agent.isRayCastOff()) agent.getBoxObjectsInSight().add(building);
                     if (agent instanceof Guard) {
                         for (Guard guard : mass.getMap().getGuards()) { //Global communication, share with all other agent
                             if (!guard.getIndividualMap().getBuildings().contains(building)) {
@@ -107,7 +107,7 @@ public class WorldContactListener implements ContactListener {
                 if (visualField.getVisualFieldType() == VisualField.VisualFieldType.TOWER) {
                     SentryTower sentryTower = fixtureA.getUserData() instanceof SentryTower ? (SentryTower) fixtureA.getUserData() : (SentryTower) fixtureB.getUserData();
                     Agent agent = visualField.getAgent();
-                    //agent.getBoxObjectsInSight().add(sentryTower);
+                    if (agent.isRayCastOff()) agent.getBoxObjectsInSight().add(sentryTower);
                     if (agent instanceof Guard) {
                         for (Guard guard : mass.getMap().getGuards()) { //Global communication, share with all other agent
                             if (!guard.getIndividualMap().getSentryTowers().contains(sentryTower)) {

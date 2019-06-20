@@ -10,6 +10,9 @@ import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.MapToGraph.TSP;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
+
+import com.mygdx.mass.Sensors.GapSensor;
 import com.mygdx.mass.Sensors.RayCastField;
 import com.mygdx.mass.World.Map;
 
@@ -61,7 +64,6 @@ public class Guard extends Agent {
 //        if(CONE_ENABLED == true) coneLight = new ConeLight(mass.rayHandler, 45, new Color(0,0,1,1), visualRange*5, body.getPosition().x, body.getPosition().y, (float) (body.getAngle()*180/Math.PI), viewAngle/2);
 //        if(CONE_ENABLED == true) coneLight.attachToBody(body);
 //        if(CONE_ENABLED == true) coneLight.setContactFilter(LIGHT_BIT, (short) 0, (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT));
-
 //        algorithm = new Random(this);
 //        predictionModel = new PredictionModel();
     }
@@ -69,12 +71,16 @@ public class Guard extends Agent {
     public void update(float delta) {
         updateState();
         updateAction();
-        updateRayCasting();
+        gapsensor();
+        raycast();
         super.update(delta);
     }
 
     private void updateState() {
-        if (!enemyInSight.isEmpty()) {
+        if (currentState == State.NONE) {
+            // keep it this way until somebody presses a button
+        }
+        else if (!enemyInSight.isEmpty()) {
             if (currentState != State.CHASE) {
                 currentState = State.CHASE;
                 destination = null;
@@ -86,7 +92,8 @@ public class Guard extends Agent {
 //                destination = null;
 //                route.clear();
 //            }
-        } else if (!intrudersSeen.isEmpty()){
+        }
+        else if (!intrudersSeen.isEmpty()){
             if (currentState != State.SEARCH) {
                 currentState = State.SEARCH;
                 destination = null;
@@ -120,67 +127,8 @@ public class Guard extends Agent {
 
     }
 
-    private void updateRayCasting(){
-        if (!super.blind) {
-            if (!onTower) {
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-                objectsTransparent = (short) (WINDOW_BIT);
-                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-                rayCastFieldBuildings = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
 
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
-                objectsTransparent = (short) (SENTRY_TOWER_BIT);
-                objectsWanted = (short) (SENTRY_TOWER_BIT);
-                rayCastFieldTowers = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
 
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
-                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
-                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
-                rayCastFieldAgents = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
-            }
-            else {
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                rayCastFieldAgents = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
-            }
-        }
-
-        processResultsFromRayCastFields();
-//        if (!super.blind) {
-//            if (!onTower) {
-//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-//                objectsTransparent = (short) (WINDOW_BIT);
-//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-//                rayCastFieldBuildings = new RayCastField(mass);
-//                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
-//
-//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
-//                objectsTransparent = (short) (SENTRY_TOWER_BIT);
-//                objectsWanted = (short) (SENTRY_TOWER_BIT);
-//                rayCastFieldTowers = new RayCastField(mass);
-//                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
-//
-//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
-//                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
-//                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
-//                rayCastFieldAgents = new RayCastField(mass);
-//                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
-//            }
-//            else {
-//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-//                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-//                rayCastFieldAgents = new RayCastField(mass);
-//                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
-//            }
-//        }
-//
-//        processResultsFromRayCastFields();
 
 //        if (capture != null) {
 //            capture.increaseCounter(delta);
@@ -191,8 +139,6 @@ public class Guard extends Agent {
 //                break;
 //            }
 //        }
-
-    }
 
     private double angleDifference(float angle1, float angle2) {
         return Math.PI - Math.abs(Math.PI - Math.abs(angle1%(Math.PI*2) - angle2%(Math.PI*2)));
@@ -280,6 +226,51 @@ public class Guard extends Agent {
     }
 
 //    public PredictionModel getPredictionModel() { return predictionModel; }
+    public void gapsensor() {
+        drawGapSensor = true;
+        if(gapSensorOn) {
+            fireGapSensor();
+            gapSensor.showGapSensorGraphs();
+        }
+    }
+
+    public void raycast(boolean forceRayCast) {
+        if(forceRayCast) isRayCastOff = false;
+        raycast();
+        isRayCastOff = true;
+    }
+
+    public void raycast() {
+        if (!super.blind && !isRayCastOff) {
+            if (!onTower) {
+                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+                objectsTransparent = (short) (WINDOW_BIT);
+                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+                rayCastFieldBuildings = new RayCastField(mass);
+                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
+
+                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
+                objectsTransparent = (short) (SENTRY_TOWER_BIT);
+                objectsWanted = (short) (SENTRY_TOWER_BIT);
+                rayCastFieldTowers = new RayCastField(mass);
+                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
+
+                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
+                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
+                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
+                rayCastFieldAgents = new RayCastField(mass);
+                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
+            }
+            else {
+                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+                rayCastFieldAgents = new RayCastField(mass);
+                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
+            }
+            super.processResultsFromRayCastFields();
+        }
+    }
 
     public void setCurrentState(State state) { this.currentState = state; }
 

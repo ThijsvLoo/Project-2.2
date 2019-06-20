@@ -46,6 +46,7 @@ public class OptionsScreen implements Screen {
     //Change ui skin
     private boolean neon;
     private boolean fs;
+    private boolean raycasting;
 
     private Label notice;
 
@@ -68,6 +69,15 @@ public class OptionsScreen implements Screen {
                 break;
             } else {
                 fs = false;
+            }
+        }
+
+        for(int i = 0; i<mass.getSettings().size(); i++){
+            if (mass.getSettings().get(i).getName().equals("raycasting") && mass.getSettings().get(i).getSetting().equals("true")) {
+                raycasting = true;
+                break;
+            } else {
+                raycasting = false;
             }
         }
 
@@ -170,6 +180,23 @@ public class OptionsScreen implements Screen {
         optionsTable.add(fsCheck);
         optionsTable.row();
 
+        //Add heading
+        final Label raycastingLabel = new Label("Raycasting: ",skin);
+        title.setFontScale(1f,1f);
+        optionsTable.add(raycastingLabel);
+        optionsTable.row();
+
+        //Create radio buttons
+        ButtonGroup<CheckBox> buttonGroup3 = new ButtonGroup<CheckBox>();
+        CheckBox raycastingCheck = new CheckBox("On", skin, "radio");
+        buttonGroup3.add(raycastingCheck);
+        optionsTable.add(raycastingCheck);
+        raycastingCheck = new CheckBox("Off", skin, "radio");
+        raycastingCheck.setChecked(!raycasting);
+        buttonGroup3.add(raycastingCheck);
+        optionsTable.add(raycastingCheck);
+        optionsTable.row();
+
         //Add listeners
         uiCheck.addListener(new ChangeListener() {
             @Override
@@ -233,6 +260,25 @@ public class OptionsScreen implements Screen {
 //                }
 
 //                System.out.println(mass.getSettingStrings().toString());
+            }
+        });
+
+        raycastingCheck.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                System.out.println("Raycasting radio clicked");
+                if(raycasting) {
+                    raycasting = false;
+                } else {
+                    raycasting = true;
+                }
+                for(int i = 0; i<mass.getSettings().size(); i++){
+                    if (mass.getSettings().get(i).getName().equals("raycasting")) {
+                        mass.getSettings().get(i).setSetting(String.valueOf(raycasting));
+                        mass.writeSettings();
+                        break;
+                    }
+                }
             }
         });
 

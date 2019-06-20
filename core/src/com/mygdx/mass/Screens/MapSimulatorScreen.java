@@ -20,6 +20,7 @@ import com.mygdx.mass.Algorithms.Explore;
 import com.mygdx.mass.Algorithms.PredictionPoint;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Graph.Gap;
 import com.mygdx.mass.Scenes.MapSimulatorHUD;
 import com.mygdx.mass.Scenes.MapSimulatorInfo;
 import com.mygdx.mass.Sensors.RayCastField;
@@ -158,6 +159,19 @@ public class MapSimulatorScreen implements Screen {
                 body.setTransform(body.getWorldCenter(), (float)(body.getAngle()+(Math.PI)*delta));
             }
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
+            mass.GapNavigationTreeAlgorithm.loadAllAgents();
+            mass.GapNavigationTreeAlgorithm.act();
+            if (!map.getAgents().isEmpty()) {
+                boolean toggle = !(map.getAgents().get(0).getGapSensorStatus()); // make sure all agents toggle to the same value
+                for (Agent a : map.getAgents()) {
+                    // a.setGapSensorStatus(toggle);
+
+                }
+            }
+
+        }
         //add keyboard controls to the first intruder
 //        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 //            ArrayList<Intruder> intruders = map.getIntruders();
@@ -192,12 +206,14 @@ public class MapSimulatorScreen implements Screen {
         }
 
         //for test purpose
-//        if (Gdx.input.justTouched()) {
-//            for (Agent agent : map.getAgents()) {
-//                agent.getRoute().clear();
-//                agent.setDestination(inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY()));
-//            }
-//        }
+        if(false) {
+            if (Gdx.input.justTouched()) {
+                for (Agent agent : map.getAgents()) {
+                    agent.getRoute().clear();
+                    agent.setDestination(inputHandler.toWorldCoordinate(Gdx.input.getX(), Gdx.input.getY()));
+                }
+            }
+        }
     }
 
     @Override
@@ -219,11 +235,11 @@ public class MapSimulatorScreen implements Screen {
 
         //draw the shapes and lines
         shapeRenderer.setProjectionMatrix(camera.combined);
+        drawRays();
         drawAgentPaths();
         drawBoxObjects();
         drawAgents();
-        drawRays();
-//        drawPredictionPoints(); //for testing
+        drawGapsFromAgents();
 
         //draw an agent's unexplored location on its local map
 //        if (!map.getAgents().isEmpty()) {
@@ -416,6 +432,9 @@ public class MapSimulatorScreen implements Screen {
                         else if (rayCastField.getTypeOfField().equalsIgnoreCase("AGENT") && agent instanceof Intruder) {
                             shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
                         }
+                        else if (rayCastField.getTypeOfField().equalsIgnoreCase("GAP SENSOR")) {
+                            shapeRenderer.setColor(0.0f,1.0f,1.0f,1.0f);
+                        }
 
                         Vector2[] beginPointRays = rayCastField.beginPointRay();
                         Vector2[] endPointRays = rayCastField.endPointRay();
@@ -426,6 +445,61 @@ public class MapSimulatorScreen implements Screen {
                     }
                 }
             }
+            if(agent.getAngleDistanceCloudPoints().size() > 0 && agent.getDrawGapSensor()) {
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                if (agent.getRayCastFieldGapSensor().getTypeOfField().equalsIgnoreCase("GAP SENSOR")) {
+                    shapeRenderer.setColor(Color.YELLOW);
+                }
+
+                Vector2[] beginPointRays = agent.getRayCastFieldGapSensor().beginPointRay();
+                Vector2[] endPointRays = agent.getRayCastFieldGapSensor().endPointRay();
+                for (int i = 0; i < beginPointRays.length; i++) {
+                    shapeRenderer.line(beginPointRays[i], endPointRays[i]);
+                }
+                shapeRenderer.end();
+            }
+        }
+        shapeRenderer.end();
+
+    }
+
+    private void drawGapsFromAgents() {
+        ArrayList<Gap> gaps = new ArrayList<Gap>();
+
+        for (Agent agent:map.getAgents()) {
+            if (agent.getGapSensor() != null) {
+                for (java.util.Map.Entry<Float, Gap> e : agent.getGapSensor().getGapList().entrySet()) {
+                    gaps.add(e.getValue());
+                }
+            }
+        }
+
+        if (!gaps.isEmpty()) drawGaps(gaps);
+    }
+
+    private void drawGaps(ArrayList<Gap> gaps) {
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        for (int i = 0 ; i < gaps.size() ; i++) {
+            shapeRenderer.setColor(gaps.get(i).getColor());
+            Vector2 location = gaps.get(i).getOffsetLocation();
+            float x = location.x;
+            float y = location.y;
+            float lineSize = 0.5f;
+            shapeRenderer.line(x - lineSize, y, x + lineSize, y);
+            shapeRenderer.line(x, y - lineSize, x, y + lineSize);
+
+        }
+        shapeRenderer.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (int i = 0 ; i < gaps.size() ; i++) {
+            shapeRenderer.setColor(gaps.get(i).getColor());
+            Vector2 location = gaps.get(i).getLocation();
+            float x = location.x;
+            float y = location.y;
+            float lineSize = 0.5f;
+            shapeRenderer.circle(x, y, lineSize);
         }
         shapeRenderer.end();
 

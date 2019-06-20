@@ -10,20 +10,27 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.Algorithms.GNT;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Screens.MapSimulatorScreen;
 import com.mygdx.mass.Screens.OptionsScreen;
+import com.mygdx.mass.Sensors.GapSensor;
 import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.Data.Properties;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.World.WorldContactListener;
+//import javafx.scene.chart.XYChart;
+import org.knowm.xchart.QuickChart;
 
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.TreeMap;
+import org.knowm.xchart.*;
+import java.util.*;
 
 public class MASS extends Game{
 
@@ -64,14 +71,17 @@ public class MASS extends Game{
 
 	private Properties properties;
 	private ArrayList<Properties> settings = new ArrayList<Properties>();
+	public boolean raycastingOn;
 
 	private static DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.ENGLISH);
 	public static DecimalFormat largeIntegerFormat = new DecimalFormat("###,###,###", symbols);
 	public static DecimalFormat largeDoubleFormat = new DecimalFormat("###,###.00", symbols);
 
+	public GNT GapNavigationTreeAlgorithm;
+
 	@Override
 	public void create(){
-		readSettings();
+        readSettings();
 		camera = new OrthographicCamera();
 		viewport = new ScreenViewport(camera);
 		PPM = MINIMAL_ZOOM;
@@ -100,6 +110,8 @@ public class MASS extends Game{
 		mapBuilderScreen = new MapBuilderScreen(this);
 		mapSimulatorScreen = new MapSimulatorScreen(this);
         setScreen(mainMenuScreen);
+
+        GapNavigationTreeAlgorithm = new GNT(map);
 	}
 
 	@Override
@@ -147,6 +159,12 @@ public class MASS extends Game{
 				if (toAdd.getName().equals("fs") && toAdd.getSetting().equals("false")){
 					Gdx.graphics.setWindowedMode(WINDOW_WIDTH,WINDOW_HEIGHT);
 				}
+				if (toAdd.getName().equals("raycasting") && toAdd.getSetting().equals("true")) {
+					this.raycastingOn = true;
+				}
+				if (toAdd.getName().equals("raycasting") && toAdd.getSetting().equals("false")) {
+					this.raycastingOn = false;
+				}
 			}
 //			System.out.println("File was read. The size was " + settings.size());
 			br.close();
@@ -172,7 +190,7 @@ public class MASS extends Game{
 
 			ArrayList<String> listy = new ArrayList<String>();
 			String prop;
-			for(int i = 0; i < 2; i++){
+			for(int i = 0; i < 3; i++){
 				Properties current = getSettings().get(i);
 				prop = (current.getLine());
 				listy.add(prop);
@@ -188,6 +206,7 @@ public class MASS extends Game{
 //			System.out.println("File was written. The size was " + settings.size() + ". The contents was: ");
 			System.out.println(getSettingStrings()[0]);
 			System.out.println(getSettingStrings()[1]);
+			System.out.println(getSettingStrings()[2]);
 
 			bw.close();
 			fw.close();

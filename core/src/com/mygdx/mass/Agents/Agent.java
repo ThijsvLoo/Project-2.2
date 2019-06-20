@@ -13,6 +13,7 @@ import com.mygdx.mass.MapToGraph.Dijkstra;
 import com.mygdx.mass.MapToGraph.Edge;
 import com.mygdx.mass.MapToGraph.Graph;
 import com.mygdx.mass.MapToGraph.Vertex;
+import com.mygdx.mass.Sensors.GapSensor;
 import com.mygdx.mass.Sensors.NoiseField;
 import com.mygdx.mass.Sensors.RayCastField;
 import com.mygdx.mass.Sensors.VisualField;
@@ -23,6 +24,7 @@ import com.mygdx.mass.World.WorldObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.mygdx.mass.Agents.Intruder.SPRINT_MAX_TURN_SPEED;
@@ -42,7 +44,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     private float blindDuration;
     private float immobilityDuration;
 
-    protected boolean stealth = false, deaf = false, blind = false;
+    protected boolean stealth = false, deaf = false, blind = false, gapSensorOn = false, isRayCastOff = false, drawGapSensor = false;
 
     public IndividualMap individualMap;
 
@@ -67,10 +69,12 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected VisualField buildingDetection;
     protected VisualField sentryTowerDetection;
 
-    protected RayCastField rayCastFieldBuildings, rayCastFieldTowers, rayCastFieldAgents;
+    protected RayCastField rayCastFieldBuildings, rayCastFieldTowers, rayCastFieldAgents, rayCastFieldGapSensor;
     protected ArrayList<RayCastField> allRayCastFields;
     protected short objectsToCheck = 0, objectsTransparent = 0, objectsWanted = 0;
 
+    protected TreeMap<Float, Float> angleDistanceCloudPoints;
+    protected GapSensor gapSensor;
 
     protected NoiseField noiseField;
 
@@ -96,6 +100,8 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         direction = new Vector2();
         velocity = new Vector2();
         allRayCastFields = new ArrayList<RayCastField>();
+        angleDistanceCloudPoints = new TreeMap<Float, Float>();
+        isRayCastOff = !mass.raycastingOn;
 
 //        collisions = new ArrayList<Object>();
         count++;
@@ -117,9 +123,9 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
 
-        agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
-        agentDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
-        agentDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
+        if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
+        if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
+        if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
 
 //        if(CONE_ENABLED == true) {agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);}
 
@@ -252,6 +258,12 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         if (rayCastFieldTowers != null) allRayCastFields.add(rayCastFieldTowers);
         if (rayCastFieldBuildings != null) allRayCastFields.add(rayCastFieldBuildings);
         if (rayCastFieldAgents != null) allRayCastFields.add(rayCastFieldAgents);
+        if (rayCastFieldGapSensor != null && gapSensorOn) {
+            allRayCastFields.add(rayCastFieldGapSensor);
+            angleDistanceCloudPoints.clear();
+            angleDistanceCloudPoints.putAll(rayCastFieldGapSensor.getAngleDistanceCloudPoints());
+            gapSensorOn = false; System.out.println("Processing reached");
+        }
 
 
         // HashSet is used because it will never add a duplicate object reference
@@ -260,10 +272,9 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             tempSet.addAll(r.getCollisionObjects());
         }
 
-        //clearing this will cause the agent not chasing intruder, causing an error...
-//        objectsInSight.clear();
-//        boxObjectsInSight.clear();
-//        enemyInSight.clear();
+        objectsInSight.clear();
+        boxObjectsInSight.clear();
+        enemyInSight.clear();
 
         for (Object o : tempSet) {
             objectsInSight.add((WorldObject)o);
@@ -272,24 +283,16 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
         for (WorldObject o : objectsInSight) {
             if (o instanceof Building) {
-                if(!individualMap.getBoxObjects().contains(o)){
-                    boxObjectsInSight.add((Building) o);
-                }
+                boxObjectsInSight.add((Building) o);
             }
             else if (o instanceof  SentryTower) {
-                if(!individualMap.getBoxObjects().contains(o)){
-                    boxObjectsInSight.add((SentryTower) o);
-                }
+                boxObjectsInSight.add((SentryTower) o);
             }
             else if (this instanceof Guard && o instanceof Intruder) {
-                if(!individualMap.getBoxObjects().contains(o)){
-                    enemyInSight.add((Intruder) o);
-                }
+                enemyInSight.add((Intruder) o);
             }
             else if (this instanceof Intruder && o instanceof Guard) {
-                if(!individualMap.getBoxObjects().contains(o)){
-                    enemyInSight.add((Guard) o);
-                }
+                enemyInSight.add((Guard) o);
             }
             //System.out.println(this + " can see "+o.getClass() + " at "+o);
         }
@@ -297,6 +300,31 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         //System.out.println(objectsInSight.size()+ " -> total objects of which: "+boxObjectsInSight.size()+" are box objects and "+enemyInSight.size()+" are enemies");
 
 
+    }
+
+    public void fireGapSensor(short objectsToCheck, short objectsTransparent, short objectsWanted, float range, float angle, float deltaAngleThreshold) {
+        this.objectsToCheck = objectsToCheck;
+        this.objectsTransparent = objectsTransparent;
+        this.objectsWanted = objectsWanted;
+        rayCastFieldGapSensor = new RayCastField(mass);
+        doRayCasting(rayCastFieldGapSensor, SIZE, range, angle, "GAP SENSOR");
+        TreeMap<Float, Float> treeMap = rayCastFieldGapSensor.getAngleDistanceCloudPoints();
+        gapSensor = new GapSensor(range, SIZE, deltaAngleThreshold, new Vector2(getBody().getPosition()));
+        for (java.util.Map.Entry<Float, Float> e : treeMap.entrySet()) {
+            gapSensor.addEntry(e.getKey(), e.getValue());
+        }
+        gapSensor.convertToDeltaDistanceCloudPoints();
+        gapSensor.createGapList();
+        System.out.println("Gap Sensor Fired!");
+    }
+
+    public void fireGapSensor() {
+        fireGapSensor((short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT),
+                (short) 0,
+                (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT),
+                (float) (Math.sqrt((double)((Map.DEFAULT_HEIGHT*Map.DEFAULT_HEIGHT)+(Map.DEFAULT_WIDTH*Map.DEFAULT_WIDTH)))),
+                360,
+                1f);
     }
 
     //get the unit vector with length 1
@@ -345,6 +373,19 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public ArrayList<RayCastField> getAllRayCastFields() {
         return allRayCastFields;
     }
+    public boolean getGapSensorStatus() { return gapSensorOn; }
+    public TreeMap<Float, Float> getAngleDistanceCloudPoints() {
+        return angleDistanceCloudPoints;
+    }
+    public RayCastField getRayCastFieldGapSensor() {
+        return rayCastFieldGapSensor;
+    }
+    public boolean getDrawGapSensor() { return drawGapSensor; }
+    public GapSensor getGapSensor() {
+        return gapSensor;
+    }
+    public boolean isRayCastOff() { return isRayCastOff; }
+    //    public ArrayList<Object> getCollisions() { return collisions; }
     public int getTurnSide() { return turnSide; }
 //    public ArrayList<Object> getCollisions() { return collisions; }
 
@@ -383,6 +424,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void setRoute(LinkedBlockingQueue<Vector2> route) { this.route = route; }
     public void setDirection(Vector2 direction) { this.direction = direction; }
     public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
+    public void setGapSensorStatus(boolean value) { this.gapSensorOn = value; }
 //    public void setCollisions(ArrayList<Object> collisions) { this.collisions = collisions; }
 
     public String toString() {
