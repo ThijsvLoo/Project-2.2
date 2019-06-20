@@ -49,7 +49,7 @@ public class MapSimulatorScreen implements Screen {
 
     private ShapeRenderer shapeRenderer;
 
-    private MapSimulatorHUD hud;
+    public MapSimulatorHUD hud;
     private MapSimulatorInfo info;
 
     private InputMultiplexer inputMultiplexer;

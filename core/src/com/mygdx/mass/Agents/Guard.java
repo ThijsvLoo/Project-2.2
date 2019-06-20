@@ -12,6 +12,7 @@ import com.mygdx.mass.MapToGraph.TSP;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import com.mygdx.mass.Scenes.MapSimulatorHUD;
 import com.mygdx.mass.Sensors.GapSensor;
 import com.mygdx.mass.Sensors.RayCastField;
 import com.mygdx.mass.World.Map;
@@ -82,32 +83,32 @@ public class Guard extends Agent {
         }
         else if (!enemyInSight.isEmpty()) {
             if (currentState != State.CHASE) {
-                currentState = State.CHASE;
+                setCurrentState(State.CHASE);
                 destination = null;
                 route.clear();
             }
 //        } else if (!MASS.map.getIntruders().isEmpty()) {
 //            if (currentState != State.INTERCEPT) {
-//                currentState = State.INTERCEPT;
+//                setCurrentState(State.INTERCEPT);
 //                destination = null;
 //                route.clear();
 //            }
         }
         else if (!intrudersSeen.isEmpty()){
             if (currentState != State.SEARCH) {
-                currentState = State.SEARCH;
+                setCurrentState(State.SEARCH);
                 destination = null;
                 route.clear();
             }
         } else if (!individualMap.getUnexploredPlaces().isEmpty()) {
             if (currentState != State.EXPLORE) {
-                currentState = State.EXPLORE;
+                setCurrentState(State.EXPLORE);
                 destination = null;
                 route.clear();
             }
         } else {
             if (currentState != State.PATROL) {
-                currentState = State.PATROL;
+                setCurrentState(State.PATROL);
                 destination = null;
                 route.clear();
             }
@@ -272,7 +273,12 @@ public class Guard extends Agent {
         }
     }
 
-    public void setCurrentState(State state) { this.currentState = state; }
+    public void setCurrentState(State state) {
+        this.currentState = state;
+        mass.mapSimulatorScreen.hud.setGuardState(state);
+        System.out.println("Guard state changed to " + state.toString());
+
+    }
 
     public PredictionModel getPredictionModel() { return predictionModel; }
 

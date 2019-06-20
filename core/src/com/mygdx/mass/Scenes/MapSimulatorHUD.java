@@ -5,18 +5,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.mass.Agents.Guard;
+import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.*;
 import com.mygdx.mass.Screens.MainMenuScreen;
@@ -54,8 +51,12 @@ public class MapSimulatorHUD implements Disposable {
     private ImageButton simulate;
 
     private Slider speed;
+    public SelectBox<Guard.State> guardState;
+    public SelectBox<Intruder.State> intruderState;
+
     private int prevSpeed;
     private boolean paused;
+    private Skin glassySkin = new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json"));
 
     public MapSimulatorHUD(final MapSimulatorScreen mapSimulatorScreen){
         this.mapSimulatorScreen = mapSimulatorScreen;
@@ -137,6 +138,7 @@ public class MapSimulatorHUD implements Disposable {
         pause.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 prevSpeed = mapSimulatorScreen.getWorldSpeedFactor();
+                speed.setValue(0);
                 mapSimulatorScreen.setWorldSpeedFactor(0);
                 setTable();
             }
@@ -175,7 +177,7 @@ public class MapSimulatorHUD implements Disposable {
             }
         });
 
-        speed = new Slider(1, 500, 1, false, new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json")));
+        speed = new Slider(1, 500, 1, false, glassySkin);
         speed.setValue(mapSimulatorScreen.getWorldSpeedFactor());
         speed.addListener(new ChangeListener() {
             @Override
@@ -193,6 +195,29 @@ public class MapSimulatorHUD implements Disposable {
                 }
             }
         });
+
+        guardState = new SelectBox<Guard.State>(glassySkin);
+        guardState.setItems(Guard.State.values());
+        guardState.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                for (Guard g : mass.getMap().getGuards()) {
+                    g.setCurrentState(guardState.getSelected());
+                }
+            }
+        });
+
+        intruderState = new SelectBox<Intruder.State>(glassySkin);
+        intruderState.setItems(Intruder.State.values());
+        intruderState.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                for (Intruder i : mass.getMap().getIntruders()) {
+                    i.setCurrentState(intruderState.getSelected());
+                }
+            }
+        });
+
         float sliderWidth = 500.f;
         int colSpan = (int) Math.ceil(sliderWidth/BUTTON_SIZE);
         table.defaults().pad(2.0f);
@@ -207,7 +232,11 @@ public class MapSimulatorHUD implements Disposable {
         miniTable.add(pause).size(BUTTON_SIZE);
         miniTable.add(stop).size(BUTTON_SIZE);
         miniTable.add(exit).size(BUTTON_SIZE);
+        miniTable.add(guardState);
+        miniTable.add(intruderState);
         stage.addActor(table);
+
+        Gdx.input.setInputProcessor(stage);
 
         miniTable.removeActor(simulate);
     }
@@ -224,6 +253,11 @@ public class MapSimulatorHUD implements Disposable {
 
     public void update(float dt){
         if(!speed.isDragging()) speed.setValue(mapSimulatorScreen.getWorldSpeedFactor());
+//        guardState.act(dt);
+//        guardState.getList().act(dt);
+        guardState.getScrollPane().act(dt);
+        intruderState.getScrollPane().act(dt);
+
     }
 
     public void resize(int width, int height) {
@@ -247,6 +281,16 @@ public class MapSimulatorHUD implements Disposable {
         }
         miniTable.add(stop).size(BUTTON_SIZE);
         miniTable.add(exit).size(BUTTON_SIZE);
+        miniTable.add(guardState);
+        miniTable.add(intruderState);
+    }
+
+    public void setGuardState(Guard.State item){
+        guardState.setSelected(item);
+    }
+
+    public void setIntruderState(Intruder.State item){
+        intruderState.setSelected(item);
     }
 
 }

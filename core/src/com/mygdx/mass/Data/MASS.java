@@ -166,7 +166,6 @@ public class MASS extends Game{
 					this.raycastingOn = false;
 				}
 			}
-//			System.out.println("File was read. The size was " + settings.size());
 			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -179,37 +178,21 @@ public class MASS extends Game{
 
 
 	public void writeSettings(){
-//		settings = newSettings;
 		BufferedWriter bw = null;
 		FileWriter fw = null;
 
-//		System.out.println(getSettings().size());
 		try {
 			fw = new FileWriter("config.properties", false);
 			bw = new BufferedWriter(fw);
-
-			ArrayList<String> listy = new ArrayList<String>();
-			String prop;
-			for(int i = 0; i < 3; i++){
+			for(int i = 0; i < settings.size(); i++){
 				Properties current = getSettings().get(i);
-				prop = (current.getLine());
-				listy.add(prop);
-			}
-//			System.out.println(listy.size());
-			for (int j = 0; j < listy.size(); j++){
-				prop = listy.get(j);
-				bw.write(prop);
+				bw.write(current.getLine());
 				bw.newLine();
+				System.out.println(getSettingStrings()[i]);
 			}
-			listy.clear();
-
-//			System.out.println("File was written. The size was " + settings.size() + ". The contents was: ");
-			System.out.println(getSettingStrings()[0]);
-			System.out.println(getSettingStrings()[1]);
-			System.out.println(getSettingStrings()[2]);
-
 			bw.close();
 			fw.close();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

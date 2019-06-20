@@ -215,4 +215,11 @@ public class Intruder extends Agent {
     public void setBreakThroughProgress(float breakThroughProgress) { this.breakThroughProgress = breakThroughProgress; }
     public void setDetected(boolean detected) { this.detected = detected; }
 
+    public void setCurrentState(State state) {
+        this.currentState = state;
+        mass.mapSimulatorScreen.hud.setIntruderState(state);
+        System.out.println("Intruder state changed to " + state.toString());
+    }
+
+
 }
