@@ -34,6 +34,15 @@ public class WorldContactListener implements ContactListener {
             case GUARD_BIT | WALL_BIT :
             case GUARD_BIT | BUILDING_BIT :
             case GUARD_BIT | SENTRY_TOWER_BIT :
+//            case GUARD_BIT | DOOR_BIT : {
+//                Guard guard = fixtureA.getUserData() instanceof Guard ? (Guard) fixtureA.getUserData() : (Guard) fixtureB.getUserData();
+//                Door door = fixtureA.getUserData() instanceof Door ? (Door) fixtureA.getUserData() : (Door) fixtureB.getUserData();
+//                guard.setDoor(door);
+//                if (door.getCurrentState() == CLOSED) {
+//                    guard.setDoorUnlockTime(Intruder.DOOR_UNLOCK_TIME_SLOW + (float) Math.random()*4 - 2);
+//                }
+//                break;
+//            }
             case INTRUDER_BIT | WALL_BIT :
             case INTRUDER_BIT | BUILDING_BIT :
             case INTRUDER_BIT | SENTRY_TOWER_BIT :
@@ -172,6 +181,14 @@ public class WorldContactListener implements ContactListener {
             case GUARD_BIT | WALL_BIT :
             case GUARD_BIT | BUILDING_BIT :
             case GUARD_BIT | SENTRY_TOWER_BIT :
+//            case GUARD_BIT | DOOR_BIT : {
+//                Guard guard = fixtureA.getUserData() instanceof Guard ? (Guard) fixtureA.getUserData() : (Guard) fixtureB.getUserData();
+//                Door door = fixtureA.getUserData() instanceof Door ? (Door) fixtureA.getUserData() : (Door) fixtureB.getUserData();
+//                guard.setDoor(null);
+//                guard.setBreakThroughProgress(0.0f);
+//                guard.setDoorUnlockTime(0.0f);
+//                break;
+//            }
             case INTRUDER_BIT | WALL_BIT :
             case INTRUDER_BIT | BUILDING_BIT :
             case INTRUDER_BIT | SENTRY_TOWER_BIT :

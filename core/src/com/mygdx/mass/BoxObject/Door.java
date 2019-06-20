@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.MapToGraph.Vertex;
 
 import java.util.ArrayList;
 
@@ -48,7 +49,9 @@ public class Door extends BoxObject {
 
         polygonShape.dispose();
     }
-
+    public Vertex getDoorCenter(){
+        return new Vertex(this.getRectangle().getCenter(new Vector2()).x, this.getRectangle().getCenter(new Vector2()).y);
+    }
     public State getCurrentState() {
         return currentState;
     }

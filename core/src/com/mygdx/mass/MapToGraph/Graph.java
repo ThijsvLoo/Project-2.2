@@ -1,11 +1,10 @@
 package com.mygdx.mass.MapToGraph;
 
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.Agents.Agent;
-import com.mygdx.mass.BoxObject.BoxObject;
-import com.mygdx.mass.BoxObject.Building;
-import com.mygdx.mass.BoxObject.SentryTower;
-import com.mygdx.mass.BoxObject.Wall;
+import com.mygdx.mass.BoxObject.*;
+import com.mygdx.mass.Data.MASS;
 
 
 import java.util.ArrayList;
@@ -17,8 +16,10 @@ public class Graph {
     private Vertex destination;
     private ArrayList<BoxObject> exploredBuilding;
     private Agent agent;
-    public Graph(ArrayList<Vertex> vertices, ArrayList<Edge> edges, Agent agent){
+    public Graph(Vertex start, Vertex end, ArrayList<Vertex> vertices, ArrayList<Edge> edges, Agent agent){
         this.vertices = vertices;
+        this.start = start;
+        this.destination = end;
         this.edges = edges;
         this.agent = agent;
 
@@ -39,9 +40,32 @@ public class Graph {
 
     }
 
-    public void connectVerticesList(ArrayList<Vertex> vertices){
+    public void connectVerticesList(Vertex start, Vertex end, ArrayList<Vertex> vertices){
+
         boolean proceed = false;
         edges.clear();
+
+        ArrayList<Vertex> doorFront = new ArrayList<Vertex>();
+        Building startBuilding = inBuilding(start);
+        Building endBuilding = inBuilding(end);
+        if(startBuilding!=null && startBuilding==endBuilding){
+            addEdge(new Edge(start, end));
+        }
+        if(startBuilding!=null){
+            for(Door door: startBuilding.getDoors()){
+                addEdge(new Edge(door.getDoorCenter(),start));
+            }
+        }
+        if(endBuilding!=null){
+            for(Door door: endBuilding.getDoors()){
+                addEdge(new Edge(end, door.getDoorCenter()));
+            }
+        }
+
+        for (Building building : MASS.map.getBuildings()){
+            doorFront.addAll(addDoors(building));
+        }
+        vertices.addAll(doorFront);
         BoxObject tmp = null;
         ArrayList<BoxObject> newBoxes = new ArrayList<BoxObject>();
         for(Vertex v1: vertices){
@@ -91,10 +115,12 @@ public class Graph {
 
         }
 
+
     }
     private BoxObject connectVertices(Vertex v1, Vertex v2){
         for(Building building: agent.getIndividualMap().getBuildings()){
             if(Intersector.intersectSegmentRectangle(v1.getCoordinates(),v2.getCoordinates(), building.getRectangle())){
+
                     return building;
             }
         }
@@ -119,10 +145,15 @@ public class Graph {
         vertices.add(start);
         vertices.add(destination);
 
+
         for (Building building : agent.getIndividualMap().getBuildings()) {
+
             if (Intersector.intersectSegmentRectangle(start.getCoordinates(), destination.getCoordinates(),building.getRectangle())) {
+
                 exploredBuilding.add(building);
                 add4Corners(building);
+
+
             }
         }
 
@@ -141,7 +172,14 @@ public class Graph {
 
         return vertices;
     }
-
+    private Building inBuilding(Vertex vertex){
+        for (Building building: MASS.map.getBuildings()){
+            if(building.getRectangle().contains(vertex.getCoordinates().x,vertex.getCoordinates().y)){
+                return building;
+            }
+        }
+        return null;
+    }
     private <T extends BoxObject> ArrayList<Vertex> add4Corners(T obj){
         ArrayList<Vertex> corners = new ArrayList<Vertex>();
 
@@ -150,9 +188,72 @@ public class Graph {
             corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)0.5), obj.getRectangle().y+obj.getRectangle().height+((float)0.5)));
             corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)0.5), obj.getRectangle().y-((float)0.5)));
 
+
             vertices.addAll(corners);
 
         return corners;
+    }
+
+    private ArrayList<Vertex> addDoors(Building building){
+        ArrayList<Vertex> doorCenter = new ArrayList<Vertex>();
+        ArrayList<Vertex> doorFront = new ArrayList<Vertex>();
+
+        ArrayList<Door> doors = new ArrayList<Door>();
+        doors.addAll(building.getDoors());
+        for(Door door: doors){
+            doorCenter.add(door.getDoorCenter());
+        }
+        for(Door door: doors){
+            doorFront.add(addDoorFront(door.getDoorCenter(), building));
+        }
+        for(int i=0; i<doors.size(); i++){
+            addEdge(new Edge(doorCenter.get(i), doorFront.get(i)));
+        }
+        for(Vertex door: doorCenter){
+            for(Vertex door2: doorCenter){
+                if(door != door2){
+                    addEdge(new Edge(door,door2));
+                }
+            }
+        }
+
+
+        return doorFront;
+    }
+    private Vertex addDoorFront(Vertex doorCenter, Building building){
+        double x = doorCenter.getCoordinates().x;
+        double y = doorCenter.getCoordinates().y;
+        double front_x = -10000;
+        double front_y = -10000;
+        if (x == building.getRectangle().x){
+            front_x = (x - 0.5);
+            front_y = y;
+            System.out.println("added door");
+            System.out.println(x+ " "+ y);
+        }
+        else if(y == building.getRectangle().y){
+            front_y = (y - 0.5);
+            front_x = x;
+            System.out.println("added door");
+            System.out.println(x+ " "+ y);
+        }
+        else if(x == building.getRectangle().x+ building.getRectangle().width){
+            front_x = (x + 0.5);
+            front_y = y;
+            System.out.println("added door");
+            System.out.println(x+ " "+ y);
+        }
+        else if(y == building.getRectangle().y+building.getRectangle().height){
+            front_y = y + 0.5;
+            front_x = x;
+            System.out.println("added door");
+            System.out.println(x+ " "+ y);
+        }
+        else{
+            System.out.println("not found!!");
+            System.out.println(x+ " "+ y);
+        }
+       return new Vertex((float)front_x,(float)front_y);
     }
 
     public void connectTSP(Vertex start){

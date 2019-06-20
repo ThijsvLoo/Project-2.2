@@ -22,7 +22,7 @@ public class Dijkstra {
     public Dijkstra(Graph graph){
         this.vertices = graph.getVertices();
         this.edges = graph.getEdges();
-        graph.connectVerticesList(vertices);
+        graph.connectVerticesList(graph.getStart(),graph.getDestination(),vertices);
         this.start = graph.getStart();
         this.destination = graph.getDestination();
 
@@ -85,16 +85,32 @@ public class Dijkstra {
     }
 
     public ArrayList<Vector2> computePath(){
+        ArrayList<Vector2> path = new ArrayList<Vector2>();
+        for(Edge edge: edges){
+            if(start==edge.getVertex1()&&destination==edge.getVertex2()) {
+                path.add(new Vector2(destination.getCoordinates()));
+                return path;
+            }
+
+            if(start==edge.getVertex2()&&destination==edge.getVertex1()) {
+                path.add(new Vector2(destination.getCoordinates()));
+                return path;
+            }
+        }
+
         while(unvisitedNodes.size()>0){
+
             Vertex vertex = getNextVertex(unvisitedNodes);
             exploreVertex(vertex);
             visitedNodes.add(vertex);
             unvisitedNodes.remove(vertex);
         }
 
-        ArrayList<Vector2> path = new ArrayList<Vector2>();
+
+
+
         Vertex tmp = destination;
-        if(predecessors.get(destination)==null) return null;
+        if(predecessors.get(destination)==null) return path; //if weird then this is null
         path.add(destination.getCoordinates());
         while(predecessors.get(tmp)!=null){
             tmp = predecessors.get(tmp);

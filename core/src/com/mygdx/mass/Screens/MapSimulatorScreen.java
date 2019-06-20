@@ -566,8 +566,7 @@ public class MapSimulatorScreen implements Screen {
             Vector2 coordinates = toWorldCoordinate(screenX, screenY);
             for (int i = 0; i< mass.getMap().getBoxObjects().size(); i++) {
 //                System.out.println(mass.getMap().getBoxObjects().get(i).getRectangle().toString());
-                if (mass.getMap().getBoxObjects().get(i).getRectangle().contains(coordinates) ||
-                    coordinates.x < 0 || coordinates.x > 200 || coordinates.y < 0 || coordinates.y > 200){
+                if  (coordinates.x < 0 || coordinates.x > 200 || coordinates.y < 0 || coordinates.y > 200){
                     System.out.println("Agent cannot travel to " + coordinates.toString());
                     return true;
                 }

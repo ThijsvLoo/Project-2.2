@@ -37,8 +37,9 @@ public class TSP {
             }
 
             if(nextVertex != null) { // added this to solve the nullpointerexception error
-                Graph graph = new Graph(new ArrayList<Vertex>(), new ArrayList<Edge>(), agent);
+                Graph graph = new Graph(start, nextVertex,new ArrayList<Vertex>(), new ArrayList<Edge>(), agent);
                 graph.getPathVertices(start, nextVertex);
+
 
                 Dijkstra dijkstra = new Dijkstra(graph);
 
