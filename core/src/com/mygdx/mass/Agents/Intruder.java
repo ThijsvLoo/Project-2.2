@@ -118,16 +118,21 @@ public class Intruder extends Agent {
     public void updateState() {
         if (!detected) { //hasn't been detected yet
             if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
-                currentState = State.EXPLORE;
-            } else {
-                currentState = State.ESCAPE;
-            }
-        } else {
-            if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
-                currentState = State.EVADE;
-            } else {
-                currentState = State.ESCAPE;
-            }
+                if(currentState != State.EXPLORE){
+                	currentState = State.EXPLORE;
+				}
+            } else if(currentState != State.ESCAPE){
+				currentState = State.ESCAPE;
+			}
+		} else {
+			if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
+				if(currentState != State.EVADE){
+					currentState = State.EVADE;
+				}
+			} else if(currentState != State.EXPLORE){
+					currentState = State.ESCAPE;
+
+			}
         }
     }
 
