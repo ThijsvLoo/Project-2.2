@@ -10,7 +10,7 @@ buildscript {
         google()
     }
     dependencies {
-        
+        compile fileTree(include: ['*.jar'])
 
     }
 }
