@@ -203,6 +203,8 @@ public class MapBuilderHUD implements Disposable {
             	System.out.println("Current action: Clear map");
             	mapBuilderScreen.mass.getMap().clearMap();
             	mapBuilderScreen.mass.getMap().addOuterWalls();
+            	mass.mapSimulatorScreen.hud.setIntruderState(Intruder.State.NONE);
+            	mass.mapSimulatorScreen.hud.setGuardState(Guard.State.NONE);
 
             }
         });

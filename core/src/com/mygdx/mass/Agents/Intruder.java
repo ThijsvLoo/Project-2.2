@@ -119,18 +119,18 @@ public class Intruder extends Agent {
         if (!detected) { //hasn't been detected yet
             if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
                 if(currentState != State.EXPLORE){
-                	currentState = State.EXPLORE;
+                	setCurrentState(State.EXPLORE);
 				}
             } else if(currentState != State.ESCAPE){
-				currentState = State.ESCAPE;
+				setCurrentState(State.ESCAPE);
 			}
 		} else {
 			if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
 				if(currentState != State.EVADE){
-					currentState = State.EVADE;
+					setCurrentState(State.EVADE);
 				}
 			} else if(currentState != State.EXPLORE){
-					currentState = State.ESCAPE;
+					setCurrentState(State.ESCAPE);
 
 			}
         }
