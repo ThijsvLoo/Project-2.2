@@ -246,26 +246,26 @@ public class MapSimulatorScreen implements Screen {
 //            drawUnexploredPoints(map.getAgents().get(0));
 //        }
 
-        if (!map.getGuards().isEmpty()) {//for the sake of testing
-            if (!map.getGuards().isEmpty() && !map.getGuards().get(0).getPredictionModel().guardMoves.isEmpty()) {
-                for (PredictionPoint predictionPoint : map.getGuards().get(0).getPredictionModel().guardMoves) {
-                    Gdx.gl.glLineWidth(4);
-                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                    shapeRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
-                    shapeRenderer.circle(predictionPoint.getPosition().x, predictionPoint.getPosition().y, 1);
-                    shapeRenderer.end();
-                }
-            }
-            if (!map.getGuards().isEmpty() && !map.getGuards().get(0).getPredictionModel().intruderMoves.isEmpty()) {
-                for (PredictionPoint predictionPoint : map.getGuards().get(0).getPredictionModel().intruderMoves) {
-                    Gdx.gl.glLineWidth(4);
-                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-                    shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
-                    shapeRenderer.circle(predictionPoint.getPosition().x, predictionPoint.getPosition().y, 1);
-                    shapeRenderer.end();
-                }
-            }
-        }
+//        if (!map.getGuards().isEmpty()) {//for the sake of testing
+//            if (!map.getGuards().isEmpty() && !map.getGuards().get(0).getPredictionModel().guardMoves.isEmpty()) {
+//                for (PredictionPoint predictionPoint : map.getGuards().get(0).getPredictionModel().guardMoves) {
+//                    Gdx.gl.glLineWidth(4);
+//                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//                    shapeRenderer.setColor(0.0f, 1.0f, 0.0f, 1.0f);
+//                    shapeRenderer.circle(predictionPoint.getPosition().x, predictionPoint.getPosition().y, 1);
+//                    shapeRenderer.end();
+//                }
+//            }
+//            if (!map.getGuards().isEmpty() && !map.getGuards().get(0).getPredictionModel().intruderMoves.isEmpty()) {
+//                for (PredictionPoint predictionPoint : map.getGuards().get(0).getPredictionModel().intruderMoves) {
+//                    Gdx.gl.glLineWidth(4);
+//                    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//                    shapeRenderer.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+//                    shapeRenderer.circle(predictionPoint.getPosition().x, predictionPoint.getPosition().y, 1);
+//                    shapeRenderer.end();
+//                }
+//            }
+//        }
 
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
@@ -575,8 +575,9 @@ public class MapSimulatorScreen implements Screen {
                 intruder.goTo(coordinates);
             }
             for (Guard guard : map.getGuards()) {
-                guard.setDestination(null);
-                guard.getRoute().clear();
+                guard.goTo(coordinates);
+//                guard.setDestination(null);
+//                guard.getRoute().clear();
             }
             return true;
         }

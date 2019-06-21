@@ -4,11 +4,15 @@ package com.mygdx.mass.Agents;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.mass.Algorithms.PredictionModel;
+import com.mygdx.mass.BoxObject.Door;
+import com.mygdx.mass.BoxObject.Window;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.MapToGraph.TSP;
 
 import java.util.ArrayList;
 import com.mygdx.mass.Sensors.RayCastField;
+
+import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 
 public class Guard extends Agent {
@@ -25,6 +29,13 @@ public class Guard extends Agent {
     private float deafDuration;
 
     private boolean onTower;
+    public static final float DOOR_UNLOCK_TIME_SLOW = 12.0f;
+
+    protected Door door;
+
+
+    protected float doorUnlockTime;
+    protected float breakThroughProgress;
 
     private PredictionModel predictionModel;
 
@@ -56,8 +67,13 @@ public class Guard extends Agent {
 
     public void update(float delta) {
         super.update(delta);
+
+
         updateState();
         updateAction();
+        if (door != null) {
+            unlockDoorSlow(delta);
+        }
     }
 
     private void updateState() {
@@ -73,36 +89,36 @@ public class Guard extends Agent {
             currentState = State.PATROL;
         }
 
-        if (!super.blind) {
-            if (!onTower) {
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-                objectsTransparent = (short) (WINDOW_BIT);
-                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-                rayCastFieldBuildings = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
-
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
-                objectsTransparent = (short) (SENTRY_TOWER_BIT);
-                objectsWanted = (short) (SENTRY_TOWER_BIT);
-                rayCastFieldTowers = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
-
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
-                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
-                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
-                rayCastFieldAgents = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
-            }
-            else {
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                rayCastFieldAgents = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
-            }
-        }
-
-        processResultsFromRayCastFields();
+//        if (!super.blind) {
+//            if (!onTower) {
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+//                objectsTransparent = (short) (WINDOW_BIT);
+//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+//                rayCastFieldBuildings = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
+//
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
+//                objectsTransparent = (short) (SENTRY_TOWER_BIT);
+//                objectsWanted = (short) (SENTRY_TOWER_BIT);
+//                rayCastFieldTowers = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
+//
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
+//                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
+//                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
+//                rayCastFieldAgents = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
+//            }
+//            else {
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                rayCastFieldAgents = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
+//            }
+//        }
+//
+//        processResultsFromRayCastFields();
 
 
 //        if (capture != null) {
@@ -167,11 +183,26 @@ public class Guard extends Agent {
     public void search() {
 
     }
+    private void unlockDoorSlow(float delta) {
+        if (door != null && door.getCurrentState() == CLOSED) {
+            breakThroughProgress += delta*100/doorUnlockTime;
+            if (breakThroughProgress >= 100.0f) {
+                door.setCurrentState(Door.State.OPEN);
+            }
+        }
+    }
 
     public PredictionModel getPredictionModel() { return predictionModel; }
-
+    public Door getDoor() { return door; }
     public void setCurrentState(State state) { this.currentState = state; }
     public void setPreviousState(State state) { this.previousState = state; }
+    public float getBreakThroughProgress() { return breakThroughProgress; }
+
+
+    public void setDoor(Door door) { this.door = door; }
+
+    public void setDoorUnlockTime(float doorUnlockTime) { this.doorUnlockTime = doorUnlockTime; }
+    public void setBreakThroughProgress(float breakThroughProgress) { this.breakThroughProgress = breakThroughProgress; }
 
     public void resetState() {
         currentState = State.NONE;
