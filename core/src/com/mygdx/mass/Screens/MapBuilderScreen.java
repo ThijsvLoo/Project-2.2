@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -256,7 +257,11 @@ public class MapBuilderScreen implements Screen {
             if (rectangle.width > Door.SIZE && rectangle.height > Door.SIZE) {
                 shapeRenderer.setColor(0.0f, 1.0f, 1.0f, 1.0f);
                 for (BoxObject boxObject : map.getBoxObjects()) {
-                    if (boxObject.getRectangle().overlaps(rectangle)) {
+                    if (boxObject.getObjectType().equals(BoxObject.ObjectType.WALL) && boxObject.getRectangle().overlaps(rectangle)) {
+                        shapeRenderer.setColor(Color.RED);
+                        break;
+                    }
+                    if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA) {
                         shapeRenderer.setColor(Color.RED);
                         break;
                     }
@@ -478,7 +483,11 @@ public class MapBuilderScreen implements Screen {
                                                         Math.abs(startDrag.y - endDrag.y));
                     boolean overlap = false;
                     for (BoxObject boxObject : map.getBoxObjects()) {
-                        if (boxObject.getRectangle().overlaps(rectangle)) {
+                        if (boxObject.getObjectType().equals(BoxObject.ObjectType.WALL) && boxObject.getRectangle().overlaps(rectangle)){
+                            overlap = true;
+                            break;
+                        }
+                        if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA) {
                             overlap = true;
                             break;
                         }
