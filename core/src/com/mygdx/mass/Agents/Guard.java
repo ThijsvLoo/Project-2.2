@@ -177,5 +177,7 @@ public class Guard extends Agent {
         currentState = State.NONE;
         previousState = State.NONE;
     }
-
+    public State getCurrentState(){
+        return currentState;
+    }
 }

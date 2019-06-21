@@ -198,6 +198,9 @@ public class MapSimulatorHUD implements Disposable {
 
         guardState = new SelectBox<Guard.State>(new Skin(Gdx.files.internal("guard/glassyui/glassy-ui.json")));
         guardState.setItems(Guard.State.values());
+        for (Guard g : mass.getMap().getGuards()) {
+            guardState.setSelected(g.getCurrentState());
+        }
         guardState.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -209,6 +212,9 @@ public class MapSimulatorHUD implements Disposable {
 
         intruderState = new SelectBox<Intruder.State>(new Skin(Gdx.files.internal("intruder/glassyui/glassy-ui.json")));
         intruderState.setItems(Intruder.State.values());
+        for (Intruder i : mass.getMap().getIntruders()) {
+            intruderState.setSelected(i.getCurrentState());
+        }
         intruderState.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

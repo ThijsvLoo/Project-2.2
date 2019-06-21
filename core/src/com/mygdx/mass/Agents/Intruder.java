@@ -226,5 +226,7 @@ public class Intruder extends Agent {
         System.out.println("Intruder state changed to " + state.toString());
     }
 
-
+    public State getCurrentState(){
+        return currentState;
+    }
 }
