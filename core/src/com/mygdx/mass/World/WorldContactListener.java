@@ -179,6 +179,7 @@ public class WorldContactListener implements ContactListener {
                     for (Intruder intruder : mass.getMap().getIntruders()) {
                         if (!intruder.getIndividualMap().getTargetAreas().contains(targetArea)) {
                             intruder.getIndividualMap().add(targetArea);
+                            intruder.setEntryPoint(targetArea.getObjCenter().getCoordinates());
                         }
                     }
                 }

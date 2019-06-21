@@ -22,9 +22,11 @@ import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.Tools.MapData;
 import com.mygdx.mass.Tools.MapFileReader;
 import com.mygdx.mass.World.WorldContactListener;
 
+import java.io.*;
 import java.util.Arrays;
 
 public class MapBuilderHUD implements Disposable {
@@ -282,7 +284,7 @@ public class MapBuilderHUD implements Disposable {
                 }
             }
         });
-        simulate = createButton("Textures/Buttons/Simulate.png");
+        simulate = createButton("Textures/Buttons/Play.png");
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Simulate");
@@ -296,6 +298,21 @@ public class MapBuilderHUD implements Disposable {
                 for (Intruder intruder : mass.getMap().getIntruders()) {
                     intruder.getIndividualMap().setWalls(mass.getMap().getWalls());
                     intruder.getIndividualMap().setIntruders(mass.getMap().getIntruders());
+                }
+
+                try {
+                File mapFile = new File("temp.ser");
+                OutputStream outStream = new FileOutputStream(mapFile);
+                ObjectOutputStream fileObjectOut = new ObjectOutputStream(outStream);
+                MapData mapData = new MapData(mapBuilderScreen.mass.getMap());
+                fileObjectOut.writeObject(mapData);
+                fileObjectOut.close();
+                outStream.close();
+                } catch(IOException e){
+                    e.printStackTrace();
+                    e.getCause();
+                    e.getMessage();
+                    System.out.println("input IO error");
                 }
 
                 mapBuilderScreen.mass.setScreen(mapBuilderScreen.mass.mapSimulatorScreen);

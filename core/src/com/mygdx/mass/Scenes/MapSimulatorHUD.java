@@ -18,6 +18,9 @@ import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.*;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.Tools.MapData;
+
+import java.io.*;
 
 public class MapSimulatorHUD implements Disposable {
 
@@ -43,14 +46,14 @@ public class MapSimulatorHUD implements Disposable {
 
     private ImageButton load;
     private ImageButton save;
-    private ImageButton move;
+    private ImageButton reset;
     private ImageButton pause;
     private ImageButton exit;
     private ImageButton clear;
     private ImageButton stop;
     private ImageButton simulate;
 
-    private Slider speed;
+    public Slider speed;
     public SelectBox<Guard.State> guardState;
     public SelectBox<Intruder.State> intruderState;
 
@@ -119,12 +122,29 @@ public class MapSimulatorHUD implements Disposable {
 //                System.out.println("Current action: Save map");
 //            }
 //        });
-//        move = createButton("Textures/Buttons/Move.png");
-//        move.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Move");
-//            }
-//        });
+        reset = createButton("Textures/Buttons/Reset2.png");
+        reset.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                System.out.println("Current action: Reset");
+                try{
+                    MapData mapData;
+                    File mapFile = new File("temp.ser");
+                    InputStream inStream = new FileInputStream(mapFile);
+                    ObjectInputStream fileObjectIn = new ObjectInputStream(inStream);
+                    mapData = (MapData) fileObjectIn.readObject();
+                    fileObjectIn.close();
+                    inStream.close();
+                    mass.getMap().clearMap();
+                    mapData.loadMap(mass);
+                } catch(IOException e){
+                    System.out.println("IO error");
+                    e.printStackTrace();
+                } catch(ClassNotFoundException e){
+                    System.out.println("Class not found");
+                    e.printStackTrace();
+                }
+            }
+        });
         clear = createButton("Textures/Buttons/Reset.png");
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
@@ -137,10 +157,7 @@ public class MapSimulatorHUD implements Disposable {
         pause = createButton("Textures/Buttons/Pause.png");
         pause.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                prevSpeed = mapSimulatorScreen.getWorldSpeedFactor();
-                speed.setValue(0);
-                mapSimulatorScreen.setWorldSpeedFactor(0);
-                setTable();
+                pauseSim();
             }
         });
 
@@ -234,6 +251,7 @@ public class MapSimulatorHUD implements Disposable {
         miniTable.defaults().pad(2.0f);
         paused = false;
         table.add(miniTable).padBottom(PAD_BOTTOM).expandX();
+        miniTable.add(reset).size(BUTTON_SIZE);
         miniTable.add(clear).size(BUTTON_SIZE);
         miniTable.add(pause).size(BUTTON_SIZE);
         miniTable.add(stop).size(BUTTON_SIZE);
@@ -277,6 +295,7 @@ public class MapSimulatorHUD implements Disposable {
 
     public void setTable(){
         miniTable.clearChildren();
+        miniTable.add(reset).size(BUTTON_SIZE);
         miniTable.add(clear).size(BUTTON_SIZE);
         if(paused){
             miniTable.add(pause).size(BUTTON_SIZE);
@@ -297,6 +316,13 @@ public class MapSimulatorHUD implements Disposable {
 
     public void setIntruderState(Intruder.State item){
         intruderState.setSelected(item);
+    }
+
+    public void pauseSim(){
+        prevSpeed = mapSimulatorScreen.getWorldSpeedFactor();
+        speed.setValue(0);
+        mapSimulatorScreen.setWorldSpeedFactor(0);
+        setTable();
     }
 
 }
