@@ -41,6 +41,8 @@ public class Intruder extends Agent {
     private boolean detected;
     private Vector2 entryPoint;
 
+    private float ticktock = 0;
+
     public Intruder(MASS mass, Vector2 position) {
         super(mass, position);
 
@@ -68,8 +70,8 @@ public class Intruder extends Agent {
 
     public void update(float delta) {
 
-		updateAction();
-//		updateState();
+		updateAction(delta);
+		updateState();
 		raycast();
 
         if (moveSpeed > 1.4f && isMoving()) {
@@ -98,7 +100,7 @@ public class Intruder extends Agent {
         }
     }
 
-    public void act() {
+    public void act(float delta) {
         updateState();
         switch (currentState) {
             case EXPLORE: {
@@ -107,6 +109,11 @@ public class Intruder extends Agent {
             case ESCAPE: {
                 if (atPosition(entryPoint)) {
                     //wait 3 sec
+                    ticktock += delta;
+                    System.out.println("Intruder is escaping!");
+                    if (ticktock > 3){
+                        mass.mapSimulatorScreen.hud.pauseSim();
+                        System.out.println("INTRUDER HAS WON!");                    }
                 } else {
                     goTo(entryPoint);
                 }
@@ -145,7 +152,7 @@ public class Intruder extends Agent {
         }
     }
 
-    private void updateAction() {
+    private void updateAction(float delta) {
         switch (currentState) {
             case EXPLORE: {
             	if(route.isEmpty()){
@@ -155,7 +162,7 @@ public class Intruder extends Agent {
                 break;
             }
             case ESCAPE: {
-				escape();
+				escape(delta);
                 break;
             }
             case EVADE: {
@@ -169,8 +176,8 @@ public class Intruder extends Agent {
         }
     }
 
-    private void escape(){
-
+    private void escape(float delta){
+        act(delta);
 	}
 	private void evade(){
 
@@ -228,5 +235,9 @@ public class Intruder extends Agent {
 
     public State getCurrentState(){
         return currentState;
+    }
+
+    public void setEntryPoint(Vector2 here){
+        entryPoint = here;
     }
 }

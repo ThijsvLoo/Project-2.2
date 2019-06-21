@@ -261,7 +261,9 @@ public class MapBuilderScreen implements Screen {
                         shapeRenderer.setColor(Color.RED);
                         break;
                     }
-                    if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA) {
+//                    if (boxObject.getObjectType().equals(BoxObject.ObjectType.TARGET_AREA) && currentState == State.BUILDING))
+                    if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA &&
+                    !(boxObject.getObjectType().equals(BoxObject.ObjectType.TARGET_AREA) && currentState == State.BUILDING)){
                         shapeRenderer.setColor(Color.RED);
                         break;
                     }
@@ -487,7 +489,8 @@ public class MapBuilderScreen implements Screen {
                             overlap = true;
                             break;
                         }
-                        if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA) {
+                        if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA &&
+                                !(boxObject.getObjectType().equals(BoxObject.ObjectType.TARGET_AREA) && currentState == State.BUILDING)) {
                             overlap = true;
                             break;
                         }
