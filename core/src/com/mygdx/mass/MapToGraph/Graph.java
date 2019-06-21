@@ -49,8 +49,6 @@ public class Graph {
 
         ArrayList<Vertex> entranceFront = new ArrayList<Vertex>();
 
-      
-
         Building startBuilding = inBuilding(start);
         Building endBuilding = inBuilding(end);
         if(startBuilding!=null && startBuilding==endBuilding){
