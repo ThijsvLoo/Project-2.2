@@ -53,12 +53,12 @@ public class Graph {
         }
         if(startBuilding!=null){
             for(Door door: startBuilding.getDoors()){
-                addEdge(new Edge(door.getDoorCenter(),start));
+                addEdge(new Edge(getDoorInside(door.getDoorCenter(),startBuilding),start));
             }
         }
         if(endBuilding!=null){
             for(Door door: endBuilding.getDoors()){
-                addEdge(new Edge(end, door.getDoorCenter()));
+                addEdge(new Edge(end, getDoorInside(door.getDoorCenter(), endBuilding)));
             }
         }
 
@@ -195,22 +195,22 @@ public class Graph {
     }
 
     private ArrayList<Vertex> addDoors(Building building){
-        ArrayList<Vertex> doorCenter = new ArrayList<Vertex>();
+        ArrayList<Vertex> doorInside = new ArrayList<Vertex>();
         ArrayList<Vertex> doorFront = new ArrayList<Vertex>();
 
         ArrayList<Door> doors = new ArrayList<Door>();
         doors.addAll(building.getDoors());
         for(Door door: doors){
-            doorCenter.add(door.getDoorCenter());
+            doorInside.add(getDoorInside(door.getDoorCenter(), building));
         }
         for(Door door: doors){
             doorFront.add(addDoorFront(door.getDoorCenter(), building));
         }
         for(int i=0; i<doors.size(); i++){
-            addEdge(new Edge(doorCenter.get(i), doorFront.get(i)));
+            addEdge(new Edge(doorInside.get(i), doorFront.get(i)));
         }
-        for(Vertex door: doorCenter){
-            for(Vertex door2: doorCenter){
+        for(Vertex door: doorInside){
+            for(Vertex door2: doorInside){
                 if(door != door2){
                     addEdge(new Edge(door,door2));
                 }
@@ -220,6 +220,41 @@ public class Graph {
 
         return doorFront;
     }
+    private Vertex getDoorInside(Vertex doorCenter, Building building){
+        double x = doorCenter.getCoordinates().x;
+        double y = doorCenter.getCoordinates().y;
+        double inside_x = -10000;
+        double inside_y = -10000;
+        if (x == building.getRectangle().x){
+            inside_x = (x + 0.5);
+            inside_y = y;
+//            System.out.println("added door");
+//            System.out.println(x+ " "+ y);
+        }
+        else if(y == building.getRectangle().y){
+            inside_y = (y + 0.5);
+            inside_x = x;
+//            System.out.println("added door");
+//            System.out.println(x+ " "+ y);
+        }
+        else if(x == building.getRectangle().x+ building.getRectangle().width){
+            inside_x = (x - 0.5);
+            inside_y = y;
+//            System.out.println("added door");
+//            System.out.println(x+ " "+ y);
+        }
+        else if(y == building.getRectangle().y+building.getRectangle().height){
+            inside_y = y - 0.5;
+            inside_x = x;
+
+
+        }
+        else{
+            System.out.println("not found!!");
+            System.out.println(x+ " "+ y);
+        }
+        return new Vertex((float)inside_x, (float)inside_y);
+    }
     private Vertex addDoorFront(Vertex doorCenter, Building building){
         double x = doorCenter.getCoordinates().x;
         double y = doorCenter.getCoordinates().y;
@@ -228,26 +263,23 @@ public class Graph {
         if (x == building.getRectangle().x){
             front_x = (x - 0.5);
             front_y = y;
-            System.out.println("added door");
-            System.out.println(x+ " "+ y);
+
         }
         else if(y == building.getRectangle().y){
             front_y = (y - 0.5);
             front_x = x;
-            System.out.println("added door");
-            System.out.println(x+ " "+ y);
+
         }
         else if(x == building.getRectangle().x+ building.getRectangle().width){
             front_x = (x + 0.5);
             front_y = y;
-            System.out.println("added door");
-            System.out.println(x+ " "+ y);
+
         }
         else if(y == building.getRectangle().y+building.getRectangle().height){
             front_y = y + 0.5;
             front_x = x;
-            System.out.println("added door");
-            System.out.println(x+ " "+ y);
+
+
         }
         else{
             System.out.println("not found!!");
