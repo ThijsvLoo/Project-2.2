@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.MapToGraph.Vertex;
 import com.mygdx.mass.World.WorldObject;
 
 public abstract class BoxObject extends WorldObject implements java.io.Serializable{
@@ -53,6 +54,7 @@ public abstract class BoxObject extends WorldObject implements java.io.Serializa
         return rectangle;
     }
     public Vector2[] getVertices() { return vertices; }
+    public Vertex getObjCenter(){ return new Vertex(this.getRectangle().getCenter(new Vector2()).x, this.getRectangle().getCenter(new Vector2()).y);}
 
 
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.MapToGraph.Vertex;
 
 import static com.mygdx.mass.BoxObject.BoxObject.ObjectType.WINDOW;
 
@@ -43,6 +44,9 @@ public class Window extends BoxObject {
         fixture.setUserData(this);
 
         polygonShape.dispose();
+    }
+    public Vertex getWindowCenter(){
+        return new Vertex(this.getRectangle().getCenter(new Vector2()).x, this.getRectangle().getCenter(new Vector2()).y);
     }
 
 }

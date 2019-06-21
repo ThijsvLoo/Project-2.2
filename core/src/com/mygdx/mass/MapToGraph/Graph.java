@@ -16,12 +16,14 @@ public class Graph {
     private Vertex destination;
     private ArrayList<BoxObject> exploredBuilding;
     private Agent agent;
+    private boolean agentIsIntruder;
     public Graph(Vertex start, Vertex end, ArrayList<Vertex> vertices, ArrayList<Edge> edges, Agent agent){
         this.vertices = vertices;
         this.start = start;
         this.destination = end;
         this.edges = edges;
         this.agent = agent;
+        this.agentIsIntruder = (agent.getAgentType() == Agent.AgentType.INTRUDER);
 
     }
     public boolean adjacent(Vertex vertex1, Vertex vertex2){
@@ -45,27 +47,26 @@ public class Graph {
         boolean proceed = false;
         edges.clear();
 
-        ArrayList<Vertex> doorFront = new ArrayList<Vertex>();
+        ArrayList<Vertex> entranceFront = new ArrayList<Vertex>();
+
+      
+
         Building startBuilding = inBuilding(start);
         Building endBuilding = inBuilding(end);
         if(startBuilding!=null && startBuilding==endBuilding){
             addEdge(new Edge(start, end));
         }
         if(startBuilding!=null){
-            for(Door door: startBuilding.getDoors()){
-                addEdge(new Edge(getDoorInside(door.getDoorCenter(),startBuilding),start));
-            }
+            addVertexToEntrance(start, startBuilding);
         }
         if(endBuilding!=null){
-            for(Door door: endBuilding.getDoors()){
-                addEdge(new Edge(end, getDoorInside(door.getDoorCenter(), endBuilding)));
-            }
+            addVertexToEntrance(end, endBuilding);
         }
 
         for (Building building : MASS.map.getBuildings()){
-            doorFront.addAll(addDoors(building));
+            entranceFront.addAll(addEntrances(building));
         }
-        vertices.addAll(doorFront);
+        vertices.addAll(entranceFront);
         BoxObject tmp = null;
         ArrayList<BoxObject> newBoxes = new ArrayList<BoxObject>();
         for(Vertex v1: vertices){
@@ -116,6 +117,16 @@ public class Graph {
         }
 
 
+    }
+    private void addVertexToEntrance(Vertex vertex, Building building){
+        for(Door door: building.getDoors()){
+            addEdge(new Edge(getEntranceInside(door.getDoorCenter(),building),vertex));
+        }
+        if (agentIsIntruder) {
+            for (Window window : building.getWindows()) {
+                addEdge(new Edge(getEntranceInside(window.getWindowCenter(), building), vertex));
+            }
+        }
     }
     private BoxObject connectVertices(Vertex v1, Vertex v2){
         for(Building building: agent.getIndividualMap().getBuildings()){
@@ -194,33 +205,34 @@ public class Graph {
         return corners;
     }
 
-    private ArrayList<Vertex> addDoors(Building building){
-        ArrayList<Vertex> doorInside = new ArrayList<Vertex>();
-        ArrayList<Vertex> doorFront = new ArrayList<Vertex>();
+    private ArrayList<Vertex> addEntrances(Building building){
+        ArrayList<Vertex> entranceInside = new ArrayList<Vertex>();
+        ArrayList<Vertex> entranceFront = new ArrayList<Vertex>();
 
-        ArrayList<Door> doors = new ArrayList<Door>();
-        doors.addAll(building.getDoors());
-        for(Door door: doors){
-            doorInside.add(getDoorInside(door.getDoorCenter(), building));
+        ArrayList<BoxObject> entrances = new ArrayList<BoxObject>();
+        entrances.addAll(building.getDoors());
+        if(agentIsIntruder) {entrances.addAll(building.getWindows());}
+        for(BoxObject obj: entrances){
+            entranceInside.add(getEntranceInside(obj.getObjCenter(), building));
         }
-        for(Door door: doors){
-            doorFront.add(addDoorFront(door.getDoorCenter(), building));
+        for(BoxObject obj: entrances){
+            entranceFront.add(addDoorFront(obj.getObjCenter(), building));
         }
-        for(int i=0; i<doors.size(); i++){
-            addEdge(new Edge(doorInside.get(i), doorFront.get(i)));
+        for(int i=0; i<entrances.size(); i++){
+            addEdge(new Edge(entranceInside.get(i), entranceFront.get(i)));
         }
-        for(Vertex door: doorInside){
-            for(Vertex door2: doorInside){
-                if(door != door2){
-                    addEdge(new Edge(door,door2));
+        for(Vertex entrance: entranceInside){
+            for(Vertex entrance2: entranceInside){
+                if(entrance != entrance2){
+                    addEdge(new Edge(entrance, entrance2));
                 }
             }
         }
 
 
-        return doorFront;
+        return entranceFront;
     }
-    private Vertex getDoorInside(Vertex doorCenter, Building building){
+    private Vertex getEntranceInside(Vertex doorCenter, Building building){
         double x = doorCenter.getCoordinates().x;
         double y = doorCenter.getCoordinates().y;
         double inside_x = -10000;
