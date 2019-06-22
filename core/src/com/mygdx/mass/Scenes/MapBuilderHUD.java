@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -20,14 +17,11 @@ import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.BoxObject;
 import com.mygdx.mass.Data.MASS;
-import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
 import com.mygdx.mass.Tools.MapData;
 import com.mygdx.mass.Tools.MapFileReader;
-import com.mygdx.mass.World.WorldContactListener;
 
 import java.io.*;
-import java.util.Arrays;
 
 public class MapBuilderHUD implements Disposable {
 
@@ -55,7 +49,7 @@ public class MapBuilderHUD implements Disposable {
 
     private ImageButton load;
     private ImageButton save;
-    private ImageButton move;
+    private ImageButton random;
     private ImageButton delete;
     private ImageButton clear;
     private ImageButton undo;
@@ -184,13 +178,36 @@ public class MapBuilderHUD implements Disposable {
                 System.out.println("Current action: Save map");
             }
         });
-//        move = createButton("Textures/Buttons/Move.png");
-//        move.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                mapBuilderScreen.setCurrentState(MapBuilderScreen.State.MOVE);
-//                System.out.println("Current action: Move");
-//            }
-//        });
+        random = createButton("Textures/Buttons/Random.png");
+        random.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                mapBuilderScreen.mass.getMap().clearMap();
+                mapBuilderScreen.mass.getMap().addOuterWalls();
+
+                mapBuilderScreen.numberOfObjects = 1;
+                mapBuilderScreen.random(MapBuilderScreen.State.TARGET_AREA);
+
+                mapBuilderScreen.maxObjects = 20;
+                mapBuilderScreen.maxSize = 50;
+                mapBuilderScreen.numberOfObjects = (int) (Math.random() * mapBuilderScreen.maxObjects);
+
+//                mapBuilderScreen.randomState = MapBuilderScreen.State.BUILDING;
+                mapBuilderScreen.random(MapBuilderScreen.State.BUILDING);
+//                mapBuilderScreen.randomState = MapBuilderScreen.State.WALL;
+                mapBuilderScreen.random(MapBuilderScreen.State.WALL);
+//                mapBuilderScreen.randomState = MapBuilderScreen.State.HIDING_AREA;
+                mapBuilderScreen.maxSize = 10;
+                mapBuilderScreen.random(MapBuilderScreen.State.HIDING_AREA);
+//                mapBuilderScreen.randomState = MapBuilderScreen.State.SENTRY_TOWER;
+                mapBuilderScreen.random(MapBuilderScreen.State.SENTRY_TOWER);
+//                mapBuilderScreen.randomState = MapBuilderScreen.State.TARGET_AREA;
+//                mapBuilderScreen.random(MapBuilderScreen.State.GUARD);
+                mapBuilderScreen.random(MapBuilderScreen.State.INTRUDER);
+
+
+                System.out.println("Current action: Randomize");
+            }
+        });
         delete = createButton("Textures/Buttons/Delete.png");
         delete.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
@@ -348,7 +365,7 @@ public class MapBuilderHUD implements Disposable {
 
         table.add(load).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(save).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-//        table.add(move).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(random).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(delete).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(clear).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(undo).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);

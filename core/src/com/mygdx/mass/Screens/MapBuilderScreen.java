@@ -52,6 +52,13 @@ public class MapBuilderScreen implements Screen {
     private Vector2 p1, p2, collision;
     private RayCastCallback callback;
 
+    public int count = 0;
+    public State randomState = MapBuilderScreen.State.BUILDING;
+    public int maxObjects = 20;
+    public int maxSize = 50;
+    public int numberOfObjects = (int) (Math.random() * maxObjects);
+
+
     public MapBuilderScreen(MASS mass) {
         this.mass = mass;
         this.camera = mass.camera;
@@ -560,4 +567,110 @@ public class MapBuilderScreen implements Screen {
         return info;
     }
 
+    public void random() {
+        if(!randomState.equals(State.GUARD) && !randomState.equals(State.INTRUDER)) {
+            for (int i = 0; i < numberOfObjects; i++) {
+                int width = (int) (Math.random() * maxSize + Door.SIZE);
+                int height = (int) (Math.random() * maxSize + Door.SIZE);
+                int x = (int) (Math.random() * 200 - width);
+                int y = (int) (Math.random() * 200 - height);
+
+//        System.out.println(x);
+//        System.out.println(y);
+//        System.out.println(width);
+//        System.out.println(height);
+
+                Rectangle rectangle = new Rectangle(x, y, width, height);
+
+                boolean overlap = false;
+                for (BoxObject boxObject : map.getBoxObjects()) {
+                    if (boxObject.getObjectType().equals(BoxObject.ObjectType.WALL) && boxObject.getRectangle().overlaps(rectangle)) {
+                        overlap = true;
+                        break;
+                    }
+                    if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA &&
+                            !(boxObject.getObjectType().equals(BoxObject.ObjectType.TARGET_AREA) && currentState == State.BUILDING)) {
+                        overlap = true;
+                        break;
+                    }
+                }
+                if (!overlap) {
+                    switch (randomState) {
+                        case WALL:
+                            map.addWall(rectangle);
+                            //graph.convertMap();
+                            break;
+                        case BUILDING:
+                            map.addBuilding(rectangle);
+
+//                            int doorx = (int) (Math.random() * rectangle.getX() + rectangle.getWidth());
+//                            int doory = (int) (Math.random() * rectangle.getY() + rectangle.getHeight());
+
+                            Vector2 mouse = rectangle.getCenter(new Vector2());
+                            Vector2 pointA = mouse.x - rectangle.x < rectangle.width/2 ? new Vector2(rectangle.x, mouse.y) : new Vector2(rectangle.x + rectangle.width, mouse.y);
+                            Vector2 pointB = mouse.y - rectangle.y < rectangle.height/2 ? new Vector2(mouse.x, rectangle.y) : new Vector2(mouse.x, rectangle.y + rectangle.height);
+                            Vector2 nearest = mouse.dst(pointA) < mouse.dst(pointB) ? pointA : pointB;
+                            if (nearest.equals(pointA)) {
+                                Rectangle rect = new Rectangle(nearest.x - Door.THICKNESS/2, nearest.y - Door.SIZE/2, Door.THICKNESS, Door.SIZE);
+//                            building.addDoor(new Door(door)); //Should add a door object instead of rectangle
+                                //need fix
+                                map.addDoor(rect);
+                            } else if (nearest.equals(pointB)) {
+                                map.addDoor(new Rectangle(nearest.x - Door.SIZE/2, nearest.y - Door.THICKNESS/2, Door.SIZE, Door.THICKNESS));
+                            }
+
+                            //graph.convertMap();
+                            break;
+                        case SENTRY_TOWER:
+                            map.addSentryTower(rectangle);
+                            //graph.convertMap();
+                            break;
+                        case HIDING_AREA:
+                            map.addHidingArea(rectangle);
+                            break;
+                        case TARGET_AREA:
+                            map.addTargetArea(rectangle);
+                            break;
+                    }
+                }
+            }
+        }
+
+        if(randomState.equals(State.GUARD) || randomState.equals(State.INTRUDER)) {
+            int x = (int) (Math.random() * 199);
+            int y = (int) (Math.random() * 199);
+            Vector2 position = new Vector2(x, y);
+            boolean goodToGo = false;
+
+            while(goodToGo = false) {
+                boolean nope = false;
+                for (BoxObject object : map.getBoxObjects()) {
+                    if (object.getRectangle().contains(position) && !object.getObjectType().equals(BoxObject.ObjectType.BUILDING))
+                        x = (int) (Math.random() * 199);
+                        y = (int) (Math.random() * 199);
+                        position = new Vector2(x, y);
+                        nope = true;
+                }
+                if(nope = false){
+                    goodToGo = true;
+                }
+            }
+
+            if (inputHandler.insideMap(position)) {
+                switch (randomState) {
+                    case GUARD:
+                        map.addGuard(position);
+                        break;
+                    case INTRUDER:
+                        map.addIntruder(position);
+                        break;
+                }
+            }
+        }
+    }
+
+    public void random(State state){
+        this.randomState = state;
+        random();
+    }
 }
