@@ -19,17 +19,21 @@ public class GapTree {
     private Agent agent;
     protected Vector2 P;
     protected double slackVar;
-    protected ArrayList<Vector2> previousGapsPositions;
+    protected ArrayList<Vector2> allGapsPositions;
+    protected ArrayList<Vector2> previousIterationGapsPosition;
     protected boolean TOP = false, BOTTOM = false, LEFT = false, RIGHT = false;
     protected int Top, Bottom, Left, Right;
     protected int previousGapsNumber;
+    protected ArrayList<Gap> appearingGaps;
+    protected ArrayList<Gap> disappearingGaps;
+    protected ArrayList<Gap> previousGaps;
 
     public GapTree(Agent agent) {
         this.agent = agent;
         parent = null;
         P = new Vector2();
         slackVar = 1;
-        previousGapsPositions = new ArrayList<Vector2>();
+        allGapsPositions = new ArrayList<Vector2>();
     }
 
     public void initializeGT(Vector2 startingPosition, ArrayList<Gap> detectedGaps) {
@@ -37,20 +41,34 @@ public class GapTree {
         previousGapsNumber = detectedGaps.size();
         for (Gap g : detectedGaps) {
             addGap(g, start);
-            previousGapsPositions.add(g.getLocation());
+            allGapsPositions.add(g.getLocation());
+            previousIterationGapsPosition.add(g.getLocation());
+            previousGaps.add(g);
         }
     }
 
-    public void chaseGap(Gap gapToChase, ArrayList<Gap> detectedGaps) {
-        agent.goTo(gapToChase.getOffsetLocation());
+    public void chaseGap(Node nodeToChase, ArrayList<Gap> detectedGaps) {
+        agent.goTo(nodeToChase.getGap().getOffsetLocation());
+        nodeToChase.setVisited(true);
+        parent = nodes.get(nodes.indexOf(nodeToChase));
         //now we need to update detectedGaps after moving to offsetLocation
-        agent.fi;
-        int gapsDifference = previousGapsNumber - agent.getGapSensor().getGapList().size();
-        for (int i = 0; i < detectedGaps.size(); i++) {
-            if (checkIfNewGap(detectedGaps.get(i))) {
-                if ()
+        agent.fireGapSensor();
+        //int gapsDifference = previousGapsNumber - agent.getGapSensor().getGapList().size();
+        for (Gap gapToCheck : previousGaps) {
+            if (gapToCheck == nodeToChase.getGap()) continue;
+            if (checkIfDisappear(gapToCheck, detectedGaps)) {
+                disappearingGaps.add(gapToCheck);
             }
         }
+        for (Gap g : detectedGaps) {
+            if (checkIfNewGap(g)) { //Appeareance
+                appearingGaps.add(g);
+            }
+        }
+        check If Merged or Split
+        gap splits if there are two new gaps that are in similar angle, same with merging, gaps merge into one if they were similar angle,
+        otherwise they only disappeared
+
     }
 
     public void removeGap(Node node) {
@@ -92,26 +110,25 @@ public class GapTree {
     //true if gap hasn't been found before
     public boolean checkIfNewGap(Gap gap) {
         P = gap.getLocation();
-        for (Vector2 V : previousGapsPositions) {
+        for (Vector2 V : allGapsPositions) { //not sure if allGapsPosition or previousIterationGapsPosition
             if ( (Math.sqrt(P.x - V.x) + Math.sqrt(P.y - V.y)) <= Math.sqrt(slackVar)) {
                 return false;
             }
         }
         Vector2 newGapLocation = new Vector2(P.x,P.y);
-        previousGapsPositions.add(newGapLocation);
+        allGapsPositions.add(newGapLocation);
         return true;
     }
 
-    public void Appearance(boolean T, boolean B, boolean L, boolean R, Gap gap) {
-        if (T, !B, L, !R) {
+    public boolean checkIfDisappear(Gap gapToCheck, ArrayList<Gap> currentGaps) {
 
+
+        for (Gap g : currentGaps) {
+            if ( (Math.sqrt(gapToCheck.getLocation().x - g.getLocation().x) + Math.sqrt(gapToCheck.getLocation().y - g.getLocation().y)) <= Math.sqrt(slackVar)) {
+                return false;
+            }
         }
-    }
-
-    public void countSides(ArrayList<Gap> gaps) {
-        for (Gap g : gaps) {
-
-        }
+        return true;
     }
 
 
