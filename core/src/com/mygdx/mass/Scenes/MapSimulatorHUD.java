@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -75,54 +76,7 @@ public class MapSimulatorHUD implements Disposable {
         table.bottom();
 
         miniTable = new Table();
-//        miniTable.setFillParent(true);
-
-        //Creating buttons along with their click listener
-//
-//        wall = createButton("Textures/Buttons/Wall.png");
-//        wall.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create wall");
-//            }
-//        });
-//        building = createButton("Textures/Buttons/Building2.png");
-//        building.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create building");
-//            }
-//        });
-//        door = createButton("Textures/Buttons/Door2.png");
-//        door.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create door");
-//            }
-//        });
-//        window = createButton("Textures/Buttons/Window.png");
-//        window.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create window");
-//            }
-//        });
-//        sentryTower = createButton("Textures/Buttons/Tower.png");
-//        sentryTower.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create sentry tower");
-//            }
-//        });
-//
-//        load = createButton("Textures/Buttons/Load.png");
-//        load.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Load map");
-//            }
-//        });
-//        save = createButton("Textures/Buttons/Save.png");
-//        save.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Save map");
-//            }
-//        });
-        reset = createButton("Textures/Buttons/Reset2.png");
+        reset = createButton("Textures/Buttons/Reset2.png", "Textures/Buttons/Reset2Invert.png");
         reset.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Reset");
@@ -145,7 +99,7 @@ public class MapSimulatorHUD implements Disposable {
                 }
             }
         });
-        clear = createButton("Textures/Buttons/Reset.png");
+        clear = createButton("Textures/Buttons/Reset.png", "Textures/Buttons/ResetInvert.png");
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Clear timers");
@@ -154,14 +108,14 @@ public class MapSimulatorHUD implements Disposable {
             }
         });
 
-        pause = createButton("Textures/Buttons/Pause.png");
+        pause = createButton("Textures/Buttons/Pause.png", "Textures/Buttons/PauseInvert.png");
         pause.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 pauseSim();
             }
         });
 
-        simulate = createButton("Textures/Buttons/Play.png");
+        simulate = createButton("Textures/Buttons/Play.png", "Textures/Buttons/PlayInvert.png");
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapSimulatorScreen.setWorldSpeedFactor(prevSpeed);
@@ -169,7 +123,7 @@ public class MapSimulatorHUD implements Disposable {
             }
         });
 
-        stop = createButton("Textures/Buttons/Stop.png");
+        stop = createButton("Textures/Buttons/Stop.png", "Textures/Buttons/StopInvert.png");
         stop.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Stop Simulation");
@@ -183,7 +137,7 @@ public class MapSimulatorHUD implements Disposable {
                 ((Game) Gdx.app.getApplicationListener()).setScreen(mapSimulatorScreen.mass.mapBuilderScreen);
             }
         });
-        exit = createButton("Textures/Buttons/Exit.png");
+        exit = createButton("Textures/Buttons/Exit.png", "Textures/Buttons/ExitInvert.png");
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit Simulation");
@@ -270,6 +224,15 @@ public class MapSimulatorHUD implements Disposable {
         TextureRegion textureRegion = new TextureRegion(texture);
         TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(textureRegion);
         ImageButton imageButton = new ImageButton(textureRegionDrawable);
+        return imageButton;
+    }
+
+    private ImageButton createButton(String upPath, String downPath) {
+        Texture up = new Texture(Gdx.files.internal(upPath));
+        Drawable upDraw = new TextureRegionDrawable(new TextureRegion(up));
+        Texture down = new Texture(Gdx.files.internal(downPath));
+        Drawable downDraw = new TextureRegionDrawable(new TextureRegion(down));
+        ImageButton imageButton = new ImageButton(upDraw, downDraw);
         return imageButton;
     }
 

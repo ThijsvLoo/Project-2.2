@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -74,7 +75,7 @@ public class MapBuilderHUD implements Disposable {
 
         //Creating buttons along with their click listener
 
-        wall = createButton("Textures/Buttons/Wall.png");
+        wall = createButton("Textures/Buttons/Wall.png", "Textures/Buttons/WallInvert.png");
         wall.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WALL);
@@ -82,7 +83,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Wall");
             }
         });
-        building = createButton("Textures/Buttons/Building2.png");
+        building = createButton("Textures/Buttons/Building2.png","Textures/Buttons/Building2Invert.png");
         building.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.BUILDING);
@@ -90,7 +91,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Building");
             }
         });
-        door = createButton("Textures/Buttons/Door2.png");
+        door = createButton("Textures/Buttons/Door2.png","Textures/Buttons/Door2Invert.png");
         door.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DOOR);
@@ -98,7 +99,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Door");
             }
         });
-        window = createButton("Textures/Buttons/Window.png");
+        window = createButton("Textures/Buttons/Window.png","Textures/Buttons/WindowInvert.png");
         window.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.WINDOW);
@@ -106,7 +107,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Window");
             }
         });
-        sentryTower = createButton("Textures/Buttons/Tower.png");
+        sentryTower = createButton("Textures/Buttons/Tower.png","Textures/Buttons/TowerInvert.png");
         sentryTower.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.SENTRY_TOWER);
@@ -114,7 +115,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Sentry tower");
             }
         });
-        hidingArea = createButton("Textures/Buttons/Hiding2.png");
+        hidingArea = createButton("Textures/Buttons/Hiding2.png","Textures/Buttons/Hiding2Invert.png");
         hidingArea.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.HIDING_AREA);
@@ -122,7 +123,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Hiding area");
             }
         });
-        targetArea = createButton("Textures/Buttons/Target.png");
+        targetArea = createButton("Textures/Buttons/Target2Invert.png","Textures/Buttons/Target2.png");
         targetArea.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.TARGET_AREA);
@@ -130,7 +131,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Target area");
             }
         });
-        guard = createButton("Textures/Buttons/Guard.png");
+        guard = createButton("Textures/Buttons/Guard.png","Textures/Buttons/GuardInvert.png");
         guard.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.GUARD);
@@ -138,7 +139,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Guard");
             }
         });
-        intruder = createButton("Textures/Buttons/Intruder2.png");
+        intruder = createButton("Textures/Buttons/Intruder2.png","Textures/Buttons/Intruder2Invert.png");
         intruder.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.INTRUDER);
@@ -147,7 +148,7 @@ public class MapBuilderHUD implements Disposable {
             }
         });
 
-        load = createButton("Textures/Buttons/Load.png");
+        load = createButton("Textures/Buttons/Load.png", "Textures/Buttons/LoadInvert.png");
         load.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
 				System.out.println("Current action: Load map");
@@ -171,44 +172,21 @@ public class MapBuilderHUD implements Disposable {
 
             }
         });
-        save = createButton("Textures/Buttons/Save.png");
+        save = createButton("Textures/Buttons/SaveInvert.png","Textures/Buttons/Save.png");
         save.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 MapFileReader.saveMapToFile(mapBuilderScreen.mass.getMap());
                 System.out.println("Current action: Save map");
             }
         });
-        random = createButton("Textures/Buttons/Random.png");
+        random = createButton("Textures/Buttons/Random.png", "Textures/Buttons/RandomInvert.png");
         random.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mapBuilderScreen.mass.getMap().clearMap();
-                mapBuilderScreen.mass.getMap().addOuterWalls();
-
-                mapBuilderScreen.numberOfObjects = 1;
-                mapBuilderScreen.random(MapBuilderScreen.State.TARGET_AREA);
-
-                mapBuilderScreen.maxObjects = 20;
-                mapBuilderScreen.maxSize = 50;
-                mapBuilderScreen.numberOfObjects = (int) (Math.random() * mapBuilderScreen.maxObjects);
-
-//                mapBuilderScreen.randomState = MapBuilderScreen.State.BUILDING;
-                mapBuilderScreen.random(MapBuilderScreen.State.BUILDING);
-//                mapBuilderScreen.randomState = MapBuilderScreen.State.WALL;
-                mapBuilderScreen.random(MapBuilderScreen.State.WALL);
-//                mapBuilderScreen.randomState = MapBuilderScreen.State.HIDING_AREA;
-                mapBuilderScreen.maxSize = 10;
-                mapBuilderScreen.random(MapBuilderScreen.State.HIDING_AREA);
-//                mapBuilderScreen.randomState = MapBuilderScreen.State.SENTRY_TOWER;
-                mapBuilderScreen.random(MapBuilderScreen.State.SENTRY_TOWER);
-//                mapBuilderScreen.randomState = MapBuilderScreen.State.TARGET_AREA;
-//                mapBuilderScreen.random(MapBuilderScreen.State.GUARD);
-                mapBuilderScreen.random(MapBuilderScreen.State.INTRUDER);
-
-
+                mapBuilderScreen.generateMap(20, 50, 0);
                 System.out.println("Current action: Randomize");
             }
         });
-        delete = createButton("Textures/Buttons/Delete.png");
+        delete = createButton("Textures/Buttons/Delete.png", "Textures/Buttons/DeleteInvert.png");
         delete.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 mapBuilderScreen.setCurrentState(MapBuilderScreen.State.DELETION);
@@ -216,7 +194,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.getInfo().updateBuildTool("Delete");
             }
         });
-        clear = createButton("Textures/Buttons/Clear.png");
+        clear = createButton("Textures/Buttons/Clear.png", "Textures/Buttons/ClearInvert.png");
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
             	System.out.println("Current action: Clear map");
@@ -227,7 +205,7 @@ public class MapBuilderHUD implements Disposable {
 
             }
         });
-        undo = createButton("Textures/Buttons/Undo.png");
+        undo = createButton("Textures/Buttons/Undo.png", "Textures/Buttons/UndoInvert.png");
         undo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Undo");
@@ -269,7 +247,7 @@ public class MapBuilderHUD implements Disposable {
 
             }
         });
-        redo = createButton("Textures/Buttons/Redo.png");
+        redo = createButton("Textures/Buttons/Redo.png", "Textures/Buttons/RedoInvert.png");
         redo.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Redo");
@@ -301,7 +279,7 @@ public class MapBuilderHUD implements Disposable {
                 }
             }
         });
-        simulate = createButton("Textures/Buttons/Play.png");
+        simulate = createButton("Textures/Buttons/Play.png", "Textures/Buttons/PlayInvert.png");
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Simulate");
@@ -335,7 +313,7 @@ public class MapBuilderHUD implements Disposable {
                 mapBuilderScreen.mass.setScreen(mapBuilderScreen.mass.mapSimulatorScreen);
             }
         });
-        exit = createButton("Textures/Buttons/Exit.png");
+        exit = createButton("Textures/Buttons/Exit.png", "Textures/Buttons/ExitInvert.png");
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit");
@@ -381,6 +359,15 @@ public class MapBuilderHUD implements Disposable {
         TextureRegion textureRegion = new TextureRegion(texture);
         TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(textureRegion);
         ImageButton imageButton = new ImageButton(textureRegionDrawable);
+        return imageButton;
+    }
+
+    private ImageButton createButton(String upPath, String downPath) {
+        Texture up = new Texture(Gdx.files.internal(upPath));
+        Drawable upDraw = new TextureRegionDrawable(new TextureRegion(up));
+        Texture down = new Texture(Gdx.files.internal(downPath));
+        Drawable downDraw = new TextureRegionDrawable(new TextureRegion(down));
+        ImageButton imageButton = new ImageButton(upDraw, downDraw);
         return imageButton;
     }
 
