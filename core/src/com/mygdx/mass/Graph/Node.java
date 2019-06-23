@@ -14,6 +14,10 @@ public class Node {
     private boolean visited;
 
 
+
+    private int indexOfNode;
+
+
     private boolean primitive;
 
 
@@ -89,6 +93,14 @@ public class Node {
 
     public void setPrimitive(boolean primitive) {
         this.primitive = primitive;
+    }
+
+    public int getIndexOfNode() {
+        return indexOfNode;
+    }
+
+    public void setIndexOfNode(int indexOfNode) {
+        this.indexOfNode = indexOfNode;
     }
 
     public boolean isVisited() { return visited; }
