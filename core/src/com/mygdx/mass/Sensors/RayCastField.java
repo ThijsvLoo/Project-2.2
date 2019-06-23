@@ -34,7 +34,7 @@ public class RayCastField { // each agent has a RayCastField
     private HashSet<Object> collisionObjects; // holds list with all objects this ray field sees
     private TreeMap<Float, Float> angleDistanceCloudPoints; // first value is angle, second value is distance to collision
     private String typeOfField;
-    private boolean isGapSensor = false, verbose = true;
+    private boolean isGapSensor = false, verbose = false;
 
     private long totalRayCastField, totalWorldCasting, totalRunningThroughCollisions;
 

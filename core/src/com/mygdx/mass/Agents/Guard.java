@@ -61,7 +61,10 @@ public class Guard extends Agent {
     }
 
     private void updateState() {
-        if (!enemyInSight.isEmpty()) {
+        if (currentState == State.NONE) {
+            currentState = State.NONE;
+        }
+        else if (!enemyInSight.isEmpty()) {
             currentState = State.CHASE;
         }
 //        else if (!predictionModel.getCapturePoints().isEmpty()){

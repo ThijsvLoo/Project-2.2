@@ -26,7 +26,7 @@ public class Graph {
         adjVertices.remove(name);
     }
 
-    public void convertMap() {
+    /*public void convertMap() {
         nodes = new ArrayList<Node>();
         adjVertices = new HashMap<Node, ArrayList<Edge>>();
         Walls = 1;
@@ -67,7 +67,7 @@ public class Graph {
 
         }
         connectNodes();
-    }
+    }*/
 
     public void connectNodes() {
         for (int i = 0; i < nodes.size(); i++) {

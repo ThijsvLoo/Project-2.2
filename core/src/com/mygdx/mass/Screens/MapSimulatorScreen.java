@@ -160,16 +160,30 @@ public class MapSimulatorScreen implements Screen {
             }
         }
 
+        boolean pauseHelper = true, isPaused = true;
         if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
-            mass.GapNavigationTreeAlgorithm.loadAllAgents();
-            mass.GapNavigationTreeAlgorithm.act();
-            if (!map.getAgents().isEmpty()) {
-                boolean toggle = !(map.getAgents().get(0).getGapSensorStatus()); // make sure all agents toggle to the same value
-                for (Agent a : map.getAgents()) {
-                    // a.setGapSensorStatus(toggle);
+            if (pauseHelper) {
+                if (isPaused) {
+                    mass.GapNavigationTreeAlgorithm.loadAllAgents();
+                    mass.GapNavigationTreeAlgorithm.act();
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        System.out.println(e);
+                    }
+                    if (!map.getAgents().isEmpty()) {
+                        boolean toggle = !(map.getAgents().get(0).getGapSensorStatus()); // make sure all agents toggle to the same value
+                        for (Agent a : map.getAgents()) {
+                            // a.setGapSensorStatus(toggle);
 
+                        }
+                    }
+                    isPaused = false;
                 }
+                else isPaused = true;
+                pauseHelper = false;
             }
+            else pauseHelper = true;
 
         }
         //add keyboard controls to the first intruder
@@ -206,7 +220,7 @@ public class MapSimulatorScreen implements Screen {
         }
 
         //for test purpose
-        if(false) {
+        if(true) {
             if (Gdx.input.justTouched()) {
                 for (Agent agent : map.getAgents()) {
                     agent.getRoute().clear();
@@ -245,7 +259,7 @@ public class MapSimulatorScreen implements Screen {
 //        if (!map.getAgents().isEmpty()) {
 //            drawUnexploredPoints(map.getAgents().get(0));
 //        }
-
+/*
         if (!map.getGuards().isEmpty()) {//for the sake of testing
             if (!map.getGuards().isEmpty() && !map.getGuards().get(0).getPredictionModel().guardMoves.isEmpty()) {
                 for (PredictionPoint predictionPoint : map.getGuards().get(0).getPredictionModel().guardMoves) {
@@ -265,7 +279,7 @@ public class MapSimulatorScreen implements Screen {
                     shapeRenderer.end();
                 }
             }
-        }
+        }*/
 
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();

@@ -6,6 +6,9 @@ import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChart;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.TreeMap;
 
 public class GapSensor {
@@ -20,6 +23,7 @@ public class GapSensor {
     private TreeMap<Float, Float> angleDistanceCloudPoints;
     private TreeMap<Float, DeltaCloudPoint> angleDeltaDistanceCloudPoints;
     private TreeMap<Float, Gap> gapList;
+    private ArrayList<Gap> cyclicalOrderedGapList;
     private TreeMap<Float, Float> problemAreasDeltaAngle; // either reached maximum distance of sensor or is lacking data. Key = start, Value = delta
 
     public GapSensor(float rayRange, float deltaDistanceThreshold, float deltaAngleRadThreshold, Vector2 locationAgent) {
@@ -101,6 +105,139 @@ public class GapSensor {
         return gaps;
     }
 
+    public ArrayList<Gap> createGapList(ArrayList<Gap> previousGaps) {
+        cyclicalOrderedGapList = new ArrayList<Gap>();
+        if (createGapList() > 0) {
+            if (previousGaps != null) { // we need to order the gaps in the same way
+                int gapDifference = gapList.size() - previousGaps.size(); // 1 = gap appeared, 0 = same amount of gaps, -1 = gap disappeared
+                if (gapDifference < -1 || gapDifference > 1) {
+                    System.out.println("Unfortunately multiple critical events are happening at the same time! Going to throw a NullPointerException!");
+                    return null;
+                }
+                System.out.println();
+                System.out.println("Now showing TreeMap: ");
+                ArrayList<Gap> gapArrayList = new ArrayList<Gap>();
+                for (java.util.Map.Entry<Float, Gap> currentEntry : gapList.entrySet()) {
+                    gapArrayList.add(currentEntry.getValue());
+                    System.out.print(currentEntry.getValue().getAngleRayAgainstObstacle()+ " + "+currentEntry.getValue().getLocation().x+"/"+currentEntry.getValue().getLocation().y+" | ");
+                }
+                System.out.println();
+                // previous gap must be row vector for matrix
+                // gapArrayList must be column vector for matrix
+                cyclicalOrderedGapList = alignGapsCOPAP(previousGaps, gapArrayList, gapDifference);
+                /*ArrayList<Float> totalMatrixCost = new ArrayList<Float>(previousGaps.size());
+                float difference = Math.abs(1f - 2f);
+                float cost = (difference > Math.PI) ? twoPI - difference : difference;*/
+                /*System.out.println("Previous gap were at angle + distance: ");
+                for (Gap g : previousGaps) {
+                    System.out.print(g.getAngleRayAgainstObstacle()+ " + "+g.getDistance()+" | ");
+                }
+                System.out.println();
+                System.out.println("New gaps are at angle + distance: ");
+                for (Gap g : cyclicalOrderedGapList) {
+                    System.out.print(g.getAngleRayAgainstObstacle()+ " + "+g.getDistance()+" | ");
+                }
+                System.out.println();*/
+            } else { // initial start, so no previous gaps to compare to
+                for (java.util.Map.Entry<Float, Gap> currentEntry : gapList.entrySet()) {
+                    cyclicalOrderedGapList.add(currentEntry.getValue());
+                }
+            }
+        }
+        return cyclicalOrderedGapList;
+    }
+
+    private ArrayList<Gap> alignGapsCOPAP(ArrayList<Gap> rowVector, ArrayList<Gap> columnVector, int gapDifference) {
+        ArrayList<Gap> copyRowVector = new ArrayList<Gap>(rowVector);
+        ArrayList<Gap> copyColumnVector = new ArrayList<Gap>(columnVector);
+        int columnVectorRotateIndex = Integer.MAX_VALUE;
+
+        if (gapDifference == 0) {
+            columnVectorRotateIndex = findLowestCostColumnRotateLOPAP(copyRowVector, copyColumnVector);
+            Collections.rotate(copyColumnVector, columnVectorRotateIndex);
+            return copyColumnVector;
+        }
+
+        else if (gapDifference == -1) { // gap disappearance, meaning we need to remove a row gap before aligning
+            float[] columnRotateCost = new float[rowVector.size()];
+            int[] rowRemoveIndex = new int[rowVector.size()];
+            for (int i = 0 ; i < rowVector.size() ; i++) {
+                copyRowVector = new ArrayList<Gap>(rowVector);
+                copyColumnVector = new ArrayList<Gap>(columnVector);
+                copyRowVector.remove(i);
+                rowRemoveIndex[i] = findLowestCostColumnRotateLOPAP(copyRowVector, copyColumnVector); // how many columns rotations for this particular removed row?
+                Collections.rotate(copyColumnVector, rowRemoveIndex[i]); // actually rotate the column
+                columnRotateCost[i] = costDiagonalSquareMatrix(copyRowVector, copyColumnVector); // get the cost of the rotated matrix
+            }
+            float rotateCost = Float.MAX_VALUE;
+            for (int i = 0 ; i < rowVector.size() ; i++) { // here find the best matching column rotate overall
+                if (columnRotateCost[i] < rotateCost) {
+                    rotateCost = columnRotateCost[i];
+                    columnVectorRotateIndex = i;
+                }
+            }
+            copyColumnVector = new ArrayList<Gap>(columnVector);
+            Collections.rotate(copyColumnVector, columnVectorRotateIndex);
+            return copyColumnVector;
+        }
+
+        else if (gapDifference == 1) { // gap appearing, meaning we need to remove a column gap before aligning
+            float[] columnRotateCost = new float[columnVector.size()];
+            int[] columnRemoveIndex = new int[columnVector.size()];
+            for (int j = 0 ; j < columnVector.size() ; j++) {
+                copyRowVector = new ArrayList<Gap>(rowVector);
+                copyColumnVector = new ArrayList<Gap>(columnVector);
+                copyColumnVector.remove(j);
+                columnRemoveIndex[j] = findLowestCostColumnRotateLOPAP(copyRowVector, copyColumnVector); // how many columns rotations for this particular removed column?
+                Collections.rotate(copyColumnVector, columnRemoveIndex[j]); // actually rotate the column
+                columnRotateCost[j] = costDiagonalSquareMatrix(copyRowVector, copyColumnVector); // get the cost of the rotated matrix
+            }
+            float rotateCost = Float.MAX_VALUE;
+            for (int j = 0 ; j < columnVector.size() ; j++) { // here find the best matching column rotate overall
+                if (columnRotateCost[j] < rotateCost) {
+                    rotateCost = columnRotateCost[j];
+                    columnVectorRotateIndex = j;
+                }
+            }
+            copyColumnVector = new ArrayList<Gap>(columnVector);
+            Collections.rotate(copyColumnVector, columnVectorRotateIndex);
+            return copyColumnVector;
+        }
+        return null;
+    }
+
+    private int findLowestCostColumnRotateLOPAP(ArrayList<Gap> copyRowVector, ArrayList<Gap> copyColumnVector) {
+        float[] columnRotationCosts = new float[copyColumnVector.size()];
+        //System.out.println();
+        //System.out.println("Float array size: "+columnRotationCosts.length);
+        for (int i = 0 ; i < copyColumnVector.size() ; i++) {
+            columnRotationCosts[i] = costDiagonalSquareMatrix(copyRowVector, copyColumnVector);
+            Collections.rotate(copyColumnVector, 1);
+            //System.out.println("First loop");
+        }
+        float minimumValue = Float.MAX_VALUE;
+        int minimumValueIndex = Integer.MAX_VALUE;
+        //System.out.println(Arrays.toString(columnRotationCosts));
+        for (int i = 0 ; i < columnRotationCosts.length ; i++) {
+            if (columnRotationCosts[i] < minimumValue) {
+                minimumValue = columnRotationCosts[i];
+                minimumValueIndex = i;
+                //System.out.println("Second loop");
+            }
+        }
+        return minimumValueIndex;
+    }
+
+    private float costDiagonalSquareMatrix(ArrayList<Gap> rowVector, ArrayList<Gap> columnVector) {
+        int n = rowVector.size();
+        float cost = 0;
+        for (int i = 0 ; i < n; i++) {
+            float difference = Math.abs(rowVector.get(i).getAngleRayAgainstObstacle() - columnVector.get(i).getAngleRayAgainstObstacle());
+            cost += (difference > Math.PI) ? twoPI - difference : difference;
+        }
+        return cost;
+    }
+
     private class DeltaCloudPoint {
         private float deltaAngle, deltaDistance, firstDistance, secondDistance;
 
@@ -163,5 +300,9 @@ public class GapSensor {
 
     public TreeMap<Float, Gap> getGapList() {
         return gapList;
+    }
+
+    public ArrayList<Gap> getCyclicalOrderedGapList() {
+        return cyclicalOrderedGapList;
     }
 }

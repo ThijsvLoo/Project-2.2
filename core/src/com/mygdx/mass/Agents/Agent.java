@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Algorithms.Algorithm;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Graph.Gap;
 import com.mygdx.mass.MapToGraph.*;
 import com.mygdx.mass.Scenes.MapSimulatorInfo;
 import com.mygdx.mass.MapToGraph.Dijkstra;
@@ -75,6 +76,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     protected TreeMap<Float, Float> angleDistanceCloudPoints;
     protected GapSensor gapSensor;
+    protected ArrayList<Gap> gapList;
 
     protected NoiseField noiseField;
 
@@ -313,18 +315,35 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         for (java.util.Map.Entry<Float, Float> e : treeMap.entrySet()) {
             gapSensor.addEntry(e.getKey(), e.getValue());
         }
+
+        System.out.println("Previous gaps were at angle + x/y: ");
+        if (gapList != null) {
+            for (Gap g : gapList) {
+                System.out.print(g.getAngleRayAgainstObstacle()+ " + "+g.getLocation().x+"/"+g.getLocation().y+" | ");
+            }
+        }
         gapSensor.convertToDeltaDistanceCloudPoints();
-        gapSensor.createGapList();
+        gapList = gapSensor.createGapList(gapList);
+        System.out.println("New gaps are at angle + x/y: ");
+        for (Gap g : gapList) {
+            System.out.print(g.getAngleRayAgainstObstacle()+ " + "+g.getLocation().x+"/"+g.getLocation().y+" | ");
+        }
+
         System.out.println("Gap Sensor Fired!");
     }
 
-    public void fireGapSensor() {
+    public void fireGapSensor(float range, float angleDegrees) {
         fireGapSensor((short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT),
                 (short) 0,
                 (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT),
-                (float) (Math.sqrt((double)((Map.DEFAULT_HEIGHT*Map.DEFAULT_HEIGHT)+(Map.DEFAULT_WIDTH*Map.DEFAULT_WIDTH)))),
-                360,
+                range,
+                angleDegrees,
                 1f);
+    }
+
+    public void fireGapSensor() {
+        fireGapSensor((float) (Math.sqrt((double)((Map.DEFAULT_HEIGHT*Map.DEFAULT_HEIGHT)+(Map.DEFAULT_WIDTH*Map.DEFAULT_WIDTH)))),
+                360f);
     }
 
     //get the unit vector with length 1

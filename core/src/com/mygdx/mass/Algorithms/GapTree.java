@@ -51,7 +51,7 @@ public class GapTree {
             previousGapsAngles.add(temp);
             previousGaps.put(E.getKey(), E.getValue());
         }
-        chaseGap();
+        //chaseGap();
     }
 
     public void chaseGap(Node nodeToChase, TreeMap<Float, Gap> detectedGaps) {
@@ -128,7 +128,7 @@ public class GapTree {
     }
 
     //true if gap hasn't been found before
-    public boolean checkIfNewGap(Gap gap) {
+    /*public boolean checkIfNewGap(Gap gap) {
         P = gap.getLocation();
         for (Vector2 V : allGapsPositions) { //not sure if allGapsPosition or previousIterationGapsPosition
             if ( (Math.sqrt(P.x - V.x) + Math.sqrt(P.y - V.y)) <= Math.sqrt(slackVar)) {
@@ -138,7 +138,7 @@ public class GapTree {
         Vector2 newGapLocation = new Vector2(P.x,P.y);
         allGapsPositions.add(newGapLocation);
         return true;
-    }
+    }*/
 
     public boolean checkIfDisappear(Gap gapToCheck, TreeMap<Float, Gap> currentGaps) {
         for (Map.Entry<Float, Gap> g : currentGaps.entrySet()) {
