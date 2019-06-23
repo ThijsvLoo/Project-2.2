@@ -246,7 +246,7 @@ public class MapSimulatorScreen implements Screen {
 //            drawUnexploredPoints(map.getAgents().get(0));
 //        }
 
-        if (!map.getGuards().isEmpty()) {//for the sake of testing
+        if (!map.getGuards().isEmpty() && map.getGuards().get(0).getPredictionModel() != null) { //for the sake of testing
             if (!map.getGuards().isEmpty() && !map.getGuards().get(0).getPredictionModel().guardMoves.isEmpty()) {
                 for (PredictionPoint predictionPoint : map.getGuards().get(0).getPredictionModel().guardMoves) {
                     Gdx.gl.glLineWidth(4);

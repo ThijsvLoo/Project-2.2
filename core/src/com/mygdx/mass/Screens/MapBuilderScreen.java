@@ -44,7 +44,7 @@ public class MapBuilderScreen implements Screen {
 
     private ShapeRenderer shapeRenderer;
 
-    private MapBuilderHUD hud;
+    public MapBuilderHUD hud;
     private MapBuilderInfo info;
 
     private InputMultiplexer inputMultiplexer;
@@ -585,7 +585,7 @@ public class MapBuilderScreen implements Screen {
 
                 boolean overlap = false;
                 for (BoxObject boxObject : map.getBoxObjects()) {
-                    Rectangle bigOne = new Rectangle(rectangle.x, rectangle.y, rectangle.getWidth()+1, rectangle.getHeight()+1);
+                    Rectangle bigOne = new Rectangle(rectangle.x - (Agent.SIZE * 4), rectangle.y - (Agent.SIZE * 4), rectangle.getWidth() + (Agent.SIZE * 8), rectangle.getHeight() + (Agent.SIZE * 8));
                     if (boxObject.getObjectType().equals(BoxObject.ObjectType.WALL)
                             && boxObject.getRectangle().overlaps(bigOne)) {
                         overlap = true;
@@ -628,7 +628,7 @@ public class MapBuilderScreen implements Screen {
                             }
 
                             int numberOfWindows = (int) (Math.random() * 3);
-                            System.out.println(numberOfWindows);
+//                            System.out.println(numberOfWindows);
                             failSafe = 0;
                             while(map.getBuildings().get(map.getBuildings().size()-1).getWindows().size() < numberOfWindows) {
                                 generateEntrances(rectangle, BoxObject.ObjectType.WINDOW);

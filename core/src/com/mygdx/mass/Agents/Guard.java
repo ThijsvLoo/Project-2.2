@@ -73,7 +73,7 @@ public class Guard extends Agent {
             currentState = State.PATROL;
         }
 
-        if (!super.blind) {
+        if (!super.blind && !isRayCastOff) {
             if (!onTower) {
                 objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
                 objectsTransparent = (short) (WINDOW_BIT);

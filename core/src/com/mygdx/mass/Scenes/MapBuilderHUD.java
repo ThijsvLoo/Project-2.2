@@ -182,7 +182,7 @@ public class MapBuilderHUD implements Disposable {
         random = createButton("Textures/Buttons/Random.png", "Textures/Buttons/RandomInvert.png");
         random.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mapBuilderScreen.generateMap(20, 50, 0);
+                newMap();
                 System.out.println("Current action: Randomize");
             }
         });
@@ -341,15 +341,15 @@ public class MapBuilderHUD implements Disposable {
         //start second row
         table.row();
 
+        table.add(exit).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(load).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(save).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(random).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(delete).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(clear).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(undo).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(redo).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
+        table.add(random).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
         table.add(simulate).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
-        table.add(exit).size(BUTTON_SIZE).padBottom(PAD_BOTTOM);
 
         stage.addActor(table);
     }
@@ -385,4 +385,17 @@ public class MapBuilderHUD implements Disposable {
 
     public Table getTable() { return table; }
 
+    public void newMap() {
+        mapBuilderScreen.generateMap(20, 50, 0);
+
+//        initiating the individual map of all agents, giving it the starting information
+        for (Guard guard : mass.getMap().getGuards()) {
+            guard.getIndividualMap().setWalls(mass.getMap().getWalls());
+            guard.getIndividualMap().setGuards(mass.getMap().getGuards());
+        }
+        for (Intruder intruder : mass.getMap().getIntruders()) {
+            intruder.getIndividualMap().setWalls(mass.getMap().getWalls());
+            intruder.getIndividualMap().setIntruders(mass.getMap().getIntruders());
+        }
+    }
 }

@@ -57,6 +57,13 @@ public class MapSimulatorHUD implements Disposable {
     public Slider speed;
     public SelectBox<Guard.State> guardState;
     public SelectBox<Intruder.State> intruderState;
+    public SelectBox<Refresh> reloadBox;
+
+    public boolean autoRandom = false;
+    public boolean autoReset = false;
+
+    public enum Refresh {NO_RELOAD, NEW_MAP, SAME_MAP}
+    public Refresh currentRefresh = Refresh.NO_RELOAD;
 
     private int prevSpeed;
     private boolean paused;
@@ -80,23 +87,7 @@ public class MapSimulatorHUD implements Disposable {
         reset.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Reset");
-                try{
-                    MapData mapData;
-                    File mapFile = new File("temp.ser");
-                    InputStream inStream = new FileInputStream(mapFile);
-                    ObjectInputStream fileObjectIn = new ObjectInputStream(inStream);
-                    mapData = (MapData) fileObjectIn.readObject();
-                    fileObjectIn.close();
-                    inStream.close();
-                    mass.getMap().clearMap();
-                    mapData.loadMap(mass);
-                } catch(IOException e){
-                    System.out.println("IO error");
-                    e.printStackTrace();
-                } catch(ClassNotFoundException e){
-                    System.out.println("Class not found");
-                    e.printStackTrace();
-                }
+                reloadMap();
             }
         });
         clear = createButton("Textures/Buttons/Reset.png", "Textures/Buttons/ResetInvert.png");
@@ -118,8 +109,7 @@ public class MapSimulatorHUD implements Disposable {
         simulate = createButton("Textures/Buttons/Play.png", "Textures/Buttons/PlayInvert.png");
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mapSimulatorScreen.setWorldSpeedFactor(prevSpeed);
-                setTable();
+                playSim();
             }
         });
 
@@ -195,6 +185,18 @@ public class MapSimulatorHUD implements Disposable {
             }
         });
 
+        reloadBox = new SelectBox<Refresh>(new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json")));
+        reloadBox.setItems(Refresh.values());
+        for (Intruder i : mass.getMap().getIntruders()) {
+            reloadBox.setSelected(null);
+        }
+        reloadBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                currentRefresh=reloadBox.getSelected();
+            }
+        });
+
         float sliderWidth = 500.f;
         int colSpan = (int) Math.ceil(sliderWidth/BUTTON_SIZE);
         table.defaults().pad(2.0f);
@@ -205,13 +207,14 @@ public class MapSimulatorHUD implements Disposable {
         miniTable.defaults().pad(2.0f);
         paused = false;
         table.add(miniTable).padBottom(PAD_BOTTOM).expandX();
-        miniTable.add(reset).size(BUTTON_SIZE);
-        miniTable.add(clear).size(BUTTON_SIZE);
-        miniTable.add(pause).size(BUTTON_SIZE);
-        miniTable.add(stop).size(BUTTON_SIZE);
-        miniTable.add(exit).size(BUTTON_SIZE);
+        miniTable.add(reloadBox);
         miniTable.add(guardState);
         miniTable.add(intruderState);
+        miniTable.add(exit).size(BUTTON_SIZE);
+        miniTable.add(reset).size(BUTTON_SIZE);
+        miniTable.add(pause).size(BUTTON_SIZE);
+        miniTable.add(stop).size(BUTTON_SIZE);
+        miniTable.add(clear).size(BUTTON_SIZE);
         stage.addActor(table);
 
         Gdx.input.setInputProcessor(stage);
@@ -244,6 +247,7 @@ public class MapSimulatorHUD implements Disposable {
 //        guardState.getList().act(dt);
         guardState.getScrollPane().act(dt);
         intruderState.getScrollPane().act(dt);
+        reloadBox.getScrollPane().act(dt);
 
     }
 
@@ -258,8 +262,11 @@ public class MapSimulatorHUD implements Disposable {
 
     public void setTable(){
         miniTable.clearChildren();
+        miniTable.add(reloadBox);
+        miniTable.add(guardState);
+        miniTable.add(intruderState);
+        miniTable.add(exit).size(BUTTON_SIZE);
         miniTable.add(reset).size(BUTTON_SIZE);
-        miniTable.add(clear).size(BUTTON_SIZE);
         if(paused){
             miniTable.add(pause).size(BUTTON_SIZE);
             paused = false;
@@ -268,9 +275,7 @@ public class MapSimulatorHUD implements Disposable {
             paused = true;
         }
         miniTable.add(stop).size(BUTTON_SIZE);
-        miniTable.add(exit).size(BUTTON_SIZE);
-        miniTable.add(guardState);
-        miniTable.add(intruderState);
+        miniTable.add(clear).size(BUTTON_SIZE);
     }
 
     public void setGuardState(Guard.State item){
@@ -286,6 +291,41 @@ public class MapSimulatorHUD implements Disposable {
         speed.setValue(0);
         mapSimulatorScreen.setWorldSpeedFactor(0);
         setTable();
+    }
+
+    public void playSim(){
+        speed.setValue(prevSpeed);
+        mapSimulatorScreen.setWorldSpeedFactor(prevSpeed);
+        setTable();
+    }
+
+    public void reloadMap(){
+        try{
+            MapData mapData;
+            File mapFile = new File("temp.ser");
+            InputStream inStream = new FileInputStream(mapFile);
+            ObjectInputStream fileObjectIn = new ObjectInputStream(inStream);
+            mapData = (MapData) fileObjectIn.readObject();
+            fileObjectIn.close();
+            inStream.close();
+            mass.getMap().clearMap();
+            mapData.loadMap(mass);
+        } catch(IOException e){
+            System.out.println("IO error");
+            e.printStackTrace();
+        } catch(ClassNotFoundException e){
+            System.out.println("Class not found");
+            e.printStackTrace();
+        }
+//        initiating the individual map of all agents, giving it the starting information
+        for (Guard guard : mass.getMap().getGuards()) {
+            guard.getIndividualMap().setWalls(mass.getMap().getWalls());
+            guard.getIndividualMap().setGuards(mass.getMap().getGuards());
+        }
+        for (Intruder intruder : mass.getMap().getIntruders()) {
+            intruder.getIndividualMap().setWalls(mass.getMap().getWalls());
+            intruder.getIndividualMap().setIntruders(mass.getMap().getIntruders());
+        }
     }
 
 }

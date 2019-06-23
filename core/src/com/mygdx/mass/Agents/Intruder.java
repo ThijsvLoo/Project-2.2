@@ -1,11 +1,14 @@
 package com.mygdx.mass.Agents;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.mass.Algorithms.Random;
 import com.mygdx.mass.BoxObject.Door;
 import com.mygdx.mass.BoxObject.Window;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Scenes.MapSimulatorHUD;
 import com.mygdx.mass.Sensors.RayCastField;
 
 import static com.mygdx.mass.Agents.Agent.AgentType.INTRUDER;
@@ -113,7 +116,17 @@ public class Intruder extends Agent {
                     System.out.println("Intruder is escaping!");
                     if (ticktock > 3){
                         mass.mapSimulatorScreen.hud.pauseSim();
-                        System.out.println("INTRUDER HAS WON!");                    }
+                        System.out.println("INTRUDER HAS WON!");
+
+                        if(mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.NEW_MAP)) {
+                            mass.mapBuilderScreen.hud.newMap();
+                            mass.mapSimulatorScreen.hud.playSim();
+                        } else if(mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.SAME_MAP)){
+                            mass.mapSimulatorScreen.hud.reloadMap();
+                            mass.mapSimulatorScreen.hud.playSim();
+                        }
+
+                    }
                 } else {
                     goTo(entryPoint);
                 }
