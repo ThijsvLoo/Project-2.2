@@ -406,7 +406,11 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public boolean isRayCastOff() { return isRayCastOff; }
     //    public ArrayList<Object> getCollisions() { return collisions; }
     public int getTurnSide() { return turnSide; }
-//    public ArrayList<Object> getCollisions() { return collisions; }
+
+    public ArrayList<Gap> getGapList() {
+        return gapList;
+    }
+    //    public ArrayList<Object> getCollisions() { return collisions; }
 
     public void setMoveSpeed(float moveSpeed) {
         if (moveSpeed >= 0.0f && moveSpeed <= Intruder.SPRINT_SPEED) {
