@@ -10,6 +10,8 @@ import com.mygdx.mass.Graph.Node;
 import javax.swing.text.Position;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class GapTree {
 
@@ -21,12 +23,13 @@ public class GapTree {
     protected double slackVar;
     protected ArrayList<Vector2> allGapsPositions;
     protected ArrayList<Vector2> previousIterationGapsPosition;
-    protected boolean TOP = false, BOTTOM = false, LEFT = false, RIGHT = false;
-    protected int Top, Bottom, Left, Right;
-    protected int previousGapsNumber;
-    protected ArrayList<Gap> appearingGaps;
-    protected ArrayList<Gap> disappearingGaps;
-    protected ArrayList<Gap> previousGaps;
+    protected TreeMap<Float, Gap> appearingGaps;
+    protected TreeMap<Float, Gap> disappearingGaps;
+    protected TreeMap<Float, Gap> previousGaps;
+    protected ArrayList<Double> degrees;
+    protected Node chasedGap;
+    protected float chasedGapAngle;
+    protected double slackAngle;
 
     public GapTree(Agent agent) {
         this.agent = agent;
@@ -34,37 +37,50 @@ public class GapTree {
         P = new Vector2();
         slackVar = 1;
         allGapsPositions = new ArrayList<Vector2>();
+        slackAngle = 35;
     }
 
-    public void initializeGT(Vector2 startingPosition, ArrayList<Gap> detectedGaps) {
+    public void initializeGT(Vector2 startingPosition, TreeMap<Float, Gap> detectedGaps) {
         Node start = new Node(startingPosition);
-        previousGapsNumber = detectedGaps.size();
-        for (Gap g : detectedGaps) {
-            addGap(g, start);
-            allGapsPositions.add(g.getLocation());
-            previousIterationGapsPosition.add(g.getLocation());
-            previousGaps.add(g);
+        for (Map.Entry<Float, Gap> E : detectedGaps.entrySet()) {
+            addGap(E.getValue(), start);
+            allGapsPositions.add(E.getValue().getLocation());
+            previousIterationGapsPosition.add(E.getValue().getLocation());
+            previousGaps.put(E.getKey(), E.getValue());
         }
+        chaseGap();
     }
 
-    public void chaseGap(Node nodeToChase, ArrayList<Gap> detectedGaps) {
+    public void chaseGap(Node nodeToChase, TreeMap<Float, Gap> detectedGaps) {
         agent.goTo(nodeToChase.getGap().getOffsetLocation());
         nodeToChase.setVisited(true);
         parent = nodes.get(nodes.indexOf(nodeToChase));
         //now we need to update detectedGaps after moving to offsetLocation
         agent.fireGapSensor();
-        //int gapsDifference = previousGapsNumber - agent.getGapSensor().getGapList().size();
-        for (Gap gapToCheck : previousGaps) {
-            if (gapToCheck == nodeToChase.getGap()) continue;
-            if (checkIfDisappear(gapToCheck, detectedGaps)) {
-                disappearingGaps.add(gapToCheck);
+
+        /*
+        //add all gaps degrees into its arraylist
+        for (Map.Entry<Float, Gap> entry : agent.getGapSensor().getGapList().entrySet()) {
+            double temp = entry.getKey();
+            degrees.add(Math.toDegrees(temp));
+        }*/
+
+        //add all but chased gaps, that disappeared into its arraylist
+        for (Map.Entry<Float, Gap> gapToCheck : previousGaps.entrySet()) { //Disappeareance
+            if (gapToCheck.getValue() == nodeToChase.getGap()) continue;
+            if (checkIfDisappear(gapToCheck.getValue(), detectedGaps)) {
+                disappearingGaps.put(gapToCheck.getKey(), gapToCheck.getValue());
             }
         }
-        for (Gap g : detectedGaps) {
-            if (checkIfNewGap(g)) { //Appeareance
-                appearingGaps.add(g);
+
+        //add all never existing gaps into arraylist with all gaps, and add all new gaps for this iteration into its arraylist
+        for (Map.Entry<Float, Gap> g : detectedGaps.entrySet()) {
+            if (checkIfNewGap(g.getValue())) { //Appeareance
+                appearingGaps.put(g.getKey(), g.getValue());
             }
         }
+
+        checkCriticalEvents(appearingGaps, disappearingGaps, chasedGap, chasedGapAngle);
         check If Merged or Split
         gap splits if there are two new gaps that are in similar angle, same with merging, gaps merge into one if they were similar angle,
         otherwise they only disappeared
@@ -120,16 +136,38 @@ public class GapTree {
         return true;
     }
 
-    public boolean checkIfDisappear(Gap gapToCheck, ArrayList<Gap> currentGaps) {
-
-
-        for (Gap g : currentGaps) {
-            if ( (Math.sqrt(gapToCheck.getLocation().x - g.getLocation().x) + Math.sqrt(gapToCheck.getLocation().y - g.getLocation().y)) <= Math.sqrt(slackVar)) {
+    public boolean checkIfDisappear(Gap gapToCheck, TreeMap<Float, Gap> currentGaps) {
+        for (Map.Entry<Float, Gap> g : currentGaps.entrySet()) {
+            if ( (Math.sqrt(gapToCheck.getLocation().x - g.getValue().getLocation().x) + Math.sqrt(gapToCheck.getLocation().y - g.getValue().getLocation().y)) <= Math.sqrt(slackVar)) {
                 return false;
             }
         }
         return true;
     }
+
+    public void checkCriticalEvents(TreeMap<Float, Gap> appearingGaps, TreeMap<Float, Gap> disappearingGaps, Node chasedGap, float chasedGapAngle) {
+        if (appearingGaps.isEmpty()) chasedGap.setPrimitive(true);
+        for (Map.Entry<Float, Gap> g : appearingGaps.entrySet()) {
+            double degrees;
+            degrees = Math.toDegrees(g.getKey());
+            Double[] values = disappearingGaps.keySet().toArray(new Double[disappearingGaps.size()]);
+            double degrees1 = Integer.MAX_VALUE;
+            double degrees2 = Integer.MAX_VALUE;
+            for (int i = 0; i < values.length; i++) {
+                double temp1 = Math.toDegrees(values[i]);
+                if (Math.abs(degrees - temp1) < degrees1) {
+                        degrees1 = temp1;
+                    }
+                }
+        }
+        for (Map.Entry<Float, Gap> g : appearingGaps.entrySet()) {
+                addGap(g.getValue(), chasedGap);
+            }
+
+
+
+    }
+
 
 
 }

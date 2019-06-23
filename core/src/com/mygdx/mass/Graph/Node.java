@@ -12,6 +12,8 @@ public class Node {
     public ArrayList<Edge> connections;
     private Vector2 position;
     private boolean visited;
+
+
     private boolean primitive;
 
 
@@ -79,6 +81,14 @@ public class Node {
 
     public void setGap(Gap gap) {
         this.gap = gap;
+    }
+
+    public boolean isPrimitive() {
+        return primitive;
+    }
+
+    public void setPrimitive(boolean primitive) {
+        this.primitive = primitive;
     }
 
     public boolean isVisited() { return visited; }
