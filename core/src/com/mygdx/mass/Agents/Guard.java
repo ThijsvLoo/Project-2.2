@@ -127,7 +127,6 @@ public class Guard extends Agent {
     }
 
     private void updateAction() {
-        //updated
         switch (currentState) {
             case CHASE: {
                 chase();
