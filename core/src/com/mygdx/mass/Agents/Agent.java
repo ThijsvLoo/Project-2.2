@@ -196,15 +196,6 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         }
         setDestination(route.poll());
     }
-    public void recalculatePath(){
-        //        Vector2 destination = agent.getDestination();
-//        while (!agent.getRoute().isEmpty()) {
-//
-//            destination = agent.getRoute().poll();
-//            System.out.println(agent.getRoute().size());
-//        }
-//        agent.goTo(destination);
-    }
 
     public void updateDirection() {
         direction.x = destination.x - body.getPosition().x;

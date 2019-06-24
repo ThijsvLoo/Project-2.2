@@ -64,10 +64,6 @@ public class IndividualMap extends Map {
         agent.getRoute().clear();
     }
 
-    private void updatePath(){
-    	agent.recalculatePath();
-    }
-
     public Agent getAgent() { return agent; }
     public ArrayList<Vector2> getUnexploredPlaces() { return unexploredPlaces; }
 
