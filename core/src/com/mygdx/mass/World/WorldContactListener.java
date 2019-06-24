@@ -129,6 +129,7 @@ public class WorldContactListener implements ContactListener {
                 }
                 break;
             }
+
             case VISUAL_FIELD_BIT | SENTRY_TOWER_BIT : {
                 VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
                 if (visualField.getVisualFieldType() == VisualField.VisualFieldType.TOWER) {
@@ -290,6 +291,7 @@ public class WorldContactListener implements ContactListener {
                 }
                 break;
             }
+
         }
     }
 

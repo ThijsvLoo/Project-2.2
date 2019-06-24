@@ -4,11 +4,14 @@ package com.mygdx.mass.Agents;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.mass.Algorithms.PredictionModel;
+import com.mygdx.mass.BoxObject.Door;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.MapToGraph.TSP;
 
 import java.util.ArrayList;
 import com.mygdx.mass.Sensors.RayCastField;
+
+import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 
 public class Guard extends Agent {
@@ -23,6 +26,9 @@ public class Guard extends Agent {
     public static final float TOWER_MAX_VISUAL_RANGE = 15.0f;
 
     private float deafDuration;
+    protected Door door;
+    protected float doorUnlockTime;
+    protected float breakThroughProgress;
 
     private boolean onTower;
 
@@ -58,6 +64,9 @@ public class Guard extends Agent {
         updateState();
         updateAction();
         super.update(delta);
+        if (door != null) {
+            unlockDoorSlow(delta);
+        }
     }
 
     private void updateState() {
@@ -119,6 +128,14 @@ public class Guard extends Agent {
 //            }
 //        }
     }
+    private void unlockDoorSlow(float delta) {
+        if (door != null && door.getCurrentState() == CLOSED) {
+            breakThroughProgress += delta*100/doorUnlockTime;
+            if (breakThroughProgress >= 100.0f) {
+                door.setCurrentState(Door.State.OPEN);
+            }
+        }
+    }
 
     private void updateAction() {
         if (destination == null && route.isEmpty()) {
@@ -170,10 +187,14 @@ public class Guard extends Agent {
     }
 
     public PredictionModel getPredictionModel() { return predictionModel; }
-
+    public Door getDoor() { return door; }
     public void setCurrentState(State state) { this.currentState = state; }
+    public void setDoorUnlockTime(float doorUnlockTime) { this.doorUnlockTime = doorUnlockTime; }
     public void setPreviousState(State state) { this.previousState = state; }
+    public void setDoor(Door door) { this.door = door; }
 
+
+    public void setBreakThroughProgress(float breakThroughProgress) { this.breakThroughProgress = breakThroughProgress; }
     public void resetState() {
         currentState = State.NONE;
         previousState = State.NONE;
