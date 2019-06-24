@@ -73,76 +73,78 @@ public class Guard extends Agent {
             currentState = State.PATROL;
         }
 
-        if (!super.blind && !isRayCastOff) {
-            if (!onTower) {
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-                objectsTransparent = (short) (WINDOW_BIT);
-                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-                rayCastFieldBuildings = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
-
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
-                objectsTransparent = (short) (SENTRY_TOWER_BIT);
-                objectsWanted = (short) (SENTRY_TOWER_BIT);
-                rayCastFieldTowers = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
-
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
-                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
-                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
-                rayCastFieldAgents = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
-            }
-            else {
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                rayCastFieldAgents = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
-            }
-        }
-
-        processResultsFromRayCastFields();
-
-
-//        if (capture != null) {
-//            capture.increaseCounter(delta);
-//        }
-//        for (CapturePoint capturePoint : capture.getCapturePoints()) {
-//            if (body.getPosition().dst(capturePoint.getPosition()) < 5.0f) {
-//                capture.removePoint(capturePoint);
-//                break;
+//        if (!super.blind && !isRayCastOff) {
+//            if (!onTower) {
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+//                objectsTransparent = (short) (WINDOW_BIT);
+//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+//                rayCastFieldBuildings = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
+//
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
+//                objectsTransparent = (short) (SENTRY_TOWER_BIT);
+//                objectsWanted = (short) (SENTRY_TOWER_BIT);
+//                rayCastFieldTowers = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
+//
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
+//                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
+//                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
+//                rayCastFieldAgents = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
+//            }
+//            else {
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                rayCastFieldAgents = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
 //            }
 //        }
+//
+//        processResultsFromRayCastFields();
     }
 
     private void updateAction() {
         switch (currentState) {
             case CHASE: {
-                //destination = individualMap.getIntruders().get(0).getBody().getPosition();
+                chase();
                 break;
             }
+//                case INTERCEPT: {
+//                    intercept(MASS.map.getIntruders().get(0));
+//                    break;
+//                }
             case SEARCH: {
-                if (previousState != State.SEARCH) {
+                if (destination == null && route.isEmpty()) {
                     search();
-                    previousState = State.SEARCH;
                 }
                 break;
             }
             case PATROL: {
-                if (previousState != State.PATROL) {
+                if (destination == null && route.isEmpty()) {
                     patrol();
-                    previousState = State.PATROL;
                 }
                 break;
             }
             case EXPLORE: {
-                if (previousState != State.EXPLORE) {
+                if (destination == null && route.isEmpty()) {
                     explore();
-                    previousState = State.EXPLORE;
                 }
                 break;
             }
+        }
+    }
+
+    private void chase() {
+        if (!enemyInSight.isEmpty()) {
+            Agent closest = enemyInSight.get(0);
+            for (Agent agent : getEnemyInSight()) {
+                if (agent.getBody().getPosition().dst(body.getPosition()) > closest.getBody().getPosition().dst(body.getPosition())) {
+                    closest = agent;
+                }
+            }
+            destination = closest.getBody().getPosition();
         }
     }
 

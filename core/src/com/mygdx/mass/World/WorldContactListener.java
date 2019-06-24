@@ -82,7 +82,22 @@ public class WorldContactListener implements ContactListener {
                     Agent agent1 = visualField.getAgent();
                     Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
                     if (agent1.getAgentType() != agent2.getAgentType()) {
-                        if(agent1.isRayCastOff()) agent1.getEnemyInSight().add(agent2);
+//                        if(agent1.isRayCastOff()) agent1.getEnemyInSight().add(agent2);
+                        agent1.getEnemyInSight().add(agent2);
+                        //the following is hard coded for the case of global communication
+                        if (agent1 instanceof Guard) {
+                            for (Guard guard : mass.getMap().getGuards()) {
+                                if (!guard.getIndividualMap().getIntruders().contains(agent2)) {
+                                    guard.getIndividualMap().getIntruders().add((Intruder) agent2);
+                                }
+                            }
+                        } else {
+                            for (Intruder intruder : mass.getMap().getIntruders()) {
+                                if (!intruder.getIndividualMap().getGuards().contains(agent2)) {
+                                    intruder.getIndividualMap().getGuards().add((Guard) agent2);
+                                }
+                            }
+                        }
                     }
                 }
                 break;
@@ -228,10 +243,31 @@ public class WorldContactListener implements ContactListener {
                     Agent agent1 = visualField.getAgent();
                     Agent agent2 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
                     if (agent1.getAgentType() != agent2.getAgentType()) {
-                        if (agent2 instanceof Guard) {
-                            agent1.getEnemyInSight().remove(agent2);
+                        agent1.getEnemyInSight().remove(agent2);
+                        //the following is hardcoded for global communications
+                        if (agent1.getAgentType() == Agent.AgentType.GUARD) {
+                            for (Guard guard : mass.getMap().getGuards()) {
+                                if (guard != agent1 && guard.getEnemyInSight().contains(agent2)) {
+                                    break;
+                                }
+                            }
+                            for (Guard guard : mass.getMap().getGuards()) {
+                                if (guard.getIndividualMap().getIntruders().contains(agent2)) {
+                                    guard.getIndividualMap().getIntruders().remove(agent2);
+                                }
+                            }
+                        } else {
+                            for (Intruder intruder : mass.getMap().getIntruders()) {
+                                if (intruder != agent1 && intruder.getEnemyInSight().contains(agent2)) {
+                                    break;
+                                }
+                            }
+                            for (Intruder intruder : mass.getMap().getIntruders()) {
+                                if (intruder.getIndividualMap().getGuards().contains(agent2)) {
+                                    intruder.getIndividualMap().getGuards().remove(agent2);
+                                }
+                            }
                         }
-
                     }
                 }
                 break;
