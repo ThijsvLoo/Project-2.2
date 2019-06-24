@@ -192,10 +192,10 @@ public class Graph {
     private <T extends BoxObject> ArrayList<Vertex> add4Corners(T obj){
         ArrayList<Vertex> corners = new ArrayList<Vertex>();
 
-            corners.add(new Vertex(obj.getRectangle().x-((float)1.5),obj.getRectangle().y-((float)1.5)));
-            corners.add(new Vertex(obj.getRectangle().x-((float)1.5),obj.getRectangle().y+obj.getRectangle().height+((float)1.5)));
-            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)1.5), obj.getRectangle().y+obj.getRectangle().height+((float)1.5)));
-            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)1.5), obj.getRectangle().y-((float)1.5)));
+            corners.add(new Vertex(obj.getRectangle().x-((float)1),obj.getRectangle().y-((float)1)));
+            corners.add(new Vertex(obj.getRectangle().x-((float)1),obj.getRectangle().y+obj.getRectangle().height+((float)1)));
+            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)1), obj.getRectangle().y+obj.getRectangle().height+((float)1)));
+            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)1), obj.getRectangle().y-((float)1)));
 
 
             vertices.addAll(corners);
@@ -217,7 +217,9 @@ public class Graph {
             entranceFront.add(addDoorFront(obj.getObjCenter(), building));
         }
         for(int i=0; i<entrances.size(); i++){
-            addEdge(new Edge(entranceInside.get(i), entranceFront.get(i)));
+            Edge edge = new Edge(entranceInside.get(i), entranceFront.get(i));
+            addEdge(edge);
+            System.out.println(edge.getWeight());
         }
         for(Vertex entrance: entranceInside){
             for(Vertex entrance2: entranceInside){
@@ -236,25 +238,25 @@ public class Graph {
         double inside_x = -10000;
         double inside_y = -10000;
         if (x == building.getRectangle().x){
-            inside_x = (x + 1.5);
+            inside_x = (x + 1);
             inside_y = y;
 //            System.out.println("added door");
 //            System.out.println(x+ " "+ y);
         }
         else if(y == building.getRectangle().y){
-            inside_y = (y + 1.5);
+            inside_y = (y + 1);
             inside_x = x;
 //            System.out.println("added door");
 //            System.out.println(x+ " "+ y);
         }
         else if(x == building.getRectangle().x+ building.getRectangle().width){
-            inside_x = (x - 1.5);
+            inside_x = (x - 1);
             inside_y = y;
 //            System.out.println("added door");
 //            System.out.println(x+ " "+ y);
         }
         else if(y == building.getRectangle().y+building.getRectangle().height){
-            inside_y = y - 1.5;
+            inside_y = y - 1;
             inside_x = x;
 
 
@@ -271,22 +273,22 @@ public class Graph {
         double front_x = -10000;
         double front_y = -10000;
         if (x == building.getRectangle().x){
-            front_x = (x - 1.5);
+            front_x = (x - 1);
             front_y = y;
 
         }
         else if(y == building.getRectangle().y){
-            front_y = (y - 1.5);
+            front_y = (y - 1);
             front_x = x;
 
         }
         else if(x == building.getRectangle().x+ building.getRectangle().width){
-            front_x = (x + 1.5);
+            front_x = (x + 1);
             front_y = y;
 
         }
         else if(y == building.getRectangle().y+building.getRectangle().height){
-            front_y = y + 1.5;
+            front_y = y + 1;
             front_x = x;
 
 

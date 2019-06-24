@@ -40,6 +40,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public static final float VISIBLE_DISTANCE_BUILDING = 10.0f;
     public static final float VISIBLE_DISTANCE_TOWER = 18.0f;
+    public static final float VISIBLE_DISTANCE_WALL = 11.0f;
 
     private float blindDuration;
     private float immobilityDuration;
@@ -49,7 +50,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public IndividualMap individualMap;
 
     public enum AgentType {GUARD, INTRUDER};
-    protected AgentType agentType;
+    public AgentType agentType;
 
     protected float moveSpeed;
     protected float turnSpeed;
@@ -126,6 +127,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
         if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
         if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
+        if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.WALL);
 
 //        if(CONE_ENABLED == true) {agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);}
 

@@ -386,7 +386,7 @@ public class MapBuilderHUD implements Disposable {
     public Table getTable() { return table; }
 
     public void newMap() {
-        mapBuilderScreen.generateMap(20, 50, 0);
+        mapBuilderScreen.generateMap(20, 50, 1);
 
 //        initiating the individual map of all agents, giving it the starting information
         for (Guard guard : mass.getMap().getGuards()) {

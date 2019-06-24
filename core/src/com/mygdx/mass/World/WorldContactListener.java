@@ -1,12 +1,14 @@
 package com.mygdx.mass.World;
 
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.Agents.Guard;
 import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Graph.Edge;
 import com.mygdx.mass.Sensors.VisualField;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
@@ -34,15 +36,31 @@ public class WorldContactListener implements ContactListener {
             case GUARD_BIT | WALL_BIT :
             case GUARD_BIT | BUILDING_BIT :
             case GUARD_BIT | SENTRY_TOWER_BIT :
-//            case GUARD_BIT | DOOR_BIT : {
-//                Guard guard = fixtureA.getUserData() instanceof Guard ? (Guard) fixtureA.getUserData() : (Guard) fixtureB.getUserData();
-//                Door door = fixtureA.getUserData() instanceof Door ? (Door) fixtureA.getUserData() : (Door) fixtureB.getUserData();
-//                guard.setDoor(door);
-//                if (door.getCurrentState() == CLOSED) {
-//                    guard.setDoorUnlockTime(Intruder.DOOR_UNLOCK_TIME_SLOW + (float) Math.random()*4 - 2);
-//                }
-//                break;
-//            }
+            case GUARD_BIT | DOOR_BIT : {
+                Guard guard = null;
+                Door door = null;
+                if(fixtureA.getUserData() instanceof Guard){
+
+                   guard = (Guard)fixtureA.getUserData();
+                     door = (Door) fixtureB.getUserData();
+
+                }
+                else if(fixtureA.getUserData() instanceof Door){
+                    guard = (Guard)fixtureB.getUserData();
+                     door = (Door) fixtureA.getUserData();
+
+                }
+                else {
+
+                    break;
+                }
+                System.out.println(fixtureA.getUserData().getClass());
+                guard.setDoor(door);
+                if (door.getCurrentState() == CLOSED) {
+                    guard.setDoorUnlockTime(Intruder.DOOR_UNLOCK_TIME_SLOW + (float) Math.random()*4 - 2);
+                }
+                break;
+            }
             case INTRUDER_BIT | WALL_BIT :
             case INTRUDER_BIT | BUILDING_BIT :
             case INTRUDER_BIT | SENTRY_TOWER_BIT :
@@ -126,6 +144,7 @@ public class WorldContactListener implements ContactListener {
                 }
                 break;
             }
+
             case VISUAL_FIELD_BIT | SENTRY_TOWER_BIT : {
                 VisualField visualField = fixtureA.getUserData() instanceof VisualField ? (VisualField) fixtureA.getUserData() : (VisualField) fixtureB.getUserData();
                 if (visualField.getVisualFieldType() == VisualField.VisualFieldType.TOWER) {
@@ -197,14 +216,32 @@ public class WorldContactListener implements ContactListener {
             case GUARD_BIT | WALL_BIT :
             case GUARD_BIT | BUILDING_BIT :
             case GUARD_BIT | SENTRY_TOWER_BIT :
-//            case GUARD_BIT | DOOR_BIT : {
-//                Guard guard = fixtureA.getUserData() instanceof Guard ? (Guard) fixtureA.getUserData() : (Guard) fixtureB.getUserData();
-//                Door door = fixtureA.getUserData() instanceof Door ? (Door) fixtureA.getUserData() : (Door) fixtureB.getUserData();
-//                guard.setDoor(null);
-//                guard.setBreakThroughProgress(0.0f);
-//                guard.setDoorUnlockTime(0.0f);
-//                break;
-//            }
+            case GUARD_BIT | DOOR_BIT : {
+
+                Guard guard = null;
+
+                if(fixtureA.getUserData() instanceof Guard){
+
+                    guard = (Guard)fixtureA.getUserData();
+
+
+                }
+                else if(fixtureA.getUserData() instanceof Door){
+                    guard = (Guard)fixtureB.getUserData();
+
+
+                }
+                else if(fixtureA.getUserData() instanceof Building){
+                    guard = (Guard)fixtureB.getUserData();
+
+
+                }
+                System.out.println(fixtureA.getUserData().getClass());
+                guard.setDoor(null);
+                guard.setBreakThroughProgress(0.0f);
+                guard.setDoorUnlockTime(0.0f);
+                break;
+            }
             case INTRUDER_BIT | WALL_BIT :
             case INTRUDER_BIT | BUILDING_BIT :
             case INTRUDER_BIT | SENTRY_TOWER_BIT :
@@ -290,6 +327,7 @@ public class WorldContactListener implements ContactListener {
                 }
                 break;
             }
+
         }
     }
 
@@ -341,7 +379,7 @@ public class WorldContactListener implements ContactListener {
             }
 
             case GUARD_BIT | WALL_BIT :
-            case GUARD_BIT | BUILDING_BIT :
+
             case GUARD_BIT | SENTRY_TOWER_BIT :
             case INTRUDER_BIT | WALL_BIT :
                 break;
@@ -356,7 +394,13 @@ public class WorldContactListener implements ContactListener {
                 }
                 break;
             }
-
+            case GUARD_BIT | BUILDING_BIT : {
+                Guard guard = fixtureA.getUserData() instanceof Guard ? (Guard) fixtureA.getUserData() : (Guard) fixtureB.getUserData();
+                if (guard.getDoor() != null && guard.getDoor().getCurrentState() == OPEN) {
+                    contact.setEnabled(false);
+                }
+                break;
+            }
             case INTRUDER_BIT | SENTRY_TOWER_BIT :
             case INTRUDER_BIT | DOOR_BIT :
                 break;
