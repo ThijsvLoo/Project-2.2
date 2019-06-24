@@ -175,12 +175,40 @@ public class Guard extends Agent {
         destination = null;
         route.clear();
         TSP tsp = new TSP();
-        ArrayList<Vector2> toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces()); //need to adapt this to work with multiple agent
-        ArrayList<Vector2> path = tsp.computePath(this, toBeExploredPoints);
-        for (Vector2 wp : path) {
-            addWaypoint(wp);
-        }
+        ArrayList<Vector2> toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces());
+		if(toBeExploredPoints.size() == 361){
+			ArrayList<Guard> tmpGuards = (ArrayList<Guard>) mass.getMap().getGuards().clone();
+			for(Guard guard: tmpGuards){
+				guard.getIndividualMap().getUnexploredPlaces().clear();
+			}
+			int maxExplorationPoints = (int)Math.ceil((float)toBeExploredPoints.size() / mass.getMap().getGuards().size());
+			for(Vector2 explorationPoint: toBeExploredPoints){
+				Guard closestGuard = tmpGuards.get(0);
+				double minDistance = Integer.MAX_VALUE;
+				for(Guard guard: tmpGuards){
+					double distance = calcDistance(guard.getBody().getPosition(), explorationPoint);
+					if( distance < minDistance){
+						closestGuard = guard;
+						minDistance = distance;
+					}
+				}
+				closestGuard.getIndividualMap().getUnexploredPlaces().add(explorationPoint);
+				if(closestGuard.getIndividualMap().getUnexploredPlaces().size() >= maxExplorationPoints){
+					tmpGuards.remove(closestGuard);
+				}
+			}
+		}
+
+		toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces());
+		ArrayList<Vector2> path = tsp.computePath(this, toBeExploredPoints);
+		for (Vector2 wp : path) {
+			addWaypoint(wp);
+		}
     }
+
+	double calcDistance(Vector2 object1, Vector2 object2){
+		return Math.sqrt(Math.pow((object2.x - object1.x), 2) + Math.pow((object2.y - object1.y), 2));
+	}
 
     public void patrol() {
         destination = null;
