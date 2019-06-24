@@ -160,6 +160,7 @@ public class Guard extends Agent {
 
     private void chase() {
         if (!enemyInSight.isEmpty()) {
+            route.clear();
             Agent closest = enemyInSight.get(0);
             for (Agent agent : getEnemyInSight()) {
                 if (agent.getBody().getPosition().dst(body.getPosition()) > closest.getBody().getPosition().dst(body.getPosition())) {

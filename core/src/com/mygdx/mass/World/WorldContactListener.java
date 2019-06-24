@@ -237,7 +237,8 @@ public class WorldContactListener implements ContactListener {
 
                 }
                 System.out.println(fixtureA.getUserData().getClass());
-                guard.setDoor(null);
+                if (guard != null)
+                    guard.setDoor(null);
                 guard.setBreakThroughProgress(0.0f);
                 guard.setDoorUnlockTime(0.0f);
                 break;
