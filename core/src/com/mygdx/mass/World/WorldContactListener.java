@@ -54,7 +54,7 @@ public class WorldContactListener implements ContactListener {
 
                     break;
                 }
-                System.out.println(fixtureA.getUserData().getClass());
+//                System.out.println(fixtureA.getUserData().getClass());
                 guard.setDoor(door);
                 if (door.getCurrentState() == CLOSED) {
                     guard.setDoorUnlockTime(Intruder.DOOR_UNLOCK_TIME_SLOW + (float) Math.random()*4 - 2);
@@ -236,11 +236,12 @@ public class WorldContactListener implements ContactListener {
 
 
                 }
-                System.out.println(fixtureA.getUserData().getClass());
-                if (guard != null)
+//                System.out.println(fixtureA.getUserData().getClass());
+                if (guard != null) {
                     guard.setDoor(null);
-                guard.setBreakThroughProgress(0.0f);
-                guard.setDoorUnlockTime(0.0f);
+                    guard.setBreakThroughProgress(0.0f);
+                    guard.setDoorUnlockTime(0.0f);
+                }
                 break;
             }
             case INTRUDER_BIT | WALL_BIT :

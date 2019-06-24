@@ -73,8 +73,8 @@ public class Intruder extends Agent {
 
     public void update(float delta) {
 
-//		updateAction(delta);
-//		updateState();
+		updateAction(delta);
+		updateState();
 //		raycast();
 
         if (moveSpeed > 1.4f && isMoving()) {
@@ -176,7 +176,7 @@ public class Intruder extends Agent {
                 break;
             }
             case ESCAPE: {
-				escape(delta);
+				act(delta);
                 break;
             }
             case EVADE: {
@@ -191,7 +191,7 @@ public class Intruder extends Agent {
     }
 
     private void escape(float delta){
-        act(delta);
+
 	}
 	private void evade(){
 
