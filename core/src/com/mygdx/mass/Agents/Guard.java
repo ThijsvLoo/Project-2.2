@@ -13,7 +13,7 @@ import com.mygdx.mass.Sensors.RayCastField;
 
 public class Guard extends Agent {
 
-    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH};
+    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH, INTERCEPT};
     public State currentState;
     public State previousState;
     public static final float BASE_SPEED = 1.4f;
@@ -55,22 +55,26 @@ public class Guard extends Agent {
     }
 
     public void update(float delta) {
-        super.update(delta);
         updateState();
         updateAction();
+        super.update(delta);
     }
 
     private void updateState() {
         if (!enemyInSight.isEmpty()) {
             currentState = State.CHASE;
+            mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
+            System.out.println(currentState);
         }
 //        else if (!predictionModel.getCapturePoints().isEmpty()){
 //            currentState = State.SEARCH;
 //        }
-        else if (!individualMap.getUnexploredPlaces().isEmpty()) {
+        else if (individualMap.getUnexploredPlaces().size() > 0) {
             currentState = State.EXPLORE;
+            mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
         } else {
             currentState = State.PATROL;
+            mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
         }
 
         if (!super.blind && !isRayCastOff) {
@@ -117,31 +121,28 @@ public class Guard extends Agent {
     }
 
     private void updateAction() {
-        switch (currentState) {
-            case CHASE: {
-                //destination = individualMap.getIntruders().get(0).getBody().getPosition();
-                break;
-            }
-            case SEARCH: {
-                if (previousState != State.SEARCH) {
+        if (destination == null && route.isEmpty()) {
+            switch (currentState) {
+                case CHASE: {
+                    destination = getEnemyInSight().get(0).getBody().getPosition();
+                    break;
+                }
+                case INTERCEPT: {
+//                    intercept(MASS.map.getIntruders().get(0));
+                    break;
+                }
+                case SEARCH: {
                     search();
-                    previousState = State.SEARCH;
+                    break;
                 }
-                break;
-            }
-            case PATROL: {
-                if (previousState != State.PATROL) {
+                case PATROL: {
                     patrol();
-                    previousState = State.PATROL;
+                    break;
                 }
-                break;
-            }
-            case EXPLORE: {
-                if (previousState != State.EXPLORE) {
+                case EXPLORE: {
                     explore();
-                    previousState = State.EXPLORE;
+                    break;
                 }
-                break;
             }
         }
     }

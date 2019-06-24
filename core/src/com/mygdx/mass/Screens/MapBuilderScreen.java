@@ -662,13 +662,15 @@ public class MapBuilderScreen implements Screen {
                 boolean nope = false;
                 for (BoxObject object : map.getBoxObjects()) {
                     if (object.getRectangle().contains(position) && !object.getObjectType().equals(BoxObject.ObjectType.BUILDING))
-                        x = (int) (Math.random() * 199 + 1);
-                        y = (int) (Math.random() * 199 + 1);
-                        position = new Vector2(x, y);
                         nope = true;
+                    break;
                 }
                 if(nope = false){
                     goodToGo = true;
+                } else {
+                    x = (int) (Math.random() * 199 + 1);
+                    y = (int) (Math.random() * 199 + 1);
+                    position = new Vector2(x, y);
                 }
             }
 
@@ -709,7 +711,10 @@ public class MapBuilderScreen implements Screen {
         random(State.SENTRY_TOWER);
         random(State.INTRUDER);
 
-        int numGuards = (int) (Math.random() * maxGuards);
+        int numGuards = maxGuards;
+        if(maxGuards != 0) {
+            numGuards = (int) (Math.random() * maxGuards + 1);
+        }
         for(int i = 0; i < numGuards; i++){
             random(State.GUARD);
         }

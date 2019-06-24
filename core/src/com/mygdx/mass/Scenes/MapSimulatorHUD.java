@@ -326,6 +326,8 @@ public class MapSimulatorHUD implements Disposable {
             intruder.getIndividualMap().setWalls(mass.getMap().getWalls());
             intruder.getIndividualMap().setIntruders(mass.getMap().getIntruders());
         }
+
+        playSim();
     }
 
 }

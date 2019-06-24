@@ -49,7 +49,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public IndividualMap individualMap;
 
     public enum AgentType {GUARD, INTRUDER};
-    protected AgentType agentType;
+    public AgentType agentType;
 
     protected float moveSpeed;
     protected float turnSpeed;

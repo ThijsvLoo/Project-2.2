@@ -117,13 +117,14 @@ public class Intruder extends Agent {
                     if (ticktock > 3){
                         mass.mapSimulatorScreen.hud.pauseSim();
                         System.out.println("INTRUDER HAS WON!");
+                        mass.chart.addWin(this);
+//                        mass.chart.createChart();
 
                         if(mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.NEW_MAP)) {
                             mass.mapBuilderScreen.hud.newMap();
                             mass.mapSimulatorScreen.hud.playSim();
                         } else if(mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.SAME_MAP)){
                             mass.mapSimulatorScreen.hud.reloadMap();
-                            mass.mapSimulatorScreen.hud.playSim();
                         }
 
                     }
