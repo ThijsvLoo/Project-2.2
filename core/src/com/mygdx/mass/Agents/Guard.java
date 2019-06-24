@@ -73,7 +73,7 @@ public class Guard extends Agent {
         if (!enemyInSight.isEmpty()) {
             currentState = State.CHASE;
             mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
-            System.out.println(currentState);
+//            System.out.println(currentState);
         }
 //        else if (!predictionModel.getCapturePoints().isEmpty()){
 //            currentState = State.SEARCH;
