@@ -102,7 +102,7 @@ public class WorldContactListener implements ContactListener {
                     if (agent1.getAgentType() != agent2.getAgentType()) {
 //                        if(agent1.isRayCastOff()) agent1.getEnemyInSight().add(agent2);
                         agent1.getEnemyInSight().add(agent2);
-                        //the following is hard coded for the case of global communication
+                        //the following is hard coded for the case of global communications
                         if (agent1 instanceof Guard) {
                             for (Guard guard : mass.getMap().getGuards()) {
                                 if (!guard.getIndividualMap().getIntruders().contains(agent2)) {

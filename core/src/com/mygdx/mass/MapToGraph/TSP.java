@@ -13,7 +13,9 @@ import com.mygdx.mass.Data.MASS;
 
 
 import java.awt.geom.Point2D;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TSP {
 
@@ -114,5 +116,10 @@ public class TSP {
         }
         return false;
     }
+
+//    public HashMap<Agent, ArrayList<Vector2>> distribute(ArrayList<Agent> agents, ArrayList<Vector2>) {
+//        HashMap<Agent, ArrayList<Vector2>> distributions = new HashMap<Agent, ArrayList<Vector2>>();
+//        int nrOfAgents = distributions.size();
+//    }
 
 }

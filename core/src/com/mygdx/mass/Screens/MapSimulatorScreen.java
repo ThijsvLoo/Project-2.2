@@ -575,8 +575,8 @@ public class MapSimulatorScreen implements Screen {
                 intruder.goTo(coordinates);
             }
             for (Guard guard : map.getGuards()) {
-                guard.setDestination(null);
-                guard.getRoute().clear();
+//                guard.setDestination(null);
+//                guard.getRoute().clear();
             }
             return true;
         }
