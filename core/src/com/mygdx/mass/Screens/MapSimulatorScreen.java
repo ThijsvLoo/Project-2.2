@@ -28,6 +28,7 @@ import com.mygdx.mass.World.IndividualMap;
 import com.mygdx.mass.World.Map;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
@@ -108,22 +109,26 @@ public class MapSimulatorScreen implements Screen {
             System.out.println("World speed cap reached! Lowering the world speed factor by 40% from "+oldSpeedFactor+" to "+worldSpeedFactor);
         }
 
-        accumulator += timePassed;
-        while (accumulator >= MASS.FIXED_TIME_STEP) {
-            for (int i = 0; i < worldSpeedFactor; i++) {
-                MapSimulatorInfo.resetRayCounters();
-                for (Guard guard : map.getGuards()) {
-                    guard.update(MASS.FIXED_TIME_STEP);
-                }
-                for (Intruder intruder : map.getIntruders()) {
-                    intruder.update(MASS.FIXED_TIME_STEP);
-                }
+        try {
+            accumulator += timePassed;
+            while (accumulator >= MASS.FIXED_TIME_STEP) {
+                for (int i = 0; i < worldSpeedFactor; i++) {
+                    MapSimulatorInfo.resetRayCounters();
+                    for (Guard guard : map.getGuards()) {
+                        guard.update(MASS.FIXED_TIME_STEP);
+                    }
+                    for (Intruder intruder : map.getIntruders()) {
+                        intruder.update(MASS.FIXED_TIME_STEP);
+                    }
 
-                world.step(MASS.FIXED_TIME_STEP, 6, 2);
-                simulationStep++;
-                simulationTime = simulationTime + MASS.FIXED_TIME_STEP;
+                    world.step(MASS.FIXED_TIME_STEP, 6, 2);
+                    simulationStep++;
+                    simulationTime = simulationTime + MASS.FIXED_TIME_STEP;
+                }
+                accumulator -= MASS.FIXED_TIME_STEP;
             }
-            accumulator -= MASS.FIXED_TIME_STEP;
+        } catch (ConcurrentModificationException c){
+            System.out.println(c.getMessage());
         }
 
         camera.update();

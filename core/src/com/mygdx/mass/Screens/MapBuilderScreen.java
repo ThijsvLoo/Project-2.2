@@ -582,8 +582,21 @@ public class MapBuilderScreen implements Screen {
 //        System.out.println(height);
 
                 Rectangle rectangle = new Rectangle(x, y, width, height);
-
                 boolean overlap = false;
+                if(randomState.equals(State.WALL)){
+                    if(rectangle.width > rectangle.height){
+//                                rectangle.height = (int) (Math.random() * 5 + Door.SIZE);
+                        rectangle.height = Wall.THICKNESS;
+                    } else {
+//                                rectangle.width = (int) (Math.random() * 5 + Door.SIZE);
+                        rectangle.width = Wall.THICKNESS;
+                    }
+                }
+
+                if (rectangle.x < 0 || rectangle.y < 0 || rectangle.x > 200 || rectangle.y > 200){
+                    overlap = true;
+                }
+
                 for (BoxObject boxObject : map.getBoxObjects()) {
                     Rectangle bigOne = new Rectangle(rectangle.x - (Agent.SIZE * 4), rectangle.y - (Agent.SIZE * 4), rectangle.getWidth() + (Agent.SIZE * 8), rectangle.getHeight() + (Agent.SIZE * 8));
                     if (boxObject.getObjectType().equals(BoxObject.ObjectType.WALL)
