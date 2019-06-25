@@ -730,6 +730,10 @@ public class MapBuilderScreen implements Screen {
         for(int i = 0; i < numGuards; i++){
             random(State.GUARD);
         }
+//
+//        for(Wall wall : map.getWalls()){
+//            System.out.println(wall.getBody().getAngle());
+//        }
     }
 
     public void generateEntrances(Rectangle rectangle, BoxObject.ObjectType type){
