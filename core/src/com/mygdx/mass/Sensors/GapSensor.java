@@ -26,6 +26,8 @@ public class GapSensor {
     private ArrayList<Gap> cyclicalOrderedGapList;
     private TreeMap<Float, Float> problemAreasDeltaAngle; // either reached maximum distance of sensor or is lacking data. Key = start, Value = delta
 
+    private Gap criticalEventGap;
+
     public GapSensor(float rayRange, float deltaDistanceThreshold, float deltaAngleRadThreshold, Vector2 locationAgent) {
         angleDistanceCloudPoints = new TreeMap<Float, Float>();
         angleDeltaDistanceCloudPoints = new TreeMap<Float, DeltaCloudPoint>();
@@ -170,10 +172,12 @@ public class GapSensor {
                 columnRotateCost[i] = costDiagonalSquareMatrix(copyRowVector, copyColumnVector); // get the cost of the rotated matrix
             }
             float rotateCost = Float.MAX_VALUE;
+            int removedGapIndex = -1;
             for (int i = 0 ; i < rowVector.size() ; i++) { // here find the best matching column rotate overall
                 if (columnRotateCost[i] < rotateCost) {
                     rotateCost = columnRotateCost[i];
                     columnVectorRotateIndex = i;
+                    removedGapIndex = i;
                 }
             }
             copyColumnVector = new ArrayList<Gap>(columnVector);

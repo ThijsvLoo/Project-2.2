@@ -459,10 +459,10 @@ public class MapSimulatorScreen implements Screen {
                     }
                 }
             }
-            if(agent.getAngleDistanceCloudPoints().size() > 0 && agent.getDrawGapSensor()) {
+            if(agent.getAngleDistanceCloudPoints().size() > 0 && agent.getDrawGapSensor()) { System.out.println("REACHING");
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                 if (agent.getRayCastFieldGapSensor().getTypeOfField().equalsIgnoreCase("GAP SENSOR")) {
-                    shapeRenderer.setColor(Color.YELLOW);
+                    shapeRenderer.setColor(0.0f,1.0f,1.0f,1.0f);
                 }
 
                 Vector2[] beginPointRays = agent.getRayCastFieldGapSensor().beginPointRay();

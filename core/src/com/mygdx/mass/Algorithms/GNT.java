@@ -28,6 +28,7 @@ public class GNT extends Algorithm{
 
     public void oneIterationGNTagent (Agent agent) {
         agent.fireGapSensor();
+        agent.setDrawGapSensor(true);
         agent.getAllRayCastFields().clear();
         agent.getAllRayCastFields().add(agent.getRayCastFieldGapSensor());
         //agent.getGapSensor().showGapSensorGraphs();

@@ -8,6 +8,8 @@ public class Gap {
     public enum GapSide {LEFT, RIGHT};
     private enum UnitCircleSide {TOP, BOTTOM, LEFT, RIGHT, Y, X}; // X and Y are exactly on the axis
     private enum UnitCircleQuadrant {TR, TL, BL, BR};
+    private enum TypeOfNode {PARENT, LEAF};
+    private enum Label {PRIMITIVE, NONPRIMITIVE, CLEARED, CONTAMINATED, RECONTAMINATED};
 
     // Vector 2 location of Gap
     private Vector2 location;
@@ -16,6 +18,7 @@ public class Gap {
     private float angleRayAgainstObstacle, distance;
     private UnitCircleQuadrant quadrant;
     private Color color = new Color(); // set color green = left gap and right = red gap
+    private Gap childOne, childTwo;
 
 
     public Gap (float angleRad, float deltaAngle, GapSide gapSide, float firstDistance, float secondDistance, Vector2 locationAgent) {

@@ -45,7 +45,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     private float blindDuration;
     private float immobilityDuration;
 
-    protected boolean stealth = false, deaf = false, blind = false, gapSensorOn = false, isRayCastOff = false, drawGapSensor = false;
+    protected boolean stealth = false, deaf = false, blind = false, gapSensorOn = false, isRayCastOff = false, drawGapSensor = true;
 
     public IndividualMap individualMap;
 
@@ -262,7 +262,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         if (rayCastFieldAgents != null) allRayCastFields.add(rayCastFieldAgents);
         if (rayCastFieldGapSensor != null && gapSensorOn) {
             allRayCastFields.add(rayCastFieldGapSensor);
-            angleDistanceCloudPoints.clear();
+            //angleDistanceCloudPoints.clear();
             angleDistanceCloudPoints.putAll(rayCastFieldGapSensor.getAngleDistanceCloudPoints());
             gapSensorOn = false; System.out.println("Processing reached");
         }
@@ -305,6 +305,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     }
 
     public void fireGapSensor(short objectsToCheck, short objectsTransparent, short objectsWanted, float range, float angle, float deltaAngleThreshold) {
+        angleDistanceCloudPoints.clear();
         this.objectsToCheck = objectsToCheck;
         this.objectsTransparent = objectsTransparent;
         this.objectsWanted = objectsWanted;
@@ -329,6 +330,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             System.out.print(g.getAngleRayAgainstObstacle()+ " + "+g.getLocation().x+"/"+g.getLocation().y+" | ");
         }
 
+        gapSensor.showGapSensorGraphs();
         System.out.println("Gap Sensor Fired!");
     }
 
@@ -449,6 +451,11 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void setVelocity(Vector2 velocity) { this.velocity = velocity; }
     public void setGapSensorStatus(boolean value) { this.gapSensorOn = value; }
 //    public void setCollisions(ArrayList<Object> collisions) { this.collisions = collisions; }
+
+
+    public void setDrawGapSensor(boolean drawGapSensor) {
+        this.drawGapSensor = drawGapSensor;
+    }
 
     public String toString() {
         return "AgentType = "+this.agentType +" count of Agents = "+ count;
