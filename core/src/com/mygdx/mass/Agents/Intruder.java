@@ -73,8 +73,8 @@ public class Intruder extends Agent {
 
     public void update(float delta) {
 
-//		updateAction(delta);
-//		updateState();
+		updateAction(delta);
+		updateState();
 //		raycast();
 
         if (moveSpeed > 1.4f && isMoving()) {

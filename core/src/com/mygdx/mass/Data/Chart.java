@@ -71,7 +71,7 @@ public class Chart {
         xAxis.add(xAxis.size() + 1);
         errorBar.add(0);
         if (agent.getAgentType().equals(Agent.AgentType.INTRUDER)){
-            intruderWins.add(intruderWins.size() + 1);
+            intruderWins.add(intruderWins.get(intruderWins.size() - 1) + 1);
             if(guardWins.size() != 0) {
                 guardWins.add(guardWins.get(guardWins.size() - 1));
             } else guardWins.add(0);
@@ -82,11 +82,17 @@ public class Chart {
             } else {
                 intruderWins.add(0);
             }
-            guardWins.add(guardWins.size() + 1);
+            guardWins.add(guardWins.get(guardWins.size() - 1) + 1);
         }
 
         chart.updateXYSeries("Guard Wins", xAxis, guardWins, errorBar);
         chart.updateXYSeries("Intruder Wins", xAxis, intruderWins, errorBar);
         chartPanel.updateUI();
+
+        try{
+            BitmapEncoder.saveBitmapWithDPI(chart, "./Intruder_vs_Guard", BitmapEncoder.BitmapFormat.PNG, 300);
+        } catch (Exception e){
+            System.out.println(e.getCause().getMessage());
+        }
     }
 }

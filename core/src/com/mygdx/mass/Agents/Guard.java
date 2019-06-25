@@ -80,6 +80,7 @@ public class Guard extends Agent {
 //        else if (!predictionModel.getCapturePoints().isEmpty()){
 //            currentState = State.SEARCH;
 //        }
+
         } else if (individualMap.getUnexploredPlaces().size() > 0) {
             currentState = State.EXPLORE;
             mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
@@ -173,6 +174,7 @@ public class Guard extends Agent {
             }
             destination = closest.getBody().getPosition();
         }
+        checkWIn();
     }
 
     //check if hear suspicious sounds
@@ -254,4 +256,20 @@ public class Guard extends Agent {
     public State getCurrentState(){
         return currentState;
     }
+
+    public void checkWIn() {
+        for(Intruder i : mass.getMap().getIntruders())
+        if (this.getBody().getPosition().dst(i.getBody().getPosition()) < 0.5f) {
+                mass.mapSimulatorScreen.hud.pauseSim();
+                System.out.println("GUARD HAS WON!");
+                mass.chart.addWin(this);
+                if (mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.NEW_MAP)) {
+                    mass.mapBuilderScreen.hud.newMap();
+                    mass.mapSimulatorScreen.hud.playSim();
+                } else if (mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.SAME_MAP)) {
+                    mass.mapSimulatorScreen.hud.reloadMap();
+                }
+
+            }
+        }
 }
