@@ -56,6 +56,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected float turnSpeed;
     protected float maxTurnSpeed;
     protected int turnSide; //or Counter Clock
+    protected float totalDistanceMoved;
 
     protected float visualRange;
     protected float viewAngle;
@@ -102,6 +103,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
         velocity = new Vector2();
+        totalDistanceMoved = 0.0f;
         allRayCastFields = new ArrayList<RayCastField>();
         angleDistanceCloudPoints = new TreeMap<Float, Float>();
         isRayCastOff = !mass.raycastingOn;
@@ -139,11 +141,16 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void update(float delta) {
 
 //        algorithm.act();
+        updateTotalDistanceMoved(delta);
         followRoute();
-
         /*rayCastFieldTowers = new RayCastField(mass);
         rayCastFieldBuildings = new RayCastField(mass);
         rayCastFieldAgents = new RayCastField(mass);*/
+    }
+
+    private void updateTotalDistanceMoved(float delta) {
+        totalDistanceMoved += delta * body.getLinearVelocity().len();
+//        System.out.println(totalDistanceMoved);
     }
 
     public void addWaypoint(Vector2 waypoint) {
@@ -384,6 +391,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     //    public ArrayList<Object> getCollisions() { return collisions; }
     public int getTurnSide() { return turnSide; }
 //    public ArrayList<Object> getCollisions() { return collisions; }
+    public float getTotalDistanceMoved() { return totalDistanceMoved; }
 
     public void setMoveSpeed(float moveSpeed) {
         if (moveSpeed >= 0.0f && moveSpeed <= Intruder.SPRINT_SPEED) {

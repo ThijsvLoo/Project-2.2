@@ -17,7 +17,7 @@ import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 public class Guard extends Agent {
 
-    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH, INTERCEPT, CHECK};
+    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH, INTERCEPT, CHECK, GUARD};
     public State currentState;
     public State previousState;
     public static final float BASE_SPEED = 1.4f;
