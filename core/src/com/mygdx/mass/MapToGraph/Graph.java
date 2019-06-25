@@ -219,7 +219,7 @@ public class Graph {
         for(int i=0; i<entrances.size(); i++){
             Edge edge = new Edge(entranceInside.get(i), entranceFront.get(i));
             addEdge(edge);
-            System.out.println(edge.getWeight());
+            //System.out.println(edge.getWeight());
         }
         for(Vertex entrance: entranceInside){
             for(Vertex entrance2: entranceInside){

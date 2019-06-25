@@ -10,6 +10,7 @@ import com.mygdx.mass.BoxObject.Window;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Scenes.MapSimulatorHUD;
 import com.mygdx.mass.Sensors.RayCastField;
+import com.mygdx.mass.World.WorldObject;
 
 import static com.mygdx.mass.Agents.Agent.AgentType.INTRUDER;
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
@@ -73,8 +74,8 @@ public class Intruder extends Agent {
 
     public void update(float delta) {
 
-//		updateAction(delta);
-//		updateState();
+		updateAction(delta);
+		updateState();
 //		raycast();
 
         if (moveSpeed > 1.4f && isMoving()) {
@@ -137,24 +138,33 @@ public class Intruder extends Agent {
     }
 
     public void updateState() {
-        if (!detected) { //hasn't been detected yet
+        /*if(!unknownSounds.isEmpty()){
+			if(currentState != State.EVADE){
+				setCurrentState(State.EVADE);
+				mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
+			}
+		} else */if (!detected) { //hasn't been detected yet
             if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
                 if(currentState != State.EXPLORE){
                 	setCurrentState(State.EXPLORE);
+					mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
 				}
             } else if(currentState != State.ESCAPE){
 				setCurrentState(State.ESCAPE);
+				mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
 			}
 		} else {
 			if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
 				if(currentState != State.EVADE){
 					setCurrentState(State.EVADE);
+					mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
 				}
 			} else if(currentState != State.EXPLORE){
-					setCurrentState(State.ESCAPE);
-
+				setCurrentState(State.ESCAPE);
+				mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
 			}
         }
+
     }
 
     private void unlockDoorSlow(float delta) {
@@ -193,8 +203,21 @@ public class Intruder extends Agent {
     private void escape(float delta){
 
 	}
-	private void evade(){
 
+	private void evade(){
+    	if(!unknownSounds.isEmpty()){
+			Vector2 tmpDST = new Vector2(0, 0);
+			for (WorldObject sound : unknownSounds) {
+				tmpDST.add(sound.getBody().getPosition().add(body.getPosition().scl(-1)));
+			}
+			destination = body.getPosition().add(tmpDST.scl(-1).setLength(20));
+			if(sprintDuration > 0.0f){
+				setMoveSpeed(SPRINT_SPEED);
+			}
+		} else if (atPosition(destination)){
+    		setCurrentState(State.EXPLORE);
+			mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
+		}
 	}
 	private void hide(){
 
