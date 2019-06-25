@@ -63,6 +63,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected ConeLight coneLight;
 
     protected ArrayList<WorldObject> objectsInSight;
+    protected ArrayList<WorldObject> unknownSounds;
     protected ArrayList<BoxObject> boxObjectsInSight;
     protected ArrayList<Agent> enemyInSight;
 
@@ -95,6 +96,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         individualMap = new IndividualMap(mass, Map.DEFAULT_WIDTH, Map.DEFAULT_HEIGHT, this);
         maxTurnSpeed = DEFAULT_MAX_TURN_SPEED;
         objectsInSight = new ArrayList<WorldObject>();
+        unknownSounds = new ArrayList<WorldObject>();
         boxObjectsInSight = new ArrayList<BoxObject>();
         enemyInSight = new ArrayList<Agent>();
         route = new LinkedBlockingQueue<Vector2>();
@@ -378,6 +380,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         return gapSensor;
     }
     public boolean isRayCastOff() { return isRayCastOff; }
+    public ArrayList<WorldObject> getUnknownSounds() { return unknownSounds; }
     //    public ArrayList<Object> getCollisions() { return collisions; }
     public int getTurnSide() { return turnSide; }
 //    public ArrayList<Object> getCollisions() { return collisions; }

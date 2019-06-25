@@ -9,6 +9,7 @@ import com.mygdx.mass.Agents.Intruder;
 import com.mygdx.mass.BoxObject.*;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Graph.Edge;
+import com.mygdx.mass.Sensors.NoiseField;
 import com.mygdx.mass.Sensors.VisualField;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
@@ -102,6 +103,7 @@ public class WorldContactListener implements ContactListener {
                     if (agent1.getAgentType() != agent2.getAgentType()) {
 //                        if(agent1.isRayCastOff()) agent1.getEnemyInSight().add(agent2);
                         agent1.getEnemyInSight().add(agent2);
+                        agent1.getRoute().clear();
                         //the following is hard coded for the case of global communications
                         if (agent1 instanceof Guard) {
                             for (Guard guard : mass.getMap().getGuards()) {
@@ -199,6 +201,16 @@ public class WorldContactListener implements ContactListener {
                         }
                     }
                 }
+                break;
+            }
+
+            case NOISE_FIELD_BIT | GUARD_BIT :
+            case NOISE_FIELD_BIT | INTRUDER_BIT : {
+                NoiseField noiseField = fixtureA.getUserData() instanceof NoiseField ? (NoiseField) fixtureA.getUserData() : (NoiseField) fixtureB.getUserData();
+                Agent agent1 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
+                Agent agent2 = noiseField.getAgent();
+                agent1.getUnknownSounds().add(agent2);
+                agent1.getRoute().clear();
                 break;
             }
         }
@@ -330,6 +342,14 @@ public class WorldContactListener implements ContactListener {
                 break;
             }
 
+            case NOISE_FIELD_BIT | GUARD_BIT :
+            case NOISE_FIELD_BIT | INTRUDER_BIT : {
+                NoiseField noiseField = fixtureA.getUserData() instanceof NoiseField ? (NoiseField) fixtureA.getUserData() : (NoiseField) fixtureB.getUserData();
+                Agent agent1 = fixtureA.getUserData() instanceof Agent ? (Agent) fixtureA.getUserData() : (Agent) fixtureB.getUserData();
+                Agent agent2 = noiseField.getAgent();
+                agent1.getUnknownSounds().remove(agent2);
+                break;
+            }
         }
     }
 

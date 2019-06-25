@@ -10,13 +10,14 @@ import com.mygdx.mass.MapToGraph.TSP;
 
 import java.util.ArrayList;
 import com.mygdx.mass.Sensors.RayCastField;
+import com.mygdx.mass.World.WorldObject;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 
 public class Guard extends Agent {
 
-    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH, INTERCEPT};
+    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH, INTERCEPT, CHECK};
     public State currentState;
     public State previousState;
     public static final float BASE_SPEED = 1.4f;
@@ -74,11 +75,12 @@ public class Guard extends Agent {
             currentState = State.CHASE;
             mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
 //            System.out.println(currentState);
-        }
+        } else if (!unknownSounds.isEmpty()){
+            currentState = State.CHECK;
 //        else if (!predictionModel.getCapturePoints().isEmpty()){
 //            currentState = State.SEARCH;
 //        }
-        else if (individualMap.getUnexploredPlaces().size() > 0) {
+        } else if (individualMap.getUnexploredPlaces().size() > 0) {
             currentState = State.EXPLORE;
             mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
         } else {
@@ -132,6 +134,10 @@ public class Guard extends Agent {
                 chase();
                 break;
             }
+            case CHECK: {
+                check();
+                break;
+            }
 //                case INTERCEPT: {
 //                    intercept(MASS.map.getIntruders().get(0));
 //                    break;
@@ -159,11 +165,23 @@ public class Guard extends Agent {
 
     private void chase() {
         if (!enemyInSight.isEmpty()) {
-            route.clear();
             Agent closest = enemyInSight.get(0);
             for (Agent agent : getEnemyInSight()) {
                 if (agent.getBody().getPosition().dst(body.getPosition()) > closest.getBody().getPosition().dst(body.getPosition())) {
                     closest = agent;
+                }
+            }
+            destination = closest.getBody().getPosition();
+        }
+    }
+
+    //check if hear suspicious sounds
+    private void check() {
+        if (!unknownSounds.isEmpty()) {
+            WorldObject closest = unknownSounds.get(0);
+            for (WorldObject worldObject : unknownSounds) {
+                if (worldObject.getBody().getPosition().dst(body.getPosition()) > closest.getBody().getPosition().dst(body.getPosition())) {
+                    closest = worldObject;
                 }
             }
             destination = closest.getBody().getPosition();
