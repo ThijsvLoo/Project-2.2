@@ -127,6 +127,7 @@ public class OptionsScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                mass.mapSimulatorScreen.dispose();
                 mass.mainMenuScreen = new MainMenuScreen(mass);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(mass.mainMenuScreen);
             }

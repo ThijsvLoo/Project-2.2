@@ -41,6 +41,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
 
     public static final float VISIBLE_DISTANCE_BUILDING = 10.0f;
     public static final float VISIBLE_DISTANCE_TOWER = 18.0f;
+    public static final float VISIBLE_DISTANCE_WALL = 11.0f;
 
     private float blindDuration;
     private float immobilityDuration;
@@ -50,12 +51,13 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public IndividualMap individualMap;
 
     public enum AgentType {GUARD, INTRUDER};
-    protected AgentType agentType;
+    public AgentType agentType;
 
     protected float moveSpeed;
     protected float turnSpeed;
     protected float maxTurnSpeed;
     protected int turnSide; //or Counter Clock
+    protected float totalDistanceMoved;
 
     protected float visualRange;
     protected float viewAngle;
@@ -63,6 +65,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     protected ConeLight coneLight;
 
     protected ArrayList<WorldObject> objectsInSight;
+    protected ArrayList<WorldObject> unknownSounds;
     protected ArrayList<BoxObject> boxObjectsInSight;
     protected ArrayList<Agent> enemyInSight;
 
@@ -96,11 +99,13 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         individualMap = new IndividualMap(mass, Map.DEFAULT_WIDTH, Map.DEFAULT_HEIGHT, this);
         maxTurnSpeed = DEFAULT_MAX_TURN_SPEED;
         objectsInSight = new ArrayList<WorldObject>();
+        unknownSounds = new ArrayList<WorldObject>();
         boxObjectsInSight = new ArrayList<BoxObject>();
         enemyInSight = new ArrayList<Agent>();
         route = new LinkedBlockingQueue<Vector2>();
         direction = new Vector2();
         velocity = new Vector2();
+        totalDistanceMoved = 0.0f;
         allRayCastFields = new ArrayList<RayCastField>();
         angleDistanceCloudPoints = new TreeMap<Float, Float>();
         isRayCastOff = !mass.raycastingOn;
@@ -128,6 +133,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);
         if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.BUILDING);
         if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.TOWER);
+        if (isRayCastOff) agentDetection = new VisualField(this, VisualField.VisualFieldType.WALL);
 
 //        if(CONE_ENABLED == true) {agentDetection = new VisualField(this, VisualField.VisualFieldType.AGENT);}
 
@@ -137,11 +143,17 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
     public void update(float delta) {
 
 //        algorithm.act();
+        updateTotalDistanceMoved(delta);
         followRoute();
 
         /*rayCastFieldTowers = new RayCastField(mass);
         rayCastFieldBuildings = new RayCastField(mass);
         rayCastFieldAgents = new RayCastField(mass);*/
+    }
+
+    private void updateTotalDistanceMoved(float delta) {
+        totalDistanceMoved += delta * body.getLinearVelocity().len();
+//        System.out.println(totalDistanceMoved);
     }
 
     public void addWaypoint(Vector2 waypoint) {
@@ -195,15 +207,6 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
             addWaypoint(waypoint);
         }
         setDestination(route.poll());
-    }
-    public void recalculatePath(){
-        //        Vector2 destination = agent.getDestination();
-//        while (!agent.getRoute().isEmpty()) {
-//
-//            destination = agent.getRoute().poll();
-//            System.out.println(agent.getRoute().size());
-//        }
-//        agent.goTo(destination);
     }
 
     public void updateDirection() {
@@ -262,7 +265,7 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         if (rayCastFieldAgents != null) allRayCastFields.add(rayCastFieldAgents);
         if (rayCastFieldGapSensor != null && gapSensorOn) {
             allRayCastFields.add(rayCastFieldGapSensor);
-            //angleDistanceCloudPoints.clear();
+            angleDistanceCloudPoints.clear();
             angleDistanceCloudPoints.putAll(rayCastFieldGapSensor.getAngleDistanceCloudPoints());
             gapSensorOn = false; System.out.println("Processing reached");
         }
@@ -406,8 +409,11 @@ public abstract class Agent extends WorldObject implements java.io.Serializable{
         return gapSensor;
     }
     public boolean isRayCastOff() { return isRayCastOff; }
+    public ArrayList<WorldObject> getUnknownSounds() { return unknownSounds; }
     //    public ArrayList<Object> getCollisions() { return collisions; }
     public int getTurnSide() { return turnSide; }
+//    public ArrayList<Object> getCollisions() { return collisions; }
+    public float getTotalDistanceMoved() { return totalDistanceMoved; }
 
     public ArrayList<Gap> getGapList() {
         return gapList;

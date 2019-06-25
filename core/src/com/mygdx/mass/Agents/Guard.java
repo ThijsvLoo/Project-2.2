@@ -4,16 +4,20 @@ package com.mygdx.mass.Agents;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.mass.Algorithms.PredictionModel;
+import com.mygdx.mass.BoxObject.Door;
 import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.MapToGraph.TSP;
 
 import java.util.ArrayList;
 import com.mygdx.mass.Sensors.RayCastField;
+import com.mygdx.mass.World.WorldObject;
+
+import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
 
 public class Guard extends Agent {
 
-    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH};
+    public enum State {NONE, EXPLORE, PATROL, CHASE, SEARCH, INTERCEPT, CHECK, GUARD};
     public State currentState;
     public State previousState;
     public static final float BASE_SPEED = 1.4f;
@@ -23,6 +27,9 @@ public class Guard extends Agent {
     public static final float TOWER_MAX_VISUAL_RANGE = 15.0f;
 
     private float deafDuration;
+    protected Door door;
+    protected float doorUnlockTime;
+    protected float breakThroughProgress;
 
     private boolean onTower;
 
@@ -55,9 +62,12 @@ public class Guard extends Agent {
     }
 
     public void update(float delta) {
-        super.update(delta);
         updateState();
         updateAction();
+        super.update(delta);
+        if (door != null) {
+            unlockDoorSlow(delta);
+        }
     }
 
     private void updateState() {
@@ -66,86 +76,120 @@ public class Guard extends Agent {
         }
         else if (!enemyInSight.isEmpty()) {
             currentState = State.CHASE;
-        }
+            mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
+//            System.out.println(currentState);
+        } else if (!unknownSounds.isEmpty()){
+            currentState = State.CHECK;
 //        else if (!predictionModel.getCapturePoints().isEmpty()){
 //            currentState = State.SEARCH;
 //        }
-        else if (!individualMap.getUnexploredPlaces().isEmpty()) {
+
+        } else if (individualMap.getUnexploredPlaces().size() > 0) {
             currentState = State.EXPLORE;
+            mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
         } else {
             currentState = State.PATROL;
+            mass.mapSimulatorScreen.hud.guardState.setSelected(currentState);
         }
 
-        if (!super.blind) {
-            if (!onTower) {
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-                objectsTransparent = (short) (WINDOW_BIT);
-                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
-                rayCastFieldBuildings = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
-
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
-                objectsTransparent = (short) (SENTRY_TOWER_BIT);
-                objectsWanted = (short) (SENTRY_TOWER_BIT);
-                rayCastFieldTowers = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
-
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
-                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
-                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
-                rayCastFieldAgents = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
-            }
-            else {
-                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
-                rayCastFieldAgents = new RayCastField(mass);
-                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
-            }
-        }
-
-        processResultsFromRayCastFields();
-
-
-//        if (capture != null) {
-//            capture.increaseCounter(delta);
-//        }
-//        for (CapturePoint capturePoint : capture.getCapturePoints()) {
-//            if (body.getPosition().dst(capturePoint.getPosition()) < 5.0f) {
-//                capture.removePoint(capturePoint);
-//                break;
+//        if (!super.blind && !isRayCastOff) {
+//            if (!onTower) {
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+//                objectsTransparent = (short) (WINDOW_BIT);
+//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | WINDOW_BIT);
+//                rayCastFieldBuildings = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldBuildings, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_BUILDING, viewAngle, "BUILDING");
+//
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | SENTRY_TOWER_BIT);
+//                objectsTransparent = (short) (SENTRY_TOWER_BIT);
+//                objectsWanted = (short) (SENTRY_TOWER_BIT);
+//                rayCastFieldTowers = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldTowers, super.SIZE + 0.0000001f, super.VISIBLE_DISTANCE_TOWER, viewAngle, "TOWER");
+//
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | INTRUDER_BIT | GUARD_BIT);
+//                objectsTransparent = (short) (INTRUDER_BIT | GUARD_BIT);
+//                objectsWanted = (short) (GUARD_BIT | INTRUDER_BIT);
+//                rayCastFieldAgents = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldAgents, super.SIZE + 0.0000001f, DEFAULT_VISUAL_RANGE, viewAngle, "AGENT");
+//            }
+//            else {
+//                objectsToCheck = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                objectsTransparent = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                objectsWanted = (short) (WALL_BIT | BUILDING_BIT | DOOR_BIT | GUARD_BIT | INTRUDER_BIT);
+//                rayCastFieldAgents = new RayCastField(mass);
+//                super.doRayCasting(rayCastFieldAgents, TOWER_MIN_VISUAL_RANGE, TOWER_MAX_VISUAL_RANGE, TOWER_VIEW_ANGLE, "AGENT");
 //            }
 //        }
+//
+//        processResultsFromRayCastFields();
+    }
+    private void unlockDoorSlow(float delta) {
+        if (door != null && door.getCurrentState() == CLOSED) {
+            breakThroughProgress += delta*100/doorUnlockTime;
+            if (breakThroughProgress >= 100.0f) {
+                door.setCurrentState(Door.State.OPEN);
+            }
+        }
     }
 
     private void updateAction() {
         switch (currentState) {
             case CHASE: {
-                //destination = individualMap.getIntruders().get(0).getBody().getPosition();
+                chase();
                 break;
             }
+            case CHECK: {
+                check();
+                break;
+            }
+//                case INTERCEPT: {
+//                    intercept(MASS.map.getIntruders().get(0));
+//                    break;
+//                }
             case SEARCH: {
-                if (previousState != State.SEARCH) {
+                if (destination == null && route.isEmpty()) {
                     search();
-                    previousState = State.SEARCH;
                 }
                 break;
             }
             case PATROL: {
-                if (previousState != State.PATROL) {
+                if (destination == null && route.isEmpty()) {
                     patrol();
-                    previousState = State.PATROL;
                 }
                 break;
             }
             case EXPLORE: {
-                if (previousState != State.EXPLORE) {
+                if (destination == null && route.isEmpty()) {
                     explore();
-                    previousState = State.EXPLORE;
                 }
                 break;
             }
+        }
+    }
+
+    private void chase() {
+        if (!enemyInSight.isEmpty()) {
+            Agent closest = enemyInSight.get(0);
+            for (Agent agent : getEnemyInSight()) {
+                if (agent.getBody().getPosition().dst(body.getPosition()) > closest.getBody().getPosition().dst(body.getPosition())) {
+                    closest = agent;
+                }
+            }
+            destination = closest.getBody().getPosition();
+        }
+        checkWIn();
+    }
+
+    //check if hear suspicious sounds
+    private void check() {
+        if (!unknownSounds.isEmpty()) {
+            WorldObject closest = unknownSounds.get(0);
+            for (WorldObject worldObject : unknownSounds) {
+                if (worldObject.getBody().getPosition().dst(body.getPosition()) > closest.getBody().getPosition().dst(body.getPosition())) {
+                    closest = worldObject;
+                }
+            }
+            destination = closest.getBody().getPosition();
         }
     }
 
@@ -154,12 +198,40 @@ public class Guard extends Agent {
         destination = null;
         route.clear();
         TSP tsp = new TSP();
-        ArrayList<Vector2> toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces()); //need to adapt this to work with multiple agent
-        ArrayList<Vector2> path = tsp.computePath(this, toBeExploredPoints);
-        for (Vector2 wp : path) {
-            addWaypoint(wp);
-        }
+        ArrayList<Vector2> toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces());
+		if(toBeExploredPoints.size() == 361){
+			ArrayList<Guard> tmpGuards = (ArrayList<Guard>) mass.getMap().getGuards().clone();
+			for(Guard guard: tmpGuards){
+				guard.getIndividualMap().getUnexploredPlaces().clear();
+			}
+			int maxExplorationPoints = (int)Math.ceil((float)toBeExploredPoints.size() / mass.getMap().getGuards().size());
+			for(Vector2 explorationPoint: toBeExploredPoints){
+				Guard closestGuard = tmpGuards.get(0);
+				double minDistance = Integer.MAX_VALUE;
+				for(Guard guard: tmpGuards){
+					double distance = calcDistance(guard.getBody().getPosition(), explorationPoint);
+					if( distance < minDistance){
+						closestGuard = guard;
+						minDistance = distance;
+					}
+				}
+				closestGuard.getIndividualMap().getUnexploredPlaces().add(explorationPoint);
+				if(closestGuard.getIndividualMap().getUnexploredPlaces().size() >= maxExplorationPoints){
+					tmpGuards.remove(closestGuard);
+				}
+			}
+		}
+
+		toBeExploredPoints = new ArrayList<Vector2>(individualMap.getUnexploredPlaces());
+		ArrayList<Vector2> path = tsp.computePath(this, toBeExploredPoints);
+		for (Vector2 wp : path) {
+			addWaypoint(wp);
+		}
     }
+
+	double calcDistance(Vector2 object1, Vector2 object2){
+		return Math.sqrt(Math.pow((object2.x - object1.x), 2) + Math.pow((object2.y - object1.y), 2));
+	}
 
     public void patrol() {
         destination = null;
@@ -172,13 +244,35 @@ public class Guard extends Agent {
     }
 
     public PredictionModel getPredictionModel() { return predictionModel; }
-
+    public Door getDoor() { return door; }
     public void setCurrentState(State state) { this.currentState = state; }
+    public void setDoorUnlockTime(float doorUnlockTime) { this.doorUnlockTime = doorUnlockTime; }
     public void setPreviousState(State state) { this.previousState = state; }
+    public void setDoor(Door door) { this.door = door; }
 
+
+    public void setBreakThroughProgress(float breakThroughProgress) { this.breakThroughProgress = breakThroughProgress; }
     public void resetState() {
         currentState = State.NONE;
         previousState = State.NONE;
     }
+    public State getCurrentState(){
+        return currentState;
+    }
 
+    public void checkWIn() {
+        for(Intruder i : mass.getMap().getIntruders())
+        if (this.getBody().getPosition().dst(i.getBody().getPosition()) < 0.5f) {
+                mass.mapSimulatorScreen.hud.pauseSim();
+                System.out.println("GUARD HAS WON!");
+                mass.chart.addWin(this);
+                if (mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.NEW_MAP)) {
+                    mass.mapBuilderScreen.hud.newMap();
+                    mass.mapSimulatorScreen.hud.playSim();
+                } else if (mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.SAME_MAP)) {
+                    mass.mapSimulatorScreen.hud.reloadMap();
+                }
+
+            }
+        }
 }

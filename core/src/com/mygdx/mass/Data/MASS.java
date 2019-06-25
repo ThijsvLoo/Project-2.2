@@ -79,6 +79,8 @@ public class MASS extends Game{
 
 	public GNT GapNavigationTreeAlgorithm;
 
+	public Chart chart = new Chart();
+
 	@Override
 	public void create(){
         readSettings();
@@ -112,6 +114,7 @@ public class MASS extends Game{
         setScreen(mainMenuScreen);
 
         GapNavigationTreeAlgorithm = new GNT(map);
+
 	}
 
 	@Override
@@ -206,6 +209,7 @@ public class MASS extends Game{
 		}
 		return pop;
 	}
+
 
 
 }

@@ -113,6 +113,7 @@ public class MainMenuScreen implements Screen {
         builderButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                mass.mapSimulatorScreen = new MapSimulatorScreen(mass);
                 mass.mapBuilderScreen = new MapBuilderScreen(mass);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(mass.mapBuilderScreen);
             }

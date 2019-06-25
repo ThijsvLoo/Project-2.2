@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -18,6 +19,9 @@ import com.mygdx.mass.Data.MASS;
 import com.mygdx.mass.Screens.*;
 import com.mygdx.mass.Screens.MainMenuScreen;
 import com.mygdx.mass.Screens.MapBuilderScreen;
+import com.mygdx.mass.Tools.MapData;
+
+import java.io.*;
 
 public class MapSimulatorHUD implements Disposable {
 
@@ -43,16 +47,23 @@ public class MapSimulatorHUD implements Disposable {
 
     private ImageButton load;
     private ImageButton save;
-    private ImageButton move;
+    private ImageButton reset;
     private ImageButton pause;
     private ImageButton exit;
     private ImageButton clear;
     private ImageButton stop;
     private ImageButton simulate;
 
-    private Slider speed;
+    public Slider speed;
     public SelectBox<Guard.State> guardState;
     public SelectBox<Intruder.State> intruderState;
+    public SelectBox<Refresh> reloadBox;
+
+    public boolean autoRandom = false;
+    public boolean autoReset = false;
+
+    public enum Refresh {NO_RELOAD, NEW_MAP, SAME_MAP}
+    public Refresh currentRefresh = Refresh.NO_RELOAD;
 
     private int prevSpeed;
     private boolean paused;
@@ -72,60 +83,14 @@ public class MapSimulatorHUD implements Disposable {
         table.bottom();
 
         miniTable = new Table();
-//        miniTable.setFillParent(true);
-
-        //Creating buttons along with their click listener
-//
-//        wall = createButton("Textures/Buttons/Wall.png");
-//        wall.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create wall");
-//            }
-//        });
-//        building = createButton("Textures/Buttons/Building2.png");
-//        building.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create building");
-//            }
-//        });
-//        door = createButton("Textures/Buttons/Door2.png");
-//        door.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create door");
-//            }
-//        });
-//        window = createButton("Textures/Buttons/Window.png");
-//        window.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create window");
-//            }
-//        });
-//        sentryTower = createButton("Textures/Buttons/Tower.png");
-//        sentryTower.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Create sentry tower");
-//            }
-//        });
-//
-//        load = createButton("Textures/Buttons/Load.png");
-//        load.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Load map");
-//            }
-//        });
-//        save = createButton("Textures/Buttons/Save.png");
-//        save.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Save map");
-//            }
-//        });
-//        move = createButton("Textures/Buttons/Move.png");
-//        move.addListener(new ClickListener() {
-//            public void clicked(InputEvent event, float x, float y){
-//                System.out.println("Current action: Move");
-//            }
-//        });
-        clear = createButton("Textures/Buttons/Reset.png");
+        reset = createButton("Textures/Buttons/Reset2.png", "Textures/Buttons/Reset2Invert.png");
+        reset.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y){
+                System.out.println("Current action: Reset");
+                reloadMap();
+            }
+        });
+        clear = createButton("Textures/Buttons/Reset.png", "Textures/Buttons/ResetInvert.png");
         clear.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Clear timers");
@@ -134,25 +99,21 @@ public class MapSimulatorHUD implements Disposable {
             }
         });
 
-        pause = createButton("Textures/Buttons/Pause.png");
+        pause = createButton("Textures/Buttons/Pause.png", "Textures/Buttons/PauseInvert.png");
         pause.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                prevSpeed = mapSimulatorScreen.getWorldSpeedFactor();
-                speed.setValue(0);
-                mapSimulatorScreen.setWorldSpeedFactor(0);
-                setTable();
+                pauseSim();
             }
         });
 
-        simulate = createButton("Textures/Buttons/Play.png");
+        simulate = createButton("Textures/Buttons/Play.png", "Textures/Buttons/PlayInvert.png");
         simulate.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
-                mapSimulatorScreen.setWorldSpeedFactor(prevSpeed);
-                setTable();
+                playSim();
             }
         });
 
-        stop = createButton("Textures/Buttons/Stop.png");
+        stop = createButton("Textures/Buttons/Stop.png", "Textures/Buttons/StopInvert.png");
         stop.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Stop Simulation");
@@ -166,7 +127,7 @@ public class MapSimulatorHUD implements Disposable {
                 ((Game) Gdx.app.getApplicationListener()).setScreen(mapSimulatorScreen.mass.mapBuilderScreen);
             }
         });
-        exit = createButton("Textures/Buttons/Exit.png");
+        exit = createButton("Textures/Buttons/Exit.png", "Textures/Buttons/ExitInvert.png");
         exit.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y){
                 System.out.println("Current action: Exit Simulation");
@@ -198,6 +159,9 @@ public class MapSimulatorHUD implements Disposable {
 
         guardState = new SelectBox<Guard.State>(new Skin(Gdx.files.internal("guard/glassyui/glassy-ui.json")));
         guardState.setItems(Guard.State.values());
+        for (Guard g : mass.getMap().getGuards()) {
+            guardState.setSelected(g.getCurrentState());
+        }
         guardState.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -209,12 +173,26 @@ public class MapSimulatorHUD implements Disposable {
 
         intruderState = new SelectBox<Intruder.State>(new Skin(Gdx.files.internal("intruder/glassyui/glassy-ui.json")));
         intruderState.setItems(Intruder.State.values());
+        for (Intruder i : mass.getMap().getIntruders()) {
+            intruderState.setSelected(i.getCurrentState());
+        }
         intruderState.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 for (Intruder i : mass.getMap().getIntruders()) {
                     i.setCurrentState(intruderState.getSelected());
                 }
+            }
+        });
+
+        reloadBox = new SelectBox<Refresh>(new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json")));
+        reloadBox.setItems(Refresh.values());
+        reloadBox.setSelected(Refresh.NEW_MAP);
+        currentRefresh = reloadBox.getSelected();
+        reloadBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                currentRefresh = reloadBox.getSelected();
             }
         });
 
@@ -228,12 +206,14 @@ public class MapSimulatorHUD implements Disposable {
         miniTable.defaults().pad(2.0f);
         paused = false;
         table.add(miniTable).padBottom(PAD_BOTTOM).expandX();
-        miniTable.add(clear).size(BUTTON_SIZE);
-        miniTable.add(pause).size(BUTTON_SIZE);
-        miniTable.add(stop).size(BUTTON_SIZE);
-        miniTable.add(exit).size(BUTTON_SIZE);
+        miniTable.add(reloadBox);
         miniTable.add(guardState);
         miniTable.add(intruderState);
+        miniTable.add(exit).size(BUTTON_SIZE);
+        miniTable.add(reset).size(BUTTON_SIZE);
+        miniTable.add(pause).size(BUTTON_SIZE);
+        miniTable.add(stop).size(BUTTON_SIZE);
+        miniTable.add(clear).size(BUTTON_SIZE);
         stage.addActor(table);
 
         Gdx.input.setInputProcessor(stage);
@@ -249,6 +229,15 @@ public class MapSimulatorHUD implements Disposable {
         return imageButton;
     }
 
+    private ImageButton createButton(String upPath, String downPath) {
+        Texture up = new Texture(Gdx.files.internal(upPath));
+        Drawable upDraw = new TextureRegionDrawable(new TextureRegion(up));
+        Texture down = new Texture(Gdx.files.internal(downPath));
+        Drawable downDraw = new TextureRegionDrawable(new TextureRegion(down));
+        ImageButton imageButton = new ImageButton(upDraw, downDraw);
+        return imageButton;
+    }
+
 
 
     public void update(float dt){
@@ -257,6 +246,7 @@ public class MapSimulatorHUD implements Disposable {
 //        guardState.getList().act(dt);
         guardState.getScrollPane().act(dt);
         intruderState.getScrollPane().act(dt);
+        reloadBox.getScrollPane().act(dt);
 
     }
 
@@ -271,7 +261,11 @@ public class MapSimulatorHUD implements Disposable {
 
     public void setTable(){
         miniTable.clearChildren();
-        miniTable.add(clear).size(BUTTON_SIZE);
+        miniTable.add(reloadBox);
+        miniTable.add(guardState);
+        miniTable.add(intruderState);
+        miniTable.add(exit).size(BUTTON_SIZE);
+        miniTable.add(reset).size(BUTTON_SIZE);
         if(paused){
             miniTable.add(pause).size(BUTTON_SIZE);
             paused = false;
@@ -280,9 +274,7 @@ public class MapSimulatorHUD implements Disposable {
             paused = true;
         }
         miniTable.add(stop).size(BUTTON_SIZE);
-        miniTable.add(exit).size(BUTTON_SIZE);
-        miniTable.add(guardState);
-        miniTable.add(intruderState);
+        miniTable.add(clear).size(BUTTON_SIZE);
     }
 
     public void setGuardState(Guard.State item){
@@ -291,6 +283,50 @@ public class MapSimulatorHUD implements Disposable {
 
     public void setIntruderState(Intruder.State item){
         intruderState.setSelected(item);
+    }
+
+    public void pauseSim(){
+        prevSpeed = mapSimulatorScreen.getWorldSpeedFactor();
+        speed.setValue(0);
+        mapSimulatorScreen.setWorldSpeedFactor(0);
+        setTable();
+    }
+
+    public void playSim(){
+        speed.setValue(prevSpeed);
+        mapSimulatorScreen.setWorldSpeedFactor(prevSpeed);
+        setTable();
+    }
+
+    public void reloadMap(){
+        try{
+            MapData mapData;
+            File mapFile = new File("temp.ser");
+            InputStream inStream = new FileInputStream(mapFile);
+            ObjectInputStream fileObjectIn = new ObjectInputStream(inStream);
+            mapData = (MapData) fileObjectIn.readObject();
+            fileObjectIn.close();
+            inStream.close();
+            mass.getMap().clearMap();
+            mapData.loadMap(mass);
+        } catch(IOException e){
+            System.out.println("IO error");
+            e.printStackTrace();
+        } catch(ClassNotFoundException e){
+            System.out.println("Class not found");
+            e.printStackTrace();
+        }
+//        initiating the individual map of all agents, giving it the starting information
+        for (Guard guard : mass.getMap().getGuards()) {
+            guard.getIndividualMap().setWalls(mass.getMap().getWalls());
+            guard.getIndividualMap().setGuards(mass.getMap().getGuards());
+        }
+        for (Intruder intruder : mass.getMap().getIntruders()) {
+            intruder.getIndividualMap().setWalls(mass.getMap().getWalls());
+            intruder.getIndividualMap().setIntruders(mass.getMap().getIntruders());
+        }
+
+        playSim();
     }
 
 }

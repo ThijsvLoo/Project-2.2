@@ -1,12 +1,16 @@
 package com.mygdx.mass.Agents;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Filter;
 import com.mygdx.mass.Algorithms.Random;
 import com.mygdx.mass.BoxObject.Door;
 import com.mygdx.mass.BoxObject.Window;
 import com.mygdx.mass.Data.MASS;
+import com.mygdx.mass.Scenes.MapSimulatorHUD;
 import com.mygdx.mass.Sensors.RayCastField;
+import com.mygdx.mass.World.WorldObject;
 
 import static com.mygdx.mass.Agents.Agent.AgentType.INTRUDER;
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
@@ -41,6 +45,8 @@ public class Intruder extends Agent {
     private boolean detected;
     private Vector2 entryPoint;
 
+    private float ticktock = 0;
+
     public Intruder(MASS mass, Vector2 position) {
         super(mass, position);
 
@@ -68,9 +74,9 @@ public class Intruder extends Agent {
 
     public void update(float delta) {
 
-		updateAction();
-//		updateState();
-		raycast();
+		updateAction(delta);
+		updateState();
+//		raycast();
 
         if (moveSpeed > 1.4f && isMoving()) {
             if (sprintDuration > 0.0f) {
@@ -98,7 +104,7 @@ public class Intruder extends Agent {
         }
     }
 
-    public void act() {
+    public void act(float delta) {
         updateState();
         switch (currentState) {
             case EXPLORE: {
@@ -107,6 +113,22 @@ public class Intruder extends Agent {
             case ESCAPE: {
                 if (atPosition(entryPoint)) {
                     //wait 3 sec
+                    ticktock += delta;
+                    System.out.println("Intruder is escaping!");
+                    if (ticktock > 3){
+                        mass.mapSimulatorScreen.hud.pauseSim();
+                        System.out.println("INTRUDER HAS WON!");
+                        mass.chart.addWin(this);
+//                        mass.chart.createChart();
+
+                        if(mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.NEW_MAP)) {
+                            mass.mapBuilderScreen.hud.newMap();
+                            mass.mapSimulatorScreen.hud.playSim();
+                        } else if(mass.mapSimulatorScreen.hud.currentRefresh.equals(mass.mapSimulatorScreen.hud.currentRefresh.SAME_MAP)){
+                            mass.mapSimulatorScreen.hud.reloadMap();
+                        }
+
+                    }
                 } else {
                     goTo(entryPoint);
                 }
@@ -116,24 +138,33 @@ public class Intruder extends Agent {
     }
 
     public void updateState() {
-        if (!detected) { //hasn't been detected yet
+        /*if(!unknownSounds.isEmpty()){
+			if(currentState != State.EVADE){
+				setCurrentState(State.EVADE);
+				mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
+			}
+		} else */if (!detected) { //hasn't been detected yet
             if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
                 if(currentState != State.EXPLORE){
                 	setCurrentState(State.EXPLORE);
+					mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
 				}
             } else if(currentState != State.ESCAPE){
 				setCurrentState(State.ESCAPE);
+				mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
 			}
 		} else {
 			if (individualMap.getTargetAreas().isEmpty()) { //hasn't found any Target area yet
 				if(currentState != State.EVADE){
 					setCurrentState(State.EVADE);
+					mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
 				}
 			} else if(currentState != State.EXPLORE){
-					setCurrentState(State.ESCAPE);
-
+				setCurrentState(State.ESCAPE);
+				mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
 			}
         }
+
     }
 
     private void unlockDoorSlow(float delta) {
@@ -145,7 +176,7 @@ public class Intruder extends Agent {
         }
     }
 
-    private void updateAction() {
+    private void updateAction(float delta) {
         switch (currentState) {
             case EXPLORE: {
             	if(route.isEmpty()){
@@ -155,7 +186,7 @@ public class Intruder extends Agent {
                 break;
             }
             case ESCAPE: {
-				escape();
+				act(delta);
                 break;
             }
             case EVADE: {
@@ -169,11 +200,24 @@ public class Intruder extends Agent {
         }
     }
 
-    private void escape(){
+    private void escape(float delta){
 
 	}
-	private void evade(){
 
+	private void evade(){
+    	if(!unknownSounds.isEmpty()){
+			Vector2 tmpDST = new Vector2(0, 0);
+			for (WorldObject sound : unknownSounds) {
+				tmpDST.add(sound.getBody().getPosition().add(body.getPosition().scl(-1)));
+			}
+			destination = body.getPosition().add(tmpDST.scl(-1).setLength(20));
+			if(sprintDuration > 0.0f){
+				setMoveSpeed(SPRINT_SPEED);
+			}
+		} else if (atPosition(destination)){
+    		setCurrentState(State.EXPLORE);
+			mass.mapSimulatorScreen.hud.intruderState.setSelected(currentState);
+		}
 	}
 	private void hide(){
 
@@ -226,5 +270,11 @@ public class Intruder extends Agent {
         System.out.println("Intruder state changed to " + state.toString());
     }
 
+    public State getCurrentState(){
+        return currentState;
+    }
 
+    public void setEntryPoint(Vector2 here){
+        entryPoint = here;
+    }
 }

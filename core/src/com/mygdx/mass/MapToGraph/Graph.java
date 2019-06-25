@@ -16,12 +16,14 @@ public class Graph {
     private Vertex destination;
     private ArrayList<BoxObject> exploredBuilding;
     private Agent agent;
+    private boolean agentIsIntruder;
     public Graph(Vertex start, Vertex end, ArrayList<Vertex> vertices, ArrayList<Edge> edges, Agent agent){
         this.vertices = vertices;
         this.start = start;
         this.destination = end;
         this.edges = edges;
         this.agent = agent;
+        this.agentIsIntruder = (agent.getAgentType() == Agent.AgentType.INTRUDER);
 
     }
     public boolean adjacent(Vertex vertex1, Vertex vertex2){
@@ -45,27 +47,24 @@ public class Graph {
         boolean proceed = false;
         edges.clear();
 
-        ArrayList<Vertex> doorFront = new ArrayList<Vertex>();
+        ArrayList<Vertex> entranceFront = new ArrayList<Vertex>();
+
         Building startBuilding = inBuilding(start);
         Building endBuilding = inBuilding(end);
         if(startBuilding!=null && startBuilding==endBuilding){
             addEdge(new Edge(start, end));
         }
         if(startBuilding!=null){
-            for(Door door: startBuilding.getDoors()){
-                addEdge(new Edge(door.getDoorCenter(),start));
-            }
+            addVertexToEntrance(start, startBuilding);
         }
         if(endBuilding!=null){
-            for(Door door: endBuilding.getDoors()){
-                addEdge(new Edge(end, door.getDoorCenter()));
-            }
+            addVertexToEntrance(end, endBuilding);
         }
 
         for (Building building : MASS.map.getBuildings()){
-            doorFront.addAll(addDoors(building));
+            entranceFront.addAll(addEntrances(building));
         }
-        vertices.addAll(doorFront);
+        vertices.addAll(entranceFront);
         BoxObject tmp = null;
         ArrayList<BoxObject> newBoxes = new ArrayList<BoxObject>();
         for(Vertex v1: vertices){
@@ -116,6 +115,16 @@ public class Graph {
         }
 
 
+    }
+    private void addVertexToEntrance(Vertex vertex, Building building){
+        for(Door door: building.getDoors()){
+            addEdge(new Edge(getEntranceInside(door.getDoorCenter(),building),vertex));
+        }
+        if (agentIsIntruder) {
+            for (Window window : building.getWindows()) {
+                addEdge(new Edge(getEntranceInside(window.getWindowCenter(), building), vertex));
+            }
+        }
     }
     private BoxObject connectVertices(Vertex v1, Vertex v2){
         for(Building building: agent.getIndividualMap().getBuildings()){
@@ -183,10 +192,10 @@ public class Graph {
     private <T extends BoxObject> ArrayList<Vertex> add4Corners(T obj){
         ArrayList<Vertex> corners = new ArrayList<Vertex>();
 
-            corners.add(new Vertex(obj.getRectangle().x-((float)0.5),obj.getRectangle().y-((float)0.5)));
-            corners.add(new Vertex(obj.getRectangle().x-((float)0.5),obj.getRectangle().y+obj.getRectangle().height+((float)0.5)));
-            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)0.5), obj.getRectangle().y+obj.getRectangle().height+((float)0.5)));
-            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)0.5), obj.getRectangle().y-((float)0.5)));
+            corners.add(new Vertex(obj.getRectangle().x-((float)1),obj.getRectangle().y-((float)1)));
+            corners.add(new Vertex(obj.getRectangle().x-((float)1),obj.getRectangle().y+obj.getRectangle().height+((float)1)));
+            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)1), obj.getRectangle().y+obj.getRectangle().height+((float)1)));
+            corners.add(new Vertex(obj.getRectangle().x+obj.getRectangle().width+((float)1), obj.getRectangle().y-((float)1)));
 
 
             vertices.addAll(corners);
@@ -194,31 +203,69 @@ public class Graph {
         return corners;
     }
 
-    private ArrayList<Vertex> addDoors(Building building){
-        ArrayList<Vertex> doorCenter = new ArrayList<Vertex>();
-        ArrayList<Vertex> doorFront = new ArrayList<Vertex>();
+    private ArrayList<Vertex> addEntrances(Building building){
+        ArrayList<Vertex> entranceInside = new ArrayList<Vertex>();
+        ArrayList<Vertex> entranceFront = new ArrayList<Vertex>();
 
-        ArrayList<Door> doors = new ArrayList<Door>();
-        doors.addAll(building.getDoors());
-        for(Door door: doors){
-            doorCenter.add(door.getDoorCenter());
+        ArrayList<BoxObject> entrances = new ArrayList<BoxObject>();
+        entrances.addAll(building.getDoors());
+        if(agentIsIntruder) {entrances.addAll(building.getWindows());}
+        for(BoxObject obj: entrances){
+            entranceInside.add(getEntranceInside(obj.getObjCenter(), building));
         }
-        for(Door door: doors){
-            doorFront.add(addDoorFront(door.getDoorCenter(), building));
+        for(BoxObject obj: entrances){
+            entranceFront.add(addDoorFront(obj.getObjCenter(), building));
         }
-        for(int i=0; i<doors.size(); i++){
-            addEdge(new Edge(doorCenter.get(i), doorFront.get(i)));
+        for(int i=0; i<entrances.size(); i++){
+            Edge edge = new Edge(entranceInside.get(i), entranceFront.get(i));
+            addEdge(edge);
+            //System.out.println(edge.getWeight());
         }
-        for(Vertex door: doorCenter){
-            for(Vertex door2: doorCenter){
-                if(door != door2){
-                    addEdge(new Edge(door,door2));
+        for(Vertex entrance: entranceInside){
+            for(Vertex entrance2: entranceInside){
+                if(entrance != entrance2){
+                    addEdge(new Edge(entrance, entrance2));
                 }
             }
         }
 
 
-        return doorFront;
+        return entranceFront;
+    }
+    private Vertex getEntranceInside(Vertex doorCenter, Building building){
+        double x = doorCenter.getCoordinates().x;
+        double y = doorCenter.getCoordinates().y;
+        double inside_x = -10000;
+        double inside_y = -10000;
+        if (x == building.getRectangle().x){
+            inside_x = (x + 1);
+            inside_y = y;
+//            System.out.println("added door");
+//            System.out.println(x+ " "+ y);
+        }
+        else if(y == building.getRectangle().y){
+            inside_y = (y + 1);
+            inside_x = x;
+//            System.out.println("added door");
+//            System.out.println(x+ " "+ y);
+        }
+        else if(x == building.getRectangle().x+ building.getRectangle().width){
+            inside_x = (x - 1);
+            inside_y = y;
+//            System.out.println("added door");
+//            System.out.println(x+ " "+ y);
+        }
+        else if(y == building.getRectangle().y+building.getRectangle().height){
+            inside_y = y - 1;
+            inside_x = x;
+
+
+        }
+        else{
+            System.out.println("not found!!");
+            System.out.println(x+ " "+ y);
+        }
+        return new Vertex((float)inside_x, (float)inside_y);
     }
     private Vertex addDoorFront(Vertex doorCenter, Building building){
         double x = doorCenter.getCoordinates().x;
@@ -226,28 +273,25 @@ public class Graph {
         double front_x = -10000;
         double front_y = -10000;
         if (x == building.getRectangle().x){
-            front_x = (x - 0.5);
+            front_x = (x - 1);
             front_y = y;
-            System.out.println("added door");
-            System.out.println(x+ " "+ y);
+
         }
         else if(y == building.getRectangle().y){
-            front_y = (y - 0.5);
+            front_y = (y - 1);
             front_x = x;
-            System.out.println("added door");
-            System.out.println(x+ " "+ y);
+
         }
         else if(x == building.getRectangle().x+ building.getRectangle().width){
-            front_x = (x + 0.5);
+            front_x = (x + 1);
             front_y = y;
-            System.out.println("added door");
-            System.out.println(x+ " "+ y);
+
         }
         else if(y == building.getRectangle().y+building.getRectangle().height){
-            front_y = y + 0.5;
+            front_y = y + 1;
             front_x = x;
-            System.out.println("added door");
-            System.out.println(x+ " "+ y);
+
+
         }
         else{
             System.out.println("not found!!");

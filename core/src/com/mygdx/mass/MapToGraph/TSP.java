@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.mass.Agents.Agent;
 import com.mygdx.mass.BoxObject.Building;
+import com.mygdx.mass.BoxObject.HidingArea;
 import com.mygdx.mass.BoxObject.SentryTower;
 import com.mygdx.mass.BoxObject.Wall;
 import com.mygdx.mass.Data.MASS;
@@ -12,7 +13,9 @@ import com.mygdx.mass.Data.MASS;
 
 
 import java.awt.geom.Point2D;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TSP {
 
@@ -93,25 +96,30 @@ public class TSP {
         return false;
     }
     public boolean containsPoint(Agent agent, Vertex vertex){
+        if(vertex == null){
+            return false;
+        }
+        for (Wall wall : agent.getIndividualMap().getWalls()) {
+            if (wall.getRectangle().contains(vertex.getCoordinates())) {
+                return true;
+            }
+        }
         for (Building building : agent.getIndividualMap().getBuildings()) {
             if (building.getRectangle().contains(vertex.getCoordinates())) {
-
                 return true;
             }
         }
         for (SentryTower sentryTower : agent.getIndividualMap().getSentryTowers()) {
             if (sentryTower.getRectangle().contains(vertex.getCoordinates())) {
-
-                return true;
-            }
-        }
-        for (Wall wall : agent.getIndividualMap().getWalls()) {
-            if (wall.getRectangle().contains(vertex.getCoordinates())) {
-
                 return true;
             }
         }
         return false;
     }
+
+//    public HashMap<Agent, ArrayList<Vector2>> distribute(ArrayList<Agent> agents, ArrayList<Vector2>) {
+//        HashMap<Agent, ArrayList<Vector2>> distributions = new HashMap<Agent, ArrayList<Vector2>>();
+//        int nrOfAgents = distributions.size();
+//    }
 
 }

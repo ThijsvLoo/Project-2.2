@@ -72,25 +72,26 @@ public class MapFileReader extends JPanel implements Serializable{
                 if (res == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     filePath = file.getPath();
+                    try{
+                        File mapFile = new File(filePath);
+                        InputStream inStream = new FileInputStream(mapFile);
+                        ObjectInputStream fileObjectIn = new ObjectInputStream(inStream);
+                        mapData = (MapData) fileObjectIn.readObject();
+                        fileObjectIn.close();
+                        inStream.close();
+                        mass.getMap().clearMap();
+                        mapData.loadMap(mass);
+                    } catch(IOException e){
+                        System.out.println("IO error");
+                        e.printStackTrace();
+                    } catch(ClassNotFoundException e){
+                        System.out.println("Class not found");
+                        e.printStackTrace();
+                    }
                 }
 //            }
 //        }).start();
         // Loading Code
-        try{
-        	File mapFile = new File(filePath);
-            InputStream inStream = new FileInputStream(mapFile);
-			ObjectInputStream fileObjectIn = new ObjectInputStream(inStream);
-			mapData = (MapData) fileObjectIn.readObject();
-			fileObjectIn.close();
-			inStream.close();
-            mass.getMap().clearMap();
-            mapData.loadMap(mass);
-        } catch(IOException e){
-			System.out.println("IO error");
-			e.printStackTrace();
-        } catch(ClassNotFoundException e){
-			System.out.println("Class not found");
-			e.printStackTrace();
-        }
+
     }
 }

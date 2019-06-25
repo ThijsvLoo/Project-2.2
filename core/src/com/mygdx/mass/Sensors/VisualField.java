@@ -7,7 +7,7 @@ import com.mygdx.mass.World.WorldObject;
 
 public class VisualField {
 
-    public enum VisualFieldType {AGENT, BUILDING, TOWER};
+    public enum VisualFieldType {AGENT, BUILDING, TOWER, WALL};
     public VisualFieldType visualFieldType;
 
     protected Agent agent;
@@ -51,6 +51,15 @@ public class VisualField {
                 vertices[2] = new Vector2((float) Math.cos(Math.toRadians(-agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_TOWER, (float) Math.sin(Math.toRadians(-agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_TOWER);
                 fixtureDef.filter.categoryBits = WorldObject.VISUAL_FIELD_BIT;
                 fixtureDef.filter.maskBits = WorldObject.SENTRY_TOWER_BIT;
+                break;
+            }
+            case WALL: {
+                vertices = new Vector2[3];
+                vertices[0] = new Vector2(0, 0);
+                vertices[1] = new Vector2((float) Math.cos(Math.toRadians(agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_WALL, (float) Math.sin(Math.toRadians(agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_WALL);
+                vertices[2] = new Vector2((float) Math.cos(Math.toRadians(-agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_WALL, (float) Math.sin(Math.toRadians(-agent.getViewAngle()/2))*Agent.VISIBLE_DISTANCE_WALL);
+                fixtureDef.filter.categoryBits = WorldObject.VISUAL_FIELD_BIT;
+                fixtureDef.filter.maskBits = WorldObject.WALL_BIT;
                 break;
             }
         }

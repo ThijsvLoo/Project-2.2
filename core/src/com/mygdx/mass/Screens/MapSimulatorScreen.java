@@ -28,6 +28,7 @@ import com.mygdx.mass.World.IndividualMap;
 import com.mygdx.mass.World.Map;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
@@ -108,22 +109,26 @@ public class MapSimulatorScreen implements Screen {
             System.out.println("World speed cap reached! Lowering the world speed factor by 40% from "+oldSpeedFactor+" to "+worldSpeedFactor);
         }
 
-        accumulator += timePassed;
-        while (accumulator >= MASS.FIXED_TIME_STEP) {
-            for (int i = 0; i < worldSpeedFactor; i++) {
-                MapSimulatorInfo.resetRayCounters();
-                for (Guard guard : map.getGuards()) {
-                    guard.update(MASS.FIXED_TIME_STEP);
-                }
-                for (Intruder intruder : map.getIntruders()) {
-                    intruder.update(MASS.FIXED_TIME_STEP);
-                }
+        try {
+            accumulator += timePassed;
+            while (accumulator >= MASS.FIXED_TIME_STEP) {
+                for (int i = 0; i < worldSpeedFactor; i++) {
+                    MapSimulatorInfo.resetRayCounters();
+                    for (Guard guard : map.getGuards()) {
+                        guard.update(MASS.FIXED_TIME_STEP);
+                    }
+                    for (Intruder intruder : map.getIntruders()) {
+                        intruder.update(MASS.FIXED_TIME_STEP);
+                    }
 
-                world.step(MASS.FIXED_TIME_STEP, 6, 2);
-                simulationStep++;
-                simulationTime = simulationTime + MASS.FIXED_TIME_STEP;
+                    world.step(MASS.FIXED_TIME_STEP, 6, 2);
+                    simulationStep++;
+                    simulationTime = simulationTime + MASS.FIXED_TIME_STEP;
+                }
+                accumulator -= MASS.FIXED_TIME_STEP;
             }
-            accumulator -= MASS.FIXED_TIME_STEP;
+        } catch (ConcurrentModificationException c){
+//            System.out.println(c.getCause());
         }
 
         camera.update();
@@ -220,7 +225,7 @@ public class MapSimulatorScreen implements Screen {
         }
 
         //for test purpose
-        if(true) {
+        if(false) {
             if (Gdx.input.justTouched()) {
                 for (Agent agent : map.getAgents()) {
                     agent.getRoute().clear();
@@ -238,7 +243,7 @@ public class MapSimulatorScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | (Gdx.graphics.getBufferFormat().coverageSampling?GL20.GL_COVERAGE_BUFFER_BIT_NV:0)); //anti aliasing
 
         Gdx.gl.glLineWidth(1);
-//        debugRenderer.render(world, camera.combined);
+        debugRenderer.render(world, camera.combined);
 
         //draw the sprites
         drawSprites();
@@ -259,8 +264,8 @@ public class MapSimulatorScreen implements Screen {
 //        if (!map.getAgents().isEmpty()) {
 //            drawUnexploredPoints(map.getAgents().get(0));
 //        }
-/*
-        if (!map.getGuards().isEmpty()) {//for the sake of testing
+
+        if (!map.getGuards().isEmpty() && map.getGuards().get(0).getPredictionModel() != null) { //for the sake of testing
             if (!map.getGuards().isEmpty() && !map.getGuards().get(0).getPredictionModel().guardMoves.isEmpty()) {
                 for (PredictionPoint predictionPoint : map.getGuards().get(0).getPredictionModel().guardMoves) {
                     Gdx.gl.glLineWidth(4);
@@ -279,7 +284,7 @@ public class MapSimulatorScreen implements Screen {
                     shapeRenderer.end();
                 }
             }
-        }*/
+        }
 
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
@@ -459,7 +464,7 @@ public class MapSimulatorScreen implements Screen {
                     }
                 }
             }
-            if(agent.getAngleDistanceCloudPoints().size() > 0 && agent.getDrawGapSensor()) { System.out.println("REACHING");
+            if(agent.getAngleDistanceCloudPoints().size() > 0 && agent.getDrawGapSensor()) {
                 shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
                 if (agent.getRayCastFieldGapSensor().getTypeOfField().equalsIgnoreCase("GAP SENSOR")) {
                     shapeRenderer.setColor(0.0f,1.0f,1.0f,1.0f);
@@ -589,8 +594,8 @@ public class MapSimulatorScreen implements Screen {
                 intruder.goTo(coordinates);
             }
             for (Guard guard : map.getGuards()) {
-                guard.setDestination(null);
-                guard.getRoute().clear();
+//                guard.setDestination(null);
+//                guard.getRoute().clear();
             }
             return true;
         }

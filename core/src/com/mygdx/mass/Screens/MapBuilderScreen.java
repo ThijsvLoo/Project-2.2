@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -18,6 +19,7 @@ import com.mygdx.mass.Scenes.MapBuilderInfo;
 import com.mygdx.mass.Sensors.RayCastField;
 import com.mygdx.mass.World.Map;
 import com.mygdx.mass.Scenes.MapBuilderHUD;
+import org.w3c.dom.css.Rect;
 
 import static com.mygdx.mass.BoxObject.Door.State.CLOSED;
 
@@ -42,7 +44,7 @@ public class MapBuilderScreen implements Screen {
 
     private ShapeRenderer shapeRenderer;
 
-    private MapBuilderHUD hud;
+    public MapBuilderHUD hud;
     private MapBuilderInfo info;
 
     private InputMultiplexer inputMultiplexer;
@@ -50,6 +52,13 @@ public class MapBuilderScreen implements Screen {
 
     private Vector2 p1, p2, collision;
     private RayCastCallback callback;
+
+    public int count = 0;
+    public State randomState = MapBuilderScreen.State.BUILDING;
+    public int maxObjects = 20;
+    public int maxSize = 50;
+    public int numberOfObjects = (int) (Math.random() * maxObjects);
+
 
     public MapBuilderScreen(MASS mass) {
         this.mass = mass;
@@ -256,7 +265,13 @@ public class MapBuilderScreen implements Screen {
             if (rectangle.width > Door.SIZE && rectangle.height > Door.SIZE) {
                 shapeRenderer.setColor(0.0f, 1.0f, 1.0f, 1.0f);
                 for (BoxObject boxObject : map.getBoxObjects()) {
-                    if (boxObject.getRectangle().overlaps(rectangle)) {
+                    if (boxObject.getObjectType().equals(BoxObject.ObjectType.WALL) && boxObject.getRectangle().overlaps(rectangle)) {
+                        shapeRenderer.setColor(Color.RED);
+                        break;
+                    }
+//                    if (boxObject.getObjectType().equals(BoxObject.ObjectType.TARGET_AREA) && currentState == State.BUILDING))
+                    if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA &&
+                    !(boxObject.getObjectType().equals(BoxObject.ObjectType.TARGET_AREA) && currentState == State.BUILDING)){
                         shapeRenderer.setColor(Color.RED);
                         break;
                     }
@@ -478,7 +493,12 @@ public class MapBuilderScreen implements Screen {
                                                         Math.abs(startDrag.y - endDrag.y));
                     boolean overlap = false;
                     for (BoxObject boxObject : map.getBoxObjects()) {
-                        if (boxObject.getRectangle().overlaps(rectangle)) {
+                        if (boxObject.getObjectType().equals(BoxObject.ObjectType.WALL) && boxObject.getRectangle().overlaps(rectangle)){
+                            overlap = true;
+                            break;
+                        }
+                        if (boxObject.getRectangle().overlaps(rectangle) && currentState != State.TARGET_AREA &&
+                                !(boxObject.getObjectType().equals(BoxObject.ObjectType.TARGET_AREA) && currentState == State.BUILDING)) {
                             overlap = true;
                             break;
                         }
@@ -548,4 +568,236 @@ public class MapBuilderScreen implements Screen {
         return info;
     }
 
+    public void random() {
+        if(!randomState.equals(State.GUARD) && !randomState.equals(State.INTRUDER)) {
+            for (int i = 0; i < numberOfObjects; i++) {
+                int width = (int) (Math.random() * maxSize + Door.SIZE);
+                int height = (int) (Math.random() * maxSize + Door.SIZE);
+                int x = (int) (Math.random() * 200 - width);
+                int y = (int) (Math.random() * 200 - height);
+
+//        System.out.println(x);
+//        System.out.println(y);
+//        System.out.println(width);
+//        System.out.println(height);
+
+                Rectangle rectangle = new Rectangle(x, y, width, height);
+                boolean overlap = false;
+                if(randomState.equals(State.WALL)){
+                    if(rectangle.width > rectangle.height){
+//                                rectangle.height = (int) (Math.random() * 5 + Door.SIZE);
+                        rectangle.height = Wall.THICKNESS;
+                    } else {
+//                                rectangle.width = (int) (Math.random() * 5 + Door.SIZE);
+                        rectangle.width = Wall.THICKNESS;
+                    }
+                }
+
+                if (rectangle.x < 0 || rectangle.y < 0 || rectangle.x > 200 || rectangle.y > 200){
+                    overlap = true;
+                }
+
+                for (BoxObject boxObject : map.getBoxObjects()) {
+                    Rectangle bigOne = new Rectangle(rectangle.x - (Agent.SIZE * 4), rectangle.y - (Agent.SIZE * 4), rectangle.getWidth() + (Agent.SIZE * 8), rectangle.getHeight() + (Agent.SIZE * 8));
+                    if (boxObject.getObjectType().equals(BoxObject.ObjectType.WALL)
+                            && boxObject.getRectangle().overlaps(bigOne)) {
+                        overlap = true;
+                        break;
+                    }
+                    if (boxObject.getRectangle().overlaps(bigOne)
+                            && currentState != State.TARGET_AREA
+                            && !(boxObject.getObjectType().equals(BoxObject.ObjectType.TARGET_AREA) && currentState == State.BUILDING)) {
+                        overlap = true;
+                        break;
+                    }
+                }
+
+                if(overlap && randomState.equals(State.TARGET_AREA) && map.getTargetAreas().isEmpty()){
+                    random();
+                }
+
+                if (!overlap) {
+                    switch (randomState) {
+                        case WALL:
+                            if(rectangle.width > rectangle.height){
+//                                rectangle.height = (int) (Math.random() * 5 + Door.SIZE);
+                                rectangle.height = Wall.THICKNESS;
+                            } else {
+//                                rectangle.width = (int) (Math.random() * 5 + Door.SIZE);
+                                rectangle.width = Wall.THICKNESS;
+                            }
+                            map.addWall(rectangle);
+                            break;
+                        case BUILDING:
+                            map.addBuilding(rectangle);
+                            int numberOfDoors = (int) (Math.random() * 2 + 1);
+                            int failSafe = 0;
+                            while(map.getBuildings().get(map.getBuildings().size()-1).getDoors().size() < numberOfDoors) {
+                                generateEntrances(rectangle, BoxObject.ObjectType.DOOR);
+                                failSafe++;
+                                if (failSafe > numberOfDoors * 5){
+                                    break;
+                                }
+                            }
+
+                            int numberOfWindows = (int) (Math.random() * 3);
+//                            System.out.println(numberOfWindows);
+                            failSafe = 0;
+                            while(map.getBuildings().get(map.getBuildings().size()-1).getWindows().size() < numberOfWindows) {
+                                generateEntrances(rectangle, BoxObject.ObjectType.WINDOW);
+                                failSafe++;
+                                if (failSafe > numberOfWindows * 5){
+                                    break;
+                                }
+                            }
+                            break;
+                        case SENTRY_TOWER:
+                            map.addSentryTower(rectangle);
+                            break;
+                        case HIDING_AREA:
+                            map.addHidingArea(rectangle);
+                            break;
+                        case TARGET_AREA:
+                            map.addTargetArea(rectangle);
+                            break;
+                    }
+                }
+            }
+        }
+
+        if(randomState.equals(State.GUARD) || randomState.equals(State.INTRUDER)) {
+            int x = (int) (Math.random() * 190 + 5);
+            int y = (int) (Math.random() * 190 + 5);
+            Vector2 position = new Vector2(x, y);
+            boolean goodToGo = false;
+
+            while(goodToGo = false) {
+                boolean nope = false;
+                for (BoxObject object : map.getBoxObjects()) {
+                    if (object.getRectangle().contains(position) && !object.getObjectType().equals(BoxObject.ObjectType.BUILDING))
+                        x = (int) (Math.random() * 190 + 5);
+                        y = (int) (Math.random() * 190 + 5);
+                        position = new Vector2(x, y);
+                        nope = true;
+                    break;
+                }
+                if(nope = false){
+                    goodToGo = true;
+                }
+            }
+
+            if (inputHandler.insideMap(position)) {
+                switch (randomState) {
+                    case GUARD:
+                        map.addGuard(position);
+                        break;
+                    case INTRUDER:
+                        map.addIntruder(position);
+                        break;
+                }
+            }
+        }
+    }
+
+    public void random(State state){
+        this.randomState = state;
+        random();
+    }
+
+    public void generateMap(int maxObjects, int maxSize, int maxGuards){
+        mass.getMap().clearMap();
+        mass.getMap().addOuterWalls();
+
+        numberOfObjects = 1;
+        this.maxSize = 10;
+        random(State.TARGET_AREA);
+
+        this.maxObjects = maxObjects;
+        this.maxSize = maxSize;
+        numberOfObjects = (int) (Math.random() * maxObjects);
+
+        random(State.BUILDING);
+        random(State.WALL);
+        this.maxSize = 10;
+        random(State.HIDING_AREA);
+        random(State.SENTRY_TOWER);
+        random(State.INTRUDER);
+
+        int numGuards = maxGuards;
+//        if(maxGuards != 0) {
+//            numGuards = (int) (Math.random() * maxGuards + 1);
+//        }
+        for(int i = 0; i < numGuards; i++){
+            random(State.GUARD);
+        }
+//
+//        for(Wall wall : map.getWalls()){
+//            System.out.println(wall.getBody().getAngle());
+//        }
+    }
+
+    public void generateEntrances(Rectangle rectangle, BoxObject.ObjectType type){
+
+            boolean overlap = false;
+
+            Vector2 mouse = rectangle.getPosition(new Vector2());
+            float minGreyArea = Math.min(rectangle.getHeight(), rectangle.getWidth() / 1);
+            float maxGreyArea = Math.max(rectangle.getHeight(), rectangle.getWidth() / 1);
+            if (rectangle.getWidth() > rectangle.getHeight()) {
+                mouse.x += (int) (Math.random() * maxGreyArea);
+                mouse.y += (int) (Math.random() * minGreyArea);
+            } else {
+                mouse.x += (int) (Math.random() * minGreyArea);
+                mouse.y += (int) (Math.random() * maxGreyArea);
+            }
+
+            Vector2 pointA = mouse.x - rectangle.x < rectangle.width / 2 ? new Vector2(rectangle.x, mouse.y) : new Vector2(rectangle.x + rectangle.width, mouse.y);
+            Vector2 pointB = mouse.y - rectangle.y < rectangle.height / 2 ? new Vector2(mouse.x, rectangle.y) : new Vector2(mouse.x, rectangle.y + rectangle.height);
+            Vector2 nearest = mouse.dst(pointA) < mouse.dst(pointB) ? pointA : pointB;
+            if (nearest.equals(pointA)) {
+                Rectangle rect = new Rectangle(nearest.x - Door.THICKNESS / 2, nearest.y - Door.SIZE / 2, Door.THICKNESS, Door.SIZE);
+//                            building.addDoor(new Door(door)); //Should add a door object instead of rectangle
+                //need fix
+
+                for(Door door : map.getBuildings().get(map.getBuildings().size()-1).getDoors()){
+                    if (door.getRectangle().overlaps(rect)){
+                        overlap = true;
+                    }
+                }
+                for(Window window : map.getBuildings().get(map.getBuildings().size()-1).getWindows()){
+                    if (window.getRectangle().overlaps(rect)){
+                        overlap = true;
+                    }
+                }
+                if(!overlap) {
+                    if (type.equals(BoxObject.ObjectType.DOOR)){
+                        map.addDoor(rect);
+                    }
+                    if (type.equals(BoxObject.ObjectType.WINDOW)){
+                        map.addWindow(rect);
+                    }
+                }
+
+            } else if (nearest.equals(pointB)) {
+                Rectangle rect = (new Rectangle(nearest.x - Door.SIZE / 2, nearest.y - Door.THICKNESS / 2, Door.SIZE, Door.THICKNESS));
+                for(Door door : map.getBuildings().get(map.getBuildings().size()-1).getDoors()){
+                    if (door.getRectangle().overlaps(rect)){
+                        overlap = true;
+                    }
+                }
+                for(Window window : map.getBuildings().get(map.getBuildings().size()-1).getWindows()){
+                    if (window.getRectangle().overlaps(rect)){
+                        overlap = true;
+                    }
+                }
+                if(!overlap) {
+                    if (type.equals(BoxObject.ObjectType.DOOR)){
+                        map.addDoor(rect);
+                    }
+                    if (type.equals(BoxObject.ObjectType.WINDOW)){
+                        map.addWindow(rect);
+                    }                }
+            }
+
+        }
 }
