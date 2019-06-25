@@ -187,13 +187,12 @@ public class MapSimulatorHUD implements Disposable {
 
         reloadBox = new SelectBox<Refresh>(new Skin(Gdx.files.internal("glassy/glassyui/glassy-ui.json")));
         reloadBox.setItems(Refresh.values());
-        for (Intruder i : mass.getMap().getIntruders()) {
-            reloadBox.setSelected(null);
-        }
+        reloadBox.setSelected(Refresh.NEW_MAP);
+        currentRefresh = reloadBox.getSelected();
         reloadBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                currentRefresh=reloadBox.getSelected();
+                currentRefresh = reloadBox.getSelected();
             }
         });
 

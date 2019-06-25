@@ -666,8 +666,8 @@ public class MapBuilderScreen implements Screen {
         }
 
         if(randomState.equals(State.GUARD) || randomState.equals(State.INTRUDER)) {
-            int x = (int) (Math.random() * 199);
-            int y = (int) (Math.random() * 199);
+            int x = (int) (Math.random() * 190 + 5);
+            int y = (int) (Math.random() * 190 + 5);
             Vector2 position = new Vector2(x, y);
             boolean goodToGo = false;
 
@@ -675,8 +675,8 @@ public class MapBuilderScreen implements Screen {
                 boolean nope = false;
                 for (BoxObject object : map.getBoxObjects()) {
                     if (object.getRectangle().contains(position) && !object.getObjectType().equals(BoxObject.ObjectType.BUILDING))
-                        x = (int) (Math.random() * 199 + 1);
-                        y = (int) (Math.random() * 199 + 1);
+                        x = (int) (Math.random() * 190 + 5);
+                        y = (int) (Math.random() * 190 + 5);
                         position = new Vector2(x, y);
                         nope = true;
                     break;
@@ -724,9 +724,9 @@ public class MapBuilderScreen implements Screen {
         random(State.INTRUDER);
 
         int numGuards = maxGuards;
-        if(maxGuards != 0) {
-            numGuards = (int) (Math.random() * maxGuards + 1);
-        }
+//        if(maxGuards != 0) {
+//            numGuards = (int) (Math.random() * maxGuards + 1);
+//        }
         for(int i = 0; i < numGuards; i++){
             random(State.GUARD);
         }
