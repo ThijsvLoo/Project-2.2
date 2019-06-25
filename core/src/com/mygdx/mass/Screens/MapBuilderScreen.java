@@ -675,15 +675,14 @@ public class MapBuilderScreen implements Screen {
                 boolean nope = false;
                 for (BoxObject object : map.getBoxObjects()) {
                     if (object.getRectangle().contains(position) && !object.getObjectType().equals(BoxObject.ObjectType.BUILDING))
+                        x = (int) (Math.random() * 199 + 1);
+                        y = (int) (Math.random() * 199 + 1);
+                        position = new Vector2(x, y);
                         nope = true;
                     break;
                 }
                 if(nope = false){
                     goodToGo = true;
-                } else {
-                    x = (int) (Math.random() * 199 + 1);
-                    y = (int) (Math.random() * 199 + 1);
-                    position = new Vector2(x, y);
                 }
             }
 

@@ -128,7 +128,8 @@ public class MapSimulatorScreen implements Screen {
                 accumulator -= MASS.FIXED_TIME_STEP;
             }
         } catch (ConcurrentModificationException c){
-            System.out.println(c.getMessage());
+            System.out.println(c.getMessage().toString());
+            System.out.println(c.getCause().toString());
         }
 
         camera.update();

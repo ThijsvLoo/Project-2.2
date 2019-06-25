@@ -30,7 +30,7 @@ public class Chart {
         errorBar.add(0);
 
 // Customize Chart
-        chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNE);
+        chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);
         chart.getStyler().setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Area);
 
 // Series
@@ -40,6 +40,7 @@ public class Chart {
         } catch (Exception e){
             System.out.println(e.toString());
         }
+
 // Schedule a job for the event-dispatching thread:
 // creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -84,6 +85,7 @@ public class Chart {
             }
             guardWins.add(guardWins.get(guardWins.size() - 1) + 1);
         }
+
 
         chart.updateXYSeries("Guard Wins", xAxis, guardWins, errorBar);
         chart.updateXYSeries("Intruder Wins", xAxis, intruderWins, errorBar);
